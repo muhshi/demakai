@@ -12,4 +12,9 @@ class KBJI2014 extends Model
 
     // Bebasin dulu, nanti kamu rapikan sesuai field sebenarnya
     protected $guarded = [];
+    protected $casts = [
+        'lv' => 'integer',
+        'last' => 'boolean',
+        'contoh_lapangan' => 'array',  // tambahkan juga di KBJI
+    ];
 }

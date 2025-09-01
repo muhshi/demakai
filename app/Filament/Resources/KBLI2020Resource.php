@@ -23,18 +23,37 @@ class KBLI2020Resource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            // Field yang sudah ada...
             Forms\Components\TextInput::make('kode_5_digit')
-                ->label('Kode 5 Digit')->required()->maxLength(10),
+                ->label('Kode 5 Digit')
+                ->required()
+                ->disabled()
+                ->maxLength(10),
             Forms\Components\TextInput::make('judul')
-                ->label('Judul')->required()->maxLength(300),
+                ->label('Judul')
+                ->required()
+                ->disabled()
+                ->maxLength(300),
             Forms\Components\Textarea::make('deskripsi')
-                ->label('Deskripsi')->rows(8),
-            Forms\Components\TextInput::make('sektor')
-                ->maxLength(5),
-            Forms\Components\TextInput::make('id')
-                ->numeric()->label('ID (opsional)')->columnSpan(1),
-            Forms\Components\TextInput::make('kode_4_digit_id')
-                ->numeric()->label('Kode 4 Digit ID')->columnSpan(1),
+                ->label('Deskripsi')
+                ->disabled()
+                ->rows(6),
+
+            // 🔹 Field baru:
+            Forms\Components\TagsInput::make('contoh_lapangan')
+                ->label('Contoh Lapangan')
+                ->placeholder('Tambah contoh lalu Enter')
+                ->reorderable()
+                ->separator(','),
+
+            // Forms\Components\Textarea::make('catatan_internal')
+            //     ->label('Catatan Internal')
+            //     ->rows(4),
+
+            Forms\Components\TextInput::make('last_updated_by')
+                ->label('Diupdate oleh')
+                ->disabled()
+                ->maxLength(50),
         ])->columns(2);
     }
 
@@ -65,7 +84,7 @@ class KBLI2020Resource extends Resource
     {
         return [
             'index' => Pages\ListKBLI2020s::route('/'),
-            'create' => Pages\CreateKBLI2020::route('/create'),
+            //'create' => Pages\CreateKBLI2020::route('/create'),
             'edit' => Pages\EditKBLI2020::route('/{record}/edit'),
         ];
     }

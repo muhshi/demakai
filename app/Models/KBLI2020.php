@@ -17,6 +17,7 @@ class KBLI2020 extends Model
     protected $casts = [
         'id' => 'integer',
         'kode_4_digit_id' => 'integer',
+        'contoh_lapangan' => 'array',
     ];
 
     // (opsional, tapi aman) tegaskan primary key ObjectId

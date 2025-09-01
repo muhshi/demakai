@@ -23,39 +23,67 @@ class KBJI2014Resource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('title')->label('Judul/Jabatan')->required()->maxLength(300),
-            Forms\Components\Textarea::make('desc')->label('Deskripsi')->rows(8),
-            Forms\Components\TextInput::make('id')->maxLength(50),
-            Forms\Components\TextInput::make('fid')->maxLength(50),
-            Forms\Components\TextInput::make('parent_id')->maxLength(50),
-            Forms\Components\TextInput::make('parent_fid')->maxLength(50),
-            Forms\Components\TextInput::make('lv')->numeric(),
-            Forms\Components\Toggle::make('last')->label('Leaf?'),
-        ])->columns(2);
+            Forms\Components\TextInput::make('kode_kbji')
+                ->label('KBJI')->disabled()->dehydrated(false),
+            Forms\Components\TextInput::make('title')
+                ->label('Judul')->disabled()->dehydrated(false),
+            Forms\Components\Textarea::make('desc')
+                ->label('Deskripsi')->disabled()->dehydrated(false),
+
+            Forms\Components\TagsInput::make('contoh_lapangan')
+                ->label('Contoh Lapangan')
+                ->separator(';')
+                ->placeholder('Tambah contoh lalu Enter'),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('Jabatan')->searchable()->wrap()->limit(60),
-                Tables\Columns\TextColumn::make('fid')->toggleable(),
-                Tables\Columns\TextColumn::make('parent_fid')->toggleable(),
-                Tables\Columns\BadgeColumn::make('lv')->label('Level')->color('info'),
-                Tables\Columns\IconColumn::make('last')->boolean()->label('Leaf'),
-                Tables\Columns\TextColumn::make('desc')->label('Deskripsi')->wrap()->limit(120)->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('kode_kbji')
+                    ->label('KBJI')
+                    ->formatStateUsing(
+                        fn($state) => strlen((string) $state) > 4
+                        ? substr((string) $state, -4)
+                        : $state
+                    )
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Judul')
+                    ->wrap()
+                    ->limit(80)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('desc')
+                    ->label('Deskripsi')
+                    ->wrap()
+                    ->limit(150)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->searchable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('lv')->options([0 => '0', 1 => '1', 2 => '2', 3 => '3']),
-                Tables\Filters\TernaryFilter::make('last')->label('Leaf'),
+                Tables\Filters\TernaryFilter::make('only4digit')
+                    ->label('Hanya 4 digit')
+                    ->queries(
+                        true: fn($q) => $q->where('lv', 3),
+                        false: fn($q) => $q, // semua
+                        blank: fn($q) => $q,
+                    ),
             ])
-            ->defaultSort('lv')
+            ->defaultSort('kode_kbji')
             ->paginated([25, 50, 100]);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['title', 'desc', 'fid', 'parent_fid', 'id'];
+        return ['title', 'desc', 'fid', 'kode_kbji', 'parent_fid', 'id'];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        // hanya tampilkan unit group (4 digit)
+        return parent::getEloquentQuery()->where('lv', 3);
     }
 
     public static function getPages(): array
