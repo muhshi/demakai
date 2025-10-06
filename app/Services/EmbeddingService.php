@@ -9,7 +9,7 @@ class EmbeddingService
     public function embedText(string $text): array
     {
         $resp = Http::post(env('OLLAMA_BASE_URL').'/api/embeddings', [
-            'model'  => env('OLLAMA_MODEL', 'nomic-embed-text'),
+            'model'  => env('OLLAMA_MODEL', 'bge-m3'),
             'prompt' => $text,
         ]);
 
