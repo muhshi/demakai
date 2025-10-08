@@ -8,17 +8,36 @@ class EmbeddingService
 {
     public function embedText(string $text): array
     {
-        $resp = Http::post(env('OLLAMA_BASE_URL').'/api/embeddings', [
-            'model'  => env('OLLAMA_MODEL', 'bge-m3'),
-            'prompt' => $text,
-        ]);
-
-
-        if (!$resp->successful()) {
-            throw new \RuntimeException('Embedding failed: '.$resp->status().' '.$resp->body());
+        if (trim($text) === '') {
+            return [];
         }
 
-        return $resp->json('embedding') ?? [];
+        $resp = Http::timeout(60)->post(env('OLLAMA_BASE_URL') . '/api/embeddings', [
+            'model'  => env('OLLAMA_MODEL', 'bge-m3'),
+            'prompt' => mb_substr($text, 0, 4000), // batasi panjang biar aman
+        ]);
+
+        if (!$resp->successful()) {
+            throw new \RuntimeException('Embedding failed: ' . $resp->status() . ' ' . $resp->body());
+        }
+
+        $data = $resp->json();
+
+        // ✅ jika embedding sudah array numerik
+        if (isset($data['embedding']) && is_array($data['embedding'])) {
+            return array_map('floatval', $data['embedding']);
+        }
+
+        // ✅ jika embedding berupa string JSON
+        if (isset($data['embedding']) && is_string($data['embedding'])) {
+            $decoded = json_decode($data['embedding'], true);
+            if (is_array($decoded)) {
+                return array_map('floatval', $decoded);
+            }
+        }
+
+        // fallback kosong
+        return [];
     }
 
     public function cosineSimilarity(array $a, array $b): float

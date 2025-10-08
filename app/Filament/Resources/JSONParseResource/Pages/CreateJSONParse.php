@@ -70,7 +70,7 @@ class CreateJSONParse extends CreateRecord
         }
     }
 
-    /** Saat simpan → plain text untuk embedding + metadata lengkap */
+    /** Simpan dokumen + proses embedding */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         try {
