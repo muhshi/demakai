@@ -6,40 +6,47 @@ use Illuminate\Support\Facades\Http;
 
 class EmbeddingService
 {
+    /**
+     * Generate embedding dari Ollama (bge-m3 default)
+     */
     public function embedText(string $text): array
     {
-        if (trim($text) === '') {
-            return [];
-        }
+        // Potong teks terlalu panjang agar tidak overload
+        $text = mb_substr($text, 0, 2000, 'UTF-8');
 
-        $resp = Http::timeout(60)->post(env('OLLAMA_BASE_URL') . '/api/embeddings', [
+        $resp = Http::timeout(30)->post(env('OLLAMA_BASE_URL') . '/api/embeddings', [
             'model'  => env('OLLAMA_MODEL', 'bge-m3'),
-            'prompt' => mb_substr($text, 0, 4000), // batasi panjang biar aman
+            'prompt' => $text,
         ]);
 
         if (!$resp->successful()) {
             throw new \RuntimeException('Embedding failed: ' . $resp->status() . ' ' . $resp->body());
         }
 
-        $data = $resp->json();
+        $embedding = $resp->json('embedding') ?? [];
 
-        // ✅ jika embedding sudah array numerik
-        if (isset($data['embedding']) && is_array($data['embedding'])) {
-            return array_map('floatval', $data['embedding']);
+        // pastikan array float numerik
+        if (is_string($embedding)) {
+            $embedding = json_decode($embedding, true);
         }
+        $embedding = array_map('floatval', (array) $embedding);
 
-        // ✅ jika embedding berupa string JSON
-        if (isset($data['embedding']) && is_string($data['embedding'])) {
-            $decoded = json_decode($data['embedding'], true);
-            if (is_array($decoded)) {
-                return array_map('floatval', $decoded);
-            }
-        }
-
-        // fallback kosong
-        return [];
+        // normalisasi L2 (penting untuk cosine similarity yang adil)
+        return $this->normalize($embedding);
     }
 
+    /**
+     * Normalisasi vektor ke unit length (L2 normalization)
+     */
+    private function normalize(array $vec): array
+    {
+        $norm = sqrt(array_sum(array_map(fn($x) => $x * $x, $vec)));
+        return $norm > 0 ? array_map(fn($x) => $x / $norm, $vec) : $vec;
+    }
+
+    /**
+     * Hitung cosine similarity antar dua vektor
+     */
     public function cosineSimilarity(array $a, array $b): float
     {
         $len = min(count($a), count($b));
@@ -51,7 +58,8 @@ class EmbeddingService
             $na  += $a[$i] ** 2;
             $nb  += $b[$i] ** 2;
         }
+
         $den = sqrt($na) * sqrt($nb);
-        return $den > 0 ? ($dot / $den) : 0.0;
+        return $den > 0 ? $dot / $den : 0.0;
     }
 }

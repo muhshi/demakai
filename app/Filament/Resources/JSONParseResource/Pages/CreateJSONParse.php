@@ -102,8 +102,22 @@ class CreateJSONParse extends CreateRecord
             // plain text → embedding
             $parsedText = $tika->parseFile($filePath);
 
-            // chunking
-            $chunks = $this->chunkText($parsedText, 800);
+            // 🧹 Pembersihan teks selektif
+            $parsedText = preg_replace([
+                '/h\s*t\s*t\s*p\s*s?\s*[:]\s*\/\s*\/\s*[\w\-.]+/i',   // hapus URL rusak
+                '/b\s*p\s*s\s*\.\s*g\s*o\s*\.\s*i\s*d/i',             // hapus bps.go.id terpisah
+                '/(Katalog\s*BPS|ISSN|Vol\.?|Nomor\s*Publikasi|Halaman\s+[xivlcdm]+)/i',
+                '/(DAFTAR\s+ISI|Lampiran|Gambar\s+[0-9]+|Tabel\s+[0-9]+)/i', // daftar isi
+            ], ' ', $parsedText);
+
+            // ⚖️ jangan hapus kata "Demak", "Kabupaten", "BPS", dll
+            $parsedText = preg_replace('/[^a-zA-Z0-9\s.,;:%()-]/u', ' ', $parsedText);
+            $parsedText = preg_replace('/\s+/', ' ', $parsedText);
+            $parsedText = trim($parsedText);
+
+
+            // 📏 Dynamic chunking antara 1000–1500 karakter
+            $chunks = $this->chunkTextDynamic($parsedText, 1000, 2000);
 
             // embedding tiap chunk
             $embed = app(EmbeddingService::class);
@@ -111,6 +125,11 @@ class CreateJSONParse extends CreateRecord
             foreach ($chunks as $i => $chunk) {
                 try {
                     $embedding = $embed->embedText($chunk);
+                    
+                    // pastikan array float
+                    if (is_string($embedding)) {
+                        $embedding = array_map('floatval', (array)$embedding, true);
+                    }
 
                     $chunkData[] = [
                         'chunk_id'  => $i,
@@ -187,19 +206,28 @@ class CreateJSONParse extends CreateRecord
         return \App\Filament\Resources\DocumentResource::getUrl('index');
     }
 
-    private function chunkText(string $text, int $maxChars = 800): array
+    /** Chunking natural berbasis kalimat */
+    private function chunkTextDynamic(string $text, int $maxChars = 2000): array
     {
-        $words = preg_split('/\s+/', $text ?? '', -1, PREG_SPLIT_NO_EMPTY);
-        $chunks = []; $buf = '';
-        foreach ($words as $w) {
-            if (mb_strlen($buf . ' ' . $w, 'UTF-8') > $maxChars) {
-                if ($buf !== '') $chunks[] = trim($buf);
-                $buf = $w;
+        $sentences = preg_split('/(?<=[.?!;])\s+/', $text);
+        $chunks = [];
+        $buf = '';
+
+        foreach ($sentences as $s) {
+            $s = trim($s);
+            if ($s === '') continue;
+
+            if (mb_strlen($buf . ' ' . $s, 'UTF-8') > $maxChars) {
+                $chunks[] = trim($buf);
+                $buf = $s;
             } else {
-                $buf = $buf === '' ? $w : $buf . ' ' . $w;
+                $buf .= ' ' . $s;
             }
         }
+
         if ($buf !== '') $chunks[] = trim($buf);
-        return $chunks ?: [''];
+        return array_values(array_filter($chunks, fn($c) => mb_strlen($c, 'UTF-8') > 100));
     }
+
+
 }
