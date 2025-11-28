@@ -42,9 +42,7 @@ class ListKBJI2014s extends ListRecords
                             'application/vnd.ms-excel',
                             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         ]),
-                    Toggle::make('append')
-                        ->label('Tambah (append) ke contoh_lapangan yang sudah ada?')
-                        ->default(true),
+                    // Toggle append dihapus, default behavior sekarang selalu append
                     TextInput::make('delimiter')
                         ->label('Pemisah multi-contoh di satu sel')
                         ->helperText('Jika satu sel berisi beberapa contoh, pisahkan dengan tanda ini. Mis: ;')
@@ -55,8 +53,8 @@ class ListKBJI2014s extends ListRecords
                     try {
                         $path = Storage::disk('public')->path($data['file']);
                         $delimiter = $data['delimiter'] ?: ';';
-                        $append = (bool) ($data['append'] ?? true);
-
+                        $append = true; // Selalu append
+        
                         $spreadsheet = IOFactory::load($path);
                         $sheet = $spreadsheet->getActiveSheet();
                         $rows = $sheet->toArray(null, true, true, true);
