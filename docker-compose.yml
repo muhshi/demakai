@@ -1,0 +1,40 @@
+services:
+  demakai-franken:
+    container_name: demakai-franken
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - SERVER_NAME=:80
+    ports:
+      - "8003:80"
+    volumes:
+      - ".:/app"
+    networks:
+      - ai_net
+
+  demakai-worker:
+    container_name: demakai-worker
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_ENV=production
+      - QUEUE_CONNECTION=database
+    command: "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
+    volumes:
+      - ".:/app"
+    networks:
+      - ai_net
+
+networks:
+  ai_net:
+    external: true
