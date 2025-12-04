@@ -63,10 +63,16 @@ class KBLI2020Resource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('kode_5_digit')
                     ->label('Kode')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('judul')
-                    ->searchable()->wrap()->limit(60),
                 Tables\Columns\TextColumn::make('sektor')
                     ->badge()->color('info')->toggleable(),
+                Tables\Columns\TextColumn::make('judul')
+                    ->searchable()->wrap()->limit(60),
+                Tables\Columns\TextColumn::make('contoh_lapangan')
+                    ->label('Contoh Lapangan')
+                    ->wrap()
+                    ->limit(150)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('deskripsi')
                     ->wrap()->limit(120)
                     ->toggleable(isToggledHiddenByDefault: true),

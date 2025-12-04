@@ -61,6 +61,12 @@ class KBJI2014Resource extends Resource
                     ->limit(150)
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('contoh_lapangan')
+                    ->label('Contoh Lapangan')
+                    ->wrap()
+                    ->limit(150)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->searchable(),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('only4digit')
