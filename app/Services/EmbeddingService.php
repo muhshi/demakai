@@ -9,30 +9,41 @@ class EmbeddingService
     /**
      * Generate embedding dari Ollama (bge-m3 default)
      */
+    /**
+     * Generate embedding dari Gemini (text-embedding-004)
+     */
     public function embedText(string $text): array
     {
-        // Potong teks terlalu panjang agar tidak overload
-        $text = mb_substr($text, 0, 2000, 'UTF-8');
+        // Potong teks terlalu panjang agar tidak overload (Gemini limit 2048 token, aman di 8000 char)
+        $text = mb_substr($text, 0, 8000, 'UTF-8');
+        $apiKey = env('GEMINI_API_KEY');
 
-        $resp = Http::timeout(30)->post(env('OLLAMA_BASE_URL') . '/api/embeddings', [
-            'model'  => env('OLLAMA_MODEL', 'bge-m3'),
-            'prompt' => $text,
-        ]);
-
-        if (!$resp->successful()) {
-            throw new \RuntimeException('Embedding failed: ' . $resp->status() . ' ' . $resp->body());
+        if (empty($apiKey)) {
+            throw new \RuntimeException('GEMINI_API_KEY is missing in .env');
         }
 
-        $embedding = $resp->json('embedding') ?? [];
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
+                    'model' => 'models/text-embedding-004',
+                    'content' => [
+                        'parts' => [
+                            ['text' => $text]
+                        ]
+                    ]
+                ]);
 
-        // pastikan array float numerik
-        if (is_string($embedding)) {
-            $embedding = json_decode($embedding, true);
+        if ($response->failed()) {
+            throw new \RuntimeException('Gemini API Error: ' . $response->body());
         }
-        $embedding = array_map('floatval', (array) $embedding);
 
-        // normalisasi L2 (penting untuk cosine similarity yang adil)
-        return $this->normalize($embedding);
+        $embedding = $response->json('embedding.values');
+
+        if (empty($embedding)) {
+            throw new \RuntimeException('No embedding returned from Gemini API');
+        }
+
+        return $embedding; // Gemini embeddings are already normalized usually, but can re-normalize if needed
     }
 
     /**
@@ -50,13 +61,16 @@ class EmbeddingService
     public function cosineSimilarity(array $a, array $b): float
     {
         $len = min(count($a), count($b));
-        if ($len === 0) return 0.0;
+        if ($len === 0)
+            return 0.0;
 
-        $dot = 0.0; $na = 0.0; $nb = 0.0;
+        $dot = 0.0;
+        $na = 0.0;
+        $nb = 0.0;
         for ($i = 0; $i < $len; $i++) {
             $dot += $a[$i] * $b[$i];
-            $na  += $a[$i] ** 2;
-            $nb  += $b[$i] ** 2;
+            $na += $a[$i] ** 2;
+            $nb += $b[$i] ** 2;
         }
 
         $den = sqrt($na) * sqrt($nb);

@@ -33,6 +33,15 @@ services:
     networks:
       - postgres-stack_ai_net
 
+  tika:
+    image: apache/tika:latest
+    container_name: demakai-tika
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    networks:
+      - postgres-stack_ai_net
+
 networks:
   postgres-stack_ai_net:
     external: true
