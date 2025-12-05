@@ -13,10 +13,9 @@ services:
       - SERVER_NAME=:80
     ports:
       - "8003:80"
-    volumes:
-      - ".:/app"
+    # Removed volume bind mount for production to use built image code
     networks:
-      - ai_net
+      - postgres-stack_ai_net
 
   demakai-worker:
     container_name: demakai-worker
@@ -30,11 +29,10 @@ services:
       - APP_ENV=production
       - QUEUE_CONNECTION=database
     command: "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
-    volumes:
-      - ".:/app"
+    # Removed volume bind mount for production
     networks:
-      - ai_net
+      - postgres-stack_ai_net
 
 networks:
-  ai_net:
+  postgres-stack_ai_net:
     external: true
