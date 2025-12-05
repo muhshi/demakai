@@ -31,8 +31,9 @@ COPY . /app
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Set permissions
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
-    && chmod -R 775 /app/storage /app/bootstrap/cache
+RUN touch /app/database/database.sqlite \
+    && chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/database \
+    && chmod -R 775 /app/storage /app/bootstrap/cache /app/database
 
 # Copy Caddyfile
 COPY Caddyfile /etc/caddy/Caddyfile
