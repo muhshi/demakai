@@ -13,7 +13,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ListKBLI2020s extends ListRecords // ← pastikan 's' kecil, sama seperti di Resource
+class ListKBLI2020s extends ListRecords // ← pastikan 's' 
 {
     protected static string $resource = KBLI2020Resource::class;
 
