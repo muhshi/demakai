@@ -30,7 +30,7 @@ class GenerateEmbeddings extends Command
     {
         $limit = $this->option('limit');
         $delay = (int) $this->option('delay');
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.api_key');
 
         if (empty($apiKey)) {
             $this->error('GEMINI_API_KEY is missing in .env');

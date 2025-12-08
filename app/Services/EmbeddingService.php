@@ -16,7 +16,7 @@ class EmbeddingService
     {
         // Potong teks terlalu panjang agar tidak overload (Gemini limit 2048 token, aman di 8000 char)
         $text = mb_substr($text, 0, 8000, 'UTF-8');
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.gemini.api_key');
 
         if (empty($apiKey)) {
             throw new \RuntimeException('GEMINI_API_KEY is missing in .env');

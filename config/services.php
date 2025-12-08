@@ -32,12 +32,16 @@ return [
     ],
 
     'tika' => [
-    'base_url' => env('TIKA_BASE_URL', 'http://localhost:9999'),
+        'base_url' => env('TIKA_BASE_URL', 'http://localhost:9999'),
     ],
 
     'ollama' => [
         'base_url' => env('OLLAMA_BASE_URL', 'http://127.0.0.1:11434'),
-        'model'    => env('OLLAMA_MODEL', 'bge-m3'),
+        'model' => env('OLLAMA_MODEL', 'bge-m3'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
     ],
 
 ];
