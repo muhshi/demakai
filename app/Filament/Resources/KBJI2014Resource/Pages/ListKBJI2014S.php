@@ -13,7 +13,7 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ListKBJI2014s extends ListRecords
+class ListKBJI2014s extends ListRecords //
 {
     protected static string $resource = KBJI2014Resource::class;
 
