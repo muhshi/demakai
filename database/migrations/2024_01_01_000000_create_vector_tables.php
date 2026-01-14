@@ -12,37 +12,41 @@ return new class extends Migration {
         // Enable pgvector extension
         DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS vector');
 
-        Schema::connection('pgsql')->create('kbli2020s', function (Blueprint $table) {
-            $table->id();
-            $table->string('sumber')->nullable();
-            $table->string('kode')->nullable()->index();
-            $table->text('judul')->nullable();
-            $table->text('deskripsi')->nullable();
-            $table->jsonb('contoh_lapangan')->nullable();
-            $table->string('level')->nullable();
-            $table->boolean('is_leaf')->default(false);
-            $table->string('sektor')->nullable();
-            $table->string('mongo_id')->nullable();
-            $table->text('payload')->nullable();
-            $table->vector('embedding', 768)->nullable(); // Gemini text-embedding-004 dimension
-            $table->string('embed_hash')->nullable();
-        });
+        if (!Schema::connection('pgsql')->hasTable('kbli2020s')) {
+            Schema::connection('pgsql')->create('kbli2020s', function (Blueprint $table) {
+                $table->id();
+                $table->string('sumber')->nullable();
+                $table->string('kode')->nullable()->index();
+                $table->text('judul')->nullable();
+                $table->text('deskripsi')->nullable();
+                $table->jsonb('contoh_lapangan')->nullable();
+                $table->string('level')->nullable();
+                $table->boolean('is_leaf')->default(false);
+                $table->string('sektor')->nullable();
+                $table->string('mongo_id')->nullable();
+                $table->text('payload')->nullable();
+                $table->vector('embedding', 768)->nullable(); // Gemini text-embedding-004 dimension
+                $table->string('embed_hash')->nullable();
+            });
+        }
 
-        Schema::connection('pgsql')->create('kbji2014s', function (Blueprint $table) {
-            $table->id();
-            $table->string('sumber')->nullable();
-            $table->string('kode')->nullable()->index();
-            $table->text('judul')->nullable();
-            $table->text('deskripsi')->nullable();
-            $table->jsonb('contoh_lapangan')->nullable();
-            $table->string('level')->nullable();
-            $table->boolean('is_leaf')->default(false);
-            $table->string('sektor')->nullable();
-            $table->string('mongo_id')->nullable();
-            $table->text('payload')->nullable();
-            $table->vector('embedding', 768)->nullable(); // Gemini text-embedding-004 dimension
-            $table->string('embed_hash')->nullable();
-        });
+        if (!Schema::connection('pgsql')->hasTable('kbji2014s')) {
+            Schema::connection('pgsql')->create('kbji2014s', function (Blueprint $table) {
+                $table->id();
+                $table->string('sumber')->nullable();
+                $table->string('kode')->nullable()->index();
+                $table->text('judul')->nullable();
+                $table->text('deskripsi')->nullable();
+                $table->jsonb('contoh_lapangan')->nullable();
+                $table->string('level')->nullable();
+                $table->boolean('is_leaf')->default(false);
+                $table->string('sektor')->nullable();
+                $table->string('mongo_id')->nullable();
+                $table->text('payload')->nullable();
+                $table->vector('embedding', 768)->nullable(); // Gemini text-embedding-004 dimension
+                $table->string('embed_hash')->nullable();
+            });
+        }
     }
 
     public function down(): void

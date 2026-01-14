@@ -1,0 +1,29 @@
+
+   INFO  Running migrations.  
+
+  2024_01_01_000000_create_vector_tables  325.89ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42P07]: Duplicate table: 7 ERROR:  relation "kbli2020s" already exists (Connection: pgsql, SQL: create table "kbli2020s" ("id" bigserial not null primary key, "sumber" varchar(255) null, "kode" varchar(255) null, "judul" text null, "deskripsi" text null, "contoh_lapangan" jsonb null, "level" varchar(255) null, "is_leaf" boolean not null default '0', "sektor" varchar(255) null, "mongo_id" varchar(255) null, "payload" text null, "embedding" vector(768) null, "embed_hash" varchar(255) null))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:825
+    821▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    822▕                 );
+    823▕             }
+    824▕ 
+  ➜ 825▕             throw new QueryException(
+    826▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    827▕             );
+    828▕         }
+    829▕     }
+
+      [2m+8 vendor frames [22m
+
+  9   database/migrations/2024_01_01_000000_create_vector_tables.php:15
+      Illuminate\Database\Schema\Builder::create("kbli2020s", Object(Closure))
+      [2m+27 vendor frames [22m
+
+  37  artisan:13
+      Illuminate\Foundation\Application::handleCommand(Object(Symfony\Component\Console\Input\ArgvInput))
+

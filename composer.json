@@ -61,7 +61,9 @@
             "dev-master": "11.x-dev"
         },
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "pgvector/pgvector"
+            ]
         }
     },
     "config": {
