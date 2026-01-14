@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2020;
+use App\Models\PgKBLI2025;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -39,6 +40,9 @@ class GenerateEmbeddings extends Command
 
         $this->info('Generating embeddings for KBLI2020 using Gemini...');
         $this->processModel(PgKBLI2020::class, $apiKey, $limit, $delay);
+
+        $this->info('Generating embeddings for KBLI2025 using Gemini...');
+        $this->processModel(PgKBLI2025::class, $apiKey, $limit, $delay);
 
         $this->info('Generating embeddings for KBJI2014 using Gemini...');
         $this->processModel(PgKBJI2014::class, $apiKey, $limit, $delay);

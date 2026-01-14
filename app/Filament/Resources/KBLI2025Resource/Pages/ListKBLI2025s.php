@@ -1,30 +1,29 @@
 <?php
 
-namespace App\Filament\Resources\KBLI2020Resource\Pages;
+namespace App\Filament\Resources\KBLI2025Resource\Pages;
 
-use App\Filament\Resources\KBLI2020Resource;
-use App\Models\KBLI2020;
+use App\Filament\Resources\KBLI2025Resource;
+use App\Models\KBLI2025;
 use Filament\Actions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ListKBLI2020s extends ListRecords // ← pastikan 's' 
+class ListKBLI2025s extends ListRecords
 {
-    protected static string $resource = KBLI2020Resource::class;
+    protected static string $resource = KBLI2025Resource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             // 📥 Download Template
             Actions\Action::make('downloadTemplate')
-                ->label('Download Template KBLI')
+                ->label('Download Template KBLI 2025')
                 ->icon('heroicon-o-arrow-down-tray')
-                ->url(fn() => route('template.kbli2020'))
+                ->url(fn() => route('template.kbli2025'))
                 ->openUrlInNewTab(),
 
             // 📤 Import dari Excel/CSV (header-aware)
@@ -42,7 +41,6 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                                     'application/vnd.ms-excel',
                                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                                 ]),
-                        // Toggle append dihapus, default behavior sekarang selalu append
 
                         TextInput::make('delimiter')
                             ->label('Pemisah multi-contoh di sel')
@@ -54,8 +52,7 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                     try {
                         $path = Storage::disk('public')->path($data['file']);
                         $delimiter = $data['delimiter'] ?: ';';
-                        $append = true; // Selalu append
-        
+
                         $spreadsheet = IOFactory::load($path);
                         $sheet = $spreadsheet->getActiveSheet();
                         $rows = $sheet->toArray(null, true, true, true);
@@ -79,26 +76,8 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                             $headerMap[$col] = $normalize($val);
                         }
 
-                        // Alias untuk Kode KBLI
-                        $aliasesKode = [
-                            'kode',
-                            'kode_kbli',
-                            'kodekbli',
-                            'kbli',
-                            'kbli5digit',
-                            '5digitkbli',
-                            'kd_kbli',
-                            'kode5digit',
-                        ];
-                        // Alias untuk Contoh Lapangan
-                        $aliasesContoh = [
-                            'contoh_lapangan',
-                            'contohlapangan',
-                            'contoh',
-                            'contohnyata',
-                            'kegiatan',
-                            'deskripsi_lapangan'
-                        ];
+                        $aliasesKode = ['kode', 'kode_kbli', 'kodekbli', 'kbli', 'kbli5digit', '5digitkbli', 'kd_kbli', 'kode5digit'];
+                        $aliasesContoh = ['contoh_lapangan', 'contohlapangan', 'contoh', 'contohnyata', 'kegiatan', 'deskripsi_lapangan'];
 
                         $findCol = function (array $aliases) use ($headerMap) {
                             foreach ($headerMap as $col => $hdr) {
@@ -111,14 +90,13 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                         $colKode = $findCol($aliasesKode);
                         $colContoh = $findCol($aliasesContoh);
 
-                        // Fallback ke A dan B jika header tidak ketemu
                         if (!$colKode && isset($rows[2]['A']))
                             $colKode = 'A';
                         if (!$colContoh && isset($rows[2]['B']))
                             $colContoh = 'B';
 
                         if (!$colKode) {
-                            Notification::make()->danger()->title('Kolom kode KBLI tidak ditemukan (cek header: "Kode KBLI" / "kbli").')->send();
+                            Notification::make()->danger()->title('Kolom kode KBLI tidak ditemukan.')->send();
                             return;
                         }
 
@@ -136,9 +114,7 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                                 continue;
                             }
 
-                            // Normalisasi: pastikan 5 digit (misal 1111 -> 01111)
-                            // Hati-hati: kalau kode aslinya memang pendek (misal 2 digit), logic ini akan padding.
-                            // Sesuaikan dengan data KBLI Anda. Biasanya KBLI 2020 itu 5 digit.
+                            // Normalisasi 5 digit
                             if (ctype_digit($kode) && strlen($kode) < 5) {
                                 $kode = str_pad($kode, 5, '0', STR_PAD_LEFT);
                             }
@@ -150,25 +126,16 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                                 $contohList = array_values(array_filter($parts, fn($v) => $v !== ''));
                             }
 
-                            // Cari dokumen KBLI (pastikan field di DB adalah 'kode_5_digit' atau 'kode' sesuai schema)
-                            // Di kode sebelumnya pakai 'kode_5_digit'.
-                            $doc = KBLI2020::where('kode_5_digit', $kode)->first();
+                            // Cari dokumen KBLI 2025 (menggunakan field 'Kode')
+                            $doc = KBLI2025::where('Kode', $kode)->first();
 
-                            // Fallback coba cari tanpa padding atau field lain jika perlu
                             if (!$doc) {
                                 $missing++;
                                 continue;
                             }
 
                             $current = is_array($doc->contoh_lapangan ?? null) ? $doc->contoh_lapangan : [];
-
-                            if ($append) {
-                                $doc->contoh_lapangan = array_values(array_unique(array_merge($current, $contohList)));
-                            } else {
-                                $doc->contoh_lapangan = $contohList;
-                            }
-
-                            $doc->last_updated_by = auth()->user()->nip ?? (string) auth()->id() ?? 'import';
+                            $doc->contoh_lapangan = array_values(array_unique(array_merge($current, $contohList)));
                             $doc->save();
                             $updated++;
                         }

@@ -4,8 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\KBJI2014;
 use App\Models\KBLI2020;
+use App\Models\KBLI2025;
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2020;
+use App\Models\PgKBLI2025;
 use Illuminate\Console\Command;
 
 class SyncMongoToPostgres extends Command
@@ -18,6 +20,7 @@ class SyncMongoToPostgres extends Command
         $this->info('Starting sync from MongoDB to Postgres...');
 
         $this->syncKBLI();
+        $this->syncKBLI2025();
         $this->syncKBJI();
 
         $this->info('Sync completed successfully!');
@@ -43,6 +46,36 @@ class SyncMongoToPostgres extends Command
                         'level' => $item->level ?? null,
                         'is_leaf' => $item->is_leaf ?? false,
                         'sektor' => $item->sektor ?? null,
+                    ]
+                );
+                $bar->advance();
+            }
+        });
+
+        $bar->finish();
+        $this->newLine();
+    }
+
+    protected function syncKBLI2025()
+    {
+        $this->info('Syncing KBLI2025...');
+        $count = KBLI2025::count();
+        $bar = $this->output->createProgressBar($count);
+        $bar->start();
+
+        KBLI2025::chunk(100, function ($items) use ($bar) {
+            foreach ($items as $item) {
+                PgKBLI2025::updateOrCreate(
+                    ['mongo_id' => (string) $item->_id],
+                    [
+                        'sumber' => $item->sumber ?? 'KBLI 2025',
+                        'kode' => $item->Kode ?? null,
+                        'judul' => $item->Judul ?? null,
+                        'deskripsi' => $item->Deskripsi ?? null,
+                        'contoh_lapangan' => $item->contoh_lapangan ?? null,
+                        'level' => $item->level ?? null,
+                        'is_leaf' => $item->is_leaf ?? false,
+                        'sektor' => $item->Kategori ?? null,
                     ]
                 );
                 $bar->advance();
