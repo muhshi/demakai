@@ -107,13 +107,13 @@ class SyncMongoToPostgres extends Command
                 PgKBJI2014::updateOrCreate(
                     ['mongo_id' => (string) $item->_id],
                     [
-                        'sumber' => $item->sumber ?? null,
-                        'kode' => $item->kode ?? null,
-                        'judul' => $item->judul ?? null,
-                        'deskripsi' => $item->deskripsi ?? null,
+                        'sumber' => $item->sumber ?? 'KBJI 2014',
+                        'kode' => $item->kode_kbji ?? $item->kode ?? null,
+                        'judul' => $item->title ?? $item->judul ?? null,
+                        'deskripsi' => $item->desc ?? $item->deskripsi ?? null,
                         'contoh_lapangan' => $item->contoh_lapangan ?? null,
-                        'level' => $item->level ?? null,
-                        'is_leaf' => $item->is_leaf ?? false,
+                        'level' => (string) ($item->lv ?? $item->level ?? null),
+                        'is_leaf' => (bool) ($item->last ?? $item->is_leaf ?? false),
                         'sektor' => $item->sektor ?? null,
                     ]
                 );
