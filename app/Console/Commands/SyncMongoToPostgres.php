@@ -48,7 +48,7 @@ class SyncMongoToPostgres extends Command
                     ['mongo_id' => (string) $item->_id],
                     [
                         'sumber' => $item->sumber ?? null,
-                        'kode' => $item->kode ?? $item->kode_4_digit_id ?? null, // Adjust field name if needed
+                        'kode' => $item->kode_5_digit ?? $item->kode_4_digit_id ?? $item->kode ?? null,
                         'judul' => $item->judul ?? null,
                         'deskripsi' => $item->deskripsi ?? null,
                         'contoh_lapangan' => $item->contoh_lapangan ?? null,
