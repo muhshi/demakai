@@ -129,7 +129,7 @@ class SearchController extends Controller
 
     /**
      * Build SQL for calculating keyword score across multiple words
-     * Priority: contoh_lapangan (200 per word) > judul (100 per word) > deskripsi (20 per word)
+     * Priority: kode (500) > contoh_lapangan (200) > judul (100) > deskripsi (20)
      */
     protected function buildKeywordScoreSql(array $keywords): string
     {
@@ -139,6 +139,10 @@ class SearchController extends Controller
 
         $cases = [];
         foreach ($keywords as $kw) {
+            // Highest weight for exact kode match
+            $cases[] = "(CASE WHEN kode = ? THEN 500 ELSE 0 END)";
+            // High weight for kode partial match
+            $cases[] = "(CASE WHEN kode LIKE ? THEN 300 ELSE 0 END)";
             // Higher weight for contoh_lapangan matches
             $cases[] = "(CASE WHEN LOWER(contoh_lapangan::text) LIKE ? THEN 200 ELSE 0 END)";
             // Medium weight for judul
@@ -158,7 +162,9 @@ class SearchController extends Controller
         $bindings = [];
         foreach ($keywords as $kw) {
             $like = '%' . strtolower($kw) . '%';
-            // 3 bindings per keyword (contoh, judul, deskripsi)
+            // 5 bindings per keyword (kode exact, kode partial, contoh, judul, deskripsi)
+            $bindings[] = $kw;           // kode exact match
+            $bindings[] = '%' . $kw . '%'; // kode partial match
             $bindings[] = $like;
             $bindings[] = $like;
             $bindings[] = $like;

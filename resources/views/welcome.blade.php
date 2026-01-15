@@ -478,6 +478,25 @@
             opacity: 0.8;
         }
 
+        .see-more-btn {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .see-more-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+
         .result-examples {
             display: flex;
             flex-wrap: wrap;
@@ -683,45 +702,51 @@
             let html = '';
             let totalResults = 0;
 
-            if (activeFilters.kbli2020) {
-                html += `
+            const renderColumnWithLimit = (items, columnId, title, emoji) => {
+                if (!items || items.length === 0) {
+                    return `
+                        <div class="results-column">
+                            <h2 class="column-title"><span>${emoji}</span> ${title}</h2>
+                            <div id="${columnId}-results">
+                                <p style="color: var(--text-muted); opacity: 0.5;">Tidak ada hasil.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const visibleItems = items.slice(0, 5);
+                const hiddenItems = items.slice(5);
+
+                return `
                     <div class="results-column">
-                        <h2 class="column-title"><span>🏢</span> KBLI 2020</h2>
-                        <div id="kbli2020-results">
-                            ${(data.kbli2020 && data.kbli2020.length > 0)
-                        ? data.kbli2020.map((res, index) => renderItem(res, index)).join('')
-                        : '<p style="color: var(--text-muted); opacity: 0.5;">Tidak ada hasil.</p>'}
+                        <h2 class="column-title"><span>${emoji}</span> ${title}</h2>
+                        <div id="${columnId}-results">
+                            ${visibleItems.map((res, index) => renderItem(res, index)).join('')}
+                            ${hiddenItems.length > 0 ? `
+                                <div id="${columnId}-hidden" style="display: none;">
+                                    ${hiddenItems.map((res, index) => renderItem(res, index + 5)).join('')}
+                                </div>
+                                <button class="see-more-btn" onclick="toggleSeeMore('${columnId}', this)">
+                                    Lihat ${hiddenItems.length} lainnya ▼
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 `;
+            };
+
+            if (activeFilters.kbli2020) {
+                html += renderColumnWithLimit(data.kbli2020, 'kbli2020', 'KBLI 2020', '🏢');
                 totalResults += (data.kbli2020 ? data.kbli2020.length : 0);
             }
 
             if (activeFilters.kbli2025) {
-                html += `
-                    <div class="results-column">
-                        <h2 class="column-title"><span>🚀</span> KBLI 2025</h2>
-                        <div id="kbli2025-results">
-                            ${(data.kbli2025 && data.kbli2025.length > 0)
-                        ? data.kbli2025.map((res, index) => renderItem(res, index)).join('')
-                        : '<p style="color: var(--text-muted); opacity: 0.5;">Tidak ada hasil.</p>'}
-                        </div>
-                    </div>
-                `;
+                html += renderColumnWithLimit(data.kbli2025, 'kbli2025', 'KBLI 2025', '🚀');
                 totalResults += (data.kbli2025 ? data.kbli2025.length : 0);
             }
 
             if (activeFilters.kbji) {
-                html += `
-                    <div class="results-column">
-                        <h2 class="column-title"><span>💼</span> KBJI 2014</h2>
-                        <div id="kbji-results">
-                            ${(data.kbji && data.kbji.length > 0)
-                        ? data.kbji.map((res, index) => renderItem(res, index)).join('')
-                        : '<p style="color: var(--text-muted); opacity: 0.5;">Tidak ada hasil.</p>'}
-                        </div>
-                    </div>
-                `;
+                html += renderColumnWithLimit(data.kbji, 'kbji', 'KBJI 2014', '💼');
                 totalResults += (data.kbji ? data.kbji.length : 0);
             }
 
@@ -737,6 +762,18 @@
             // Adjust grid columns based on active count
             const activeCount = Object.values(activeFilters).filter(v => v).length;
             resultsContainer.style.gridTemplateColumns = activeCount > 0 ? `repeat(${activeCount}, 1fr)` : 'none';
+        };
+
+        window.toggleSeeMore = (columnId, btn) => {
+            const hidden = document.getElementById(`${columnId}-hidden`);
+            if (hidden.style.display === 'none') {
+                hidden.style.display = 'block';
+                btn.textContent = 'Sembunyikan ▲';
+            } else {
+                hidden.style.display = 'none';
+                const count = hidden.children.length;
+                btn.textContent = `Lihat ${count} lainnya ▼`;
+            }
         };
 
         const renderItem = (res, index) => {
