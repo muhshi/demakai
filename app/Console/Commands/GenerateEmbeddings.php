@@ -10,27 +10,18 @@ use Illuminate\Support\Facades\Http;
 
 class GenerateEmbeddings extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'embeddings:generate {--limit=100 : Limit the number of API calls (embeddings generated) per run} {--delay=1000 : Delay in milliseconds between requests}';
+    protected $signature = 'embeddings:generate 
+                            {--limit=5000 : Limit the number of records processed} 
+                            {--delay=100 : Delay in ms between requests (default 100ms)}
+                            {--model= : Focus on a specific model (KBJI2014, KBLI2020, KBLI2025)}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Generate vector embeddings for KBLI and KBJI data using Google Gemini with Smart Update';
+    protected $description = 'Generate vector embeddings using Google Gemini embedContent API with Smart Update and Rate Limit handling';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        $limit = $this->option('limit');
+        $limit = (int) $this->option('limit');
         $delay = (int) $this->option('delay');
+        $modelFilter = $this->option('model');
         $apiKey = config('services.gemini.api_key');
 
         if (empty($apiKey)) {
@@ -38,64 +29,93 @@ class GenerateEmbeddings extends Command
             return Command::FAILURE;
         }
 
-        $this->info('Generating embeddings for KBLI2020 using Gemini...');
-        $this->processModel(PgKBLI2020::class, $apiKey, $limit, $delay);
+        $models = [
+            'KBLI2020' => PgKBLI2020::class,
+            'KBLI2025' => PgKBLI2025::class,
+            'KBJI2014' => PgKBJI2014::class,
+        ];
 
-        $this->info('Generating embeddings for KBLI2025 using Gemini...');
-        $this->processModel(PgKBLI2025::class, $apiKey, $limit, $delay);
+        foreach ($models as $name => $class) {
+            if ($modelFilter && strtolower($modelFilter) !== strtolower($name)) {
+                continue;
+            }
 
-        $this->info('Generating embeddings for KBJI2014 using Gemini...');
-        $this->processModel(PgKBJI2014::class, $apiKey, $limit, $delay);
+            $this->info("Processing embeddings for {$name}...");
+            $this->processModel($class, $apiKey, $limit, $delay);
+        }
 
         return Command::SUCCESS;
     }
 
     protected function processModel($modelClass, $apiKey, $limit, $delay)
     {
-        $totalRecords = $modelClass::count();
-        $this->info("Scanning {$totalRecords} records for " . class_basename($modelClass) . "...");
-
-        $generatedCount = 0;
-        $skippedCount = 0;
-
-        // Use chunkById to efficiently iterate all records
-        $modelClass::chunkById(100, function ($records) use ($apiKey, $limit, $delay, &$generatedCount, &$skippedCount) {
-            foreach ($records as $record) {
-                if ($generatedCount >= $limit) {
-                    return false; // Stop processing
-                }
-
-                $text = $this->constructPayload($record);
-                $currentHash = md5($text);
-
-                // Smart Update Check:
-                // If embedding exists AND hash matches, skip it.
-                if (!empty($record->embedding) && $record->embed_hash === $currentHash) {
-                    $skippedCount++;
-                    continue;
-                }
-
-                // If we are here, we need to generate an embedding
-                $this->generateEmbedding($record, $text, $currentHash, $apiKey, $delay);
-                $generatedCount++;
-            }
+        $q = $modelClass::where(function ($query) {
+            $query->whereNull('embedding')
+                ->orWhereRaw('embedding IS NULL');
         });
 
-        $this->info("Processed: {$generatedCount} generated, {$skippedCount} skipped (unchanged).");
+        $totalToProcess = min($q->count(), $limit);
+
+        if ($totalToProcess === 0) {
+            $this->info("No pending embeddings for " . class_basename($modelClass));
+            return;
+        }
+
+        $this->info("Found {$totalToProcess} pending records. Processing...");
+        $bar = $this->output->createProgressBar($totalToProcess);
+        $bar->start();
+
+        $processedCount = 0;
+
+        $modelClass::whereNull('embedding')
+            ->chunkById(50, function ($records) use ($apiKey, $delay, $bar, &$processedCount, $limit) {
+                if ($processedCount >= $limit)
+                    return false;
+
+                foreach ($records as $record) {
+                    $text = $this->constructPayload($record);
+                    $hash = md5($text);
+
+                    // Skip if already has correct embedding (safety check)
+                    if (!empty($record->embedding) && $record->embed_hash === $hash) {
+                        $processedCount++;
+                        $bar->advance();
+                        continue;
+                    }
+
+                    $success = $this->generateSingle($record, $text, $hash, $apiKey);
+
+                    if ($success) {
+                        $processedCount++;
+                        $bar->advance();
+                    } else {
+                        // If fatal failure or repeated rate limit, we might want to stop
+                        // But for now, we just continue to the next one
+                    }
+
+                    if ($delay > 0) {
+                        usleep($delay * 1000);
+                    }
+
+                    if ($processedCount >= $limit)
+                        return false;
+                }
+            });
+
+        $bar->finish();
         $this->newLine();
+        $this->info("Completed processing " . class_basename($modelClass));
     }
 
-    protected function generateEmbedding($record, $text, $hash, $apiKey, $delay)
+    protected function generateSingle($record, $text, $hash, $apiKey)
     {
         $attempts = 0;
         $maxAttempts = 3;
-        $success = false;
 
-        while (!$success && $attempts < $maxAttempts) {
+        while ($attempts < $maxAttempts) {
             try {
-                $response = Http::withHeaders([
-                    'Content-Type' => 'application/json',
-                ])->post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
+                $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
                             'content' => [
                                 'parts' => [
                                     ['text' => $text]
@@ -104,54 +124,41 @@ class GenerateEmbeddings extends Command
                         ]);
 
                 if ($response->successful()) {
-                    $data = $response->json();
-                    $embedding = $data['embedding']['values'] ?? null;
-
-                    if ($embedding) {
-                        $record->embedding = $embedding;
+                    $vector = $response->json()['embedding']['values'] ?? null;
+                    if ($vector) {
+                        $record->embedding = $vector;
                         $record->payload = $text;
-                        $record->embed_hash = $hash; // Save the hash
+                        $record->embed_hash = $hash;
                         $record->save();
-                        $success = true;
-                        $this->line("  <info>✔</info> Embedded ID: {$record->id}");
-                    } else {
-                        throw new \Exception("No embedding found in response: " . $response->body());
+                        return true;
                     }
+                } elseif ($response->status() == 429) {
+                    $attempts++;
+                    $this->warn("\nRate limit hit (429). Waiting 10s before retry...");
+                    sleep(10);
                 } else {
-                    throw new \Exception("API Error: " . $response->body());
+                    $this->error("\nRequest failed (Status: " . $response->status() . "): " . $response->body());
+                    return false;
                 }
-
             } catch (\Exception $e) {
                 $attempts++;
-                $this->warn("\n  Error processing record {$record->id}: " . $e->getMessage());
-                if ($attempts < $maxAttempts) {
-                    $this->info("  Retrying in 2 seconds...");
-                    sleep(2);
-                }
+                $this->error("\nError: " . $e->getMessage());
+                sleep(2);
             }
         }
 
-        if ($success) {
-            usleep($delay * 1000); // Delay in microseconds
-        }
+        return false;
     }
 
     protected function constructPayload($record)
     {
-        // Combine relevant fields into a single string
         $parts = [];
-
-        if (!empty($record->kode)) {
+        if (!empty($record->kode))
             $parts[] = "Kode: " . $record->kode;
-        }
-
-        if (!empty($record->judul)) {
+        if (!empty($record->judul))
             $parts[] = "Judul: " . $record->judul;
-        }
-
-        if (!empty($record->deskripsi)) {
+        if (!empty($record->deskripsi))
             $parts[] = "Deskripsi: " . $record->deskripsi;
-        }
 
         if (!empty($record->contoh_lapangan)) {
             $contoh = is_array($record->contoh_lapangan) ? implode(', ', $record->contoh_lapangan) : $record->contoh_lapangan;

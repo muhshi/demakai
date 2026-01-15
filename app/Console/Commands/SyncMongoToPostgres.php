@@ -12,16 +12,25 @@ use Illuminate\Console\Command;
 
 class SyncMongoToPostgres extends Command
 {
-    protected $signature = 'sync:mongo-to-postgres';
+    protected $signature = 'sync:mongo-to-postgres {--model= : Focus on a specific model (KBJI2014, KBLI2020, KBLI2025)}';
     protected $description = 'Sync KBLI and KBJI data from MongoDB to Postgres';
 
     public function handle()
     {
         $this->info('Starting sync from MongoDB to Postgres...');
+        $modelFilter = $this->option('model');
 
-        $this->syncKBLI();
-        $this->syncKBLI2025();
-        $this->syncKBJI();
+        if (!$modelFilter || strtolower($modelFilter) === 'kbli2020') {
+            $this->syncKBLI();
+        }
+
+        if (!$modelFilter || strtolower($modelFilter) === 'kbli2025') {
+            $this->syncKBLI2025();
+        }
+
+        if (!$modelFilter || strtolower($modelFilter) === 'kbji2014') {
+            $this->syncKBJI();
+        }
 
         $this->info('Sync completed successfully!');
     }
