@@ -15,4 +15,7 @@ Route::get('/templates/kbli2025', fn() => Excel::download(new KBLI2025TemplateEx
 Route::get('/templates/kbji2014', fn() => Excel::download(new KBJI2014TemplateExport, 'template_kbji2014.xlsx'))->name('template.kbji2014');
 
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\FieldExampleSubmissionController;
+
 Route::get('/api/search', [SearchController::class, 'search'])->name('search.api');
+Route::post('/api/submissions', [FieldExampleSubmissionController::class, 'store'])->name('submissions.store');

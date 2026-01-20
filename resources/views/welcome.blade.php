@@ -548,14 +548,144 @@
                 padding: 4rem 1rem;
             }
 
-            .search-container {
-                flex-direction: column;
-                gap: 0.5rem;
-                padding: 0.5rem;
-            }
-
             .search-btn {
                 padding: 1rem;
+            }
+        }
+
+        /* --- Submission Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .add-example-btn {
+            position: absolute;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 5;
+        }
+
+        .add-example-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
             }
         }
     </style>
@@ -630,11 +760,35 @@
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2026 Demakai Intelligent System. Built for BPS Indonesia.</p>
-        <p style="margin-top: 0.5rem; font-size: 0.75rem;">Laravel v{{ Illuminate\Foundation\Application::VERSION }}
-            (PHP v{{ PHP_VERSION }})</p>
     </footer>
+
+    <!-- Submission Modal -->
+    <div id="submission-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSubmissionModal()">&times;</button>
+            <h2 class="modal-title">Ajukan Contoh</h2>
+            <p class="modal-subtitle" id="modal-subtitle-text">Bantu kami memperkaya data dengan contoh lapangan nyata.
+            </p>
+
+            <form id="submission-form" onsubmit="submitExample(event)">
+                <input type="hidden" id="sub-type">
+                <input type="hidden" id="sub-kode">
+
+                <div class="form-group">
+                    <label class="form-label">Kode & Judul</label>
+                    <div id="display-info" style="font-size: 0.9rem; font-weight: 600; color: var(--text-light);"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contoh Lapangan (Pisahkan dengan koma jika lebih dari satu)</label>
+                    <textarea id="sub-content" class="form-input" rows="4"
+                        placeholder="Contoh: Petani Jagung, Pengusaha Kerupuk..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submit-btn-text">Kirim Pengajuan</button>
+            </form>
+        </div>
+    </div>
 
     <script>
         // Placeholder interaction
@@ -799,6 +953,7 @@
                             ${res.contoh.map(ex => `<span class="example-tag">${ex}</span>`).join('')}
                         </div>
                     ` : ''}
+                    <button class="add-example-btn" title="Ajukan Contoh Lapangan" onclick="openSubmissionModal('${res.type}', '${res.kode}', '${res.judul}')">+</button>
                 </div>
             `;
         };
@@ -824,6 +979,67 @@
         searchButton.addEventListener('click', () => {
             performSearch(searchInput.value);
         });
+
+        // --- Submission Logic ---
+        const modal = document.getElementById('submission-modal');
+        const subTypeInput = document.getElementById('sub-type');
+        const subKodeInput = document.getElementById('sub-kode');
+        const subContentInput = document.getElementById('sub-content');
+        const displayInfo = document.getElementById('display-info');
+
+        window.openSubmissionModal = (type, kode, judul) => {
+            subTypeInput.value = type;
+            subKodeInput.value = kode;
+            displayInfo.textContent = `${kode} - ${judul}`;
+            modal.style.display = 'flex';
+            subContentInput.focus();
+        };
+
+        window.closeSubmissionModal = () => {
+            modal.style.display = 'none';
+            subContentInput.value = '';
+        };
+
+        window.submitExample = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn-text');
+            const originalText = btn.textContent;
+
+            btn.textContent = 'Mengirim...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        type: subTypeInput.value,
+                        kode: subKodeInput.value,
+                        content: subContentInput.value
+                    })
+                });
+
+                const data = await response.json();
+                alert(data.message);
+                closeSubmissionModal();
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Terjadi kesalahan saat mengirim pengajuan.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // Close modal on click outside
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                closeSubmissionModal();
+            }
+        };
     </script>
 </body>
 
