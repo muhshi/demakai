@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
+    nodejs \
+    npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) intl gd zip pdo_mysql pdo_pgsql opcache \
     && pecl install mongodb \
@@ -27,8 +29,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Copy application code
 COPY . /app
 
-# Install dependencies
+# Install PHP dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Install Node.js dependencies and build assets
+RUN npm install && npm run build
 
 # Set permissions
 RUN touch /app/database/database.sqlite \
