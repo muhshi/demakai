@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\KBJI2014Resource\Pages;
 use App\Filament\Resources\KBJI2014Resource\RelationManagers;
-use App\Models\KBJI2014;
+use App\Models\PgKBJI2014;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class KBJI2014Resource extends Resource
 {
-    protected static ?string $model = KBJI2014::class;
+    protected static ?string $model = PgKBJI2014::class;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBJI 2014';

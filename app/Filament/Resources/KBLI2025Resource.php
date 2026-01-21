@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\KBLI2025Resource\Pages;
-use App\Models\KBLI2025;
+use App\Models\PgKBLI2025;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,7 +12,7 @@ use Filament\Tables\Table;
 
 class KBLI2025Resource extends Resource
 {
-    protected static ?string $model = KBLI2025::class;
+    protected static ?string $model = PgKBLI2025::class;
     protected static ?string $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2025';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -46,22 +46,22 @@ class KBLI2025Resource extends Resource
     {
         return $table
             ->columns([
-                    Tables\Columns\TextColumn::make('Kode')
-                        ->label('Kode')->searchable()->sortable(),
-                    Tables\Columns\TextColumn::make('Kategori')
-                        ->label('Kategori')->badge()->color('info')->toggleable(),
-                    Tables\Columns\TextColumn::make('Judul')
-                        ->searchable()->wrap()->limit(60),
-                    Tables\Columns\TextColumn::make('contoh_lapangan')
-                        ->label('Contoh Lapangan')
-                        ->wrap()
-                        ->limit(150)
-                        ->toggleable(isToggledHiddenByDefault: false)
-                        ->searchable(),
-                    Tables\Columns\TextColumn::make('Deskripsi')
-                        ->wrap()->limit(120)
-                        ->toggleable(isToggledHiddenByDefault: true),
-                ])
+                Tables\Columns\TextColumn::make('Kode')
+                    ->label('Kode')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('Kategori')
+                    ->label('Kategori')->badge()->color('info')->toggleable(),
+                Tables\Columns\TextColumn::make('Judul')
+                    ->searchable()->wrap()->limit(60),
+                Tables\Columns\TextColumn::make('contoh_lapangan')
+                    ->label('Contoh Lapangan')
+                    ->wrap()
+                    ->limit(150)
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('Deskripsi')
+                    ->wrap()->limit(120)
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
             ->defaultSort('Kode')
             ->paginated([25, 50, 100]);
     }

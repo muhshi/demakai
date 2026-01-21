@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\KBLI2020Resource\Pages;
 use App\Filament\Resources\KBLI2020Resource\RelationManagers;
-use App\Models\KBLI2020;
+use App\Models\PgKBLI2020;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class KBLI2020Resource extends Resource
 {
-    protected static ?string $model = KBLI2020::class;
+    protected static ?string $model = PgKBLI2020::class;
     protected static ?string $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2020';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
