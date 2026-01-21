@@ -9,8 +9,10 @@ return new class extends Migration {
 
     public function up(): void
     {
-        // Enable pgvector extension
-        DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS vector');
+        // Enable pgvector extension (only for pgsql)
+        if (DB::connection('pgsql')->getDriverName() === 'pgsql') {
+            DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS vector');
+        }
 
         if (!Schema::connection('pgsql')->hasTable('kbli2020s')) {
             Schema::connection('pgsql')->create('kbli2020s', function (Blueprint $table) {
