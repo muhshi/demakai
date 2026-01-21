@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('field_example_submissions', function (Blueprint $table) {
+        Schema::connection('sqlite')->create('field_example_submissions', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // 'KBLI 2025', 'KBLI 2020', 'KBJI 2014'
             $table->string('kode');
@@ -25,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('field_example_submissions');
+        Schema::connection('sqlite')->dropIfExists('field_example_submissions');
     }
 };
