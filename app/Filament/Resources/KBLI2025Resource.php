@@ -20,17 +20,17 @@ class KBLI2025Resource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('Kode')
+            Forms\Components\TextInput::make('kode')
                 ->label('Kode')
                 ->required()
                 ->disabled()
                 ->maxLength(10),
-            Forms\Components\TextInput::make('Judul')
+            Forms\Components\TextInput::make('judul')
                 ->label('Judul')
                 ->required()
                 ->disabled()
                 ->maxLength(300),
-            Forms\Components\Textarea::make('Deskripsi')
+            Forms\Components\Textarea::make('deskripsi')
                 ->label('Deskripsi')
                 ->disabled()
                 ->rows(6),
@@ -46,11 +46,11 @@ class KBLI2025Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('Kode')
+                Tables\Columns\TextColumn::make('kode')
                     ->label('Kode')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('Kategori')
+                Tables\Columns\TextColumn::make('kategori')
                     ->label('Kategori')->badge()->color('info')->toggleable(),
-                Tables\Columns\TextColumn::make('Judul')
+                Tables\Columns\TextColumn::make('judul')
                     ->searchable()->wrap()->limit(60),
                 Tables\Columns\TextColumn::make('contoh_lapangan')
                     ->label('Contoh Lapangan')
@@ -58,17 +58,17 @@ class KBLI2025Resource extends Resource
                     ->limit(150)
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('Deskripsi')
+                Tables\Columns\TextColumn::make('deskripsi')
                     ->wrap()->limit(120)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('Kode')
+            ->defaultSort('kode')
             ->paginated([25, 50, 100]);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['Kode', 'Judul', 'Deskripsi', 'Kategori'];
+        return ['kode', 'judul', 'deskripsi', 'kategori'];
     }
 
     public static function getPages(): array
