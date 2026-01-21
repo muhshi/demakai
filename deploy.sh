@@ -8,7 +8,7 @@ git pull origin main
 
 # 2. Rebuild the image (Required since code is baked into image)
 echo "🔨 Building Docker image..."
-docker compose build demakai-franken demakai-worker
+docker compose build demakai-franken
 
 # 3. Recreate containers
 echo "🔄 Recreating containers..."
