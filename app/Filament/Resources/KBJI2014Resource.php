@@ -23,11 +23,11 @@ class KBJI2014Resource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('kode_kbji')
+            Forms\Components\TextInput::make('kode')
                 ->label('KBJI')->disabled()->dehydrated(false),
-            Forms\Components\TextInput::make('title')
+            Forms\Components\TextInput::make('judul')
                 ->label('Judul')->disabled()->dehydrated(false),
-            Forms\Components\Textarea::make('desc')
+            Forms\Components\Textarea::make('deskripsi')
                 ->label('Deskripsi')->disabled()->dehydrated(false),
 
             Forms\Components\TagsInput::make('contoh_lapangan')
@@ -41,7 +41,7 @@ class KBJI2014Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kode_kbji')
+                Tables\Columns\TextColumn::make('kode')
                     ->label('KBJI')
                     ->formatStateUsing(
                         fn($state) => strlen((string) $state) > 4
@@ -50,12 +50,12 @@ class KBJI2014Resource extends Resource
                     )
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('title')
+                Tables\Columns\TextColumn::make('judul')
                     ->label('Judul')
                     ->wrap()
                     ->limit(80)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('desc')
+                Tables\Columns\TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->wrap()
                     ->limit(150)
@@ -72,24 +72,24 @@ class KBJI2014Resource extends Resource
                 Tables\Filters\TernaryFilter::make('only4digit')
                     ->label('Hanya 4 digit')
                     ->queries(
-                        true: fn($q) => $q->where('lv', 3),
+                        true: fn($q) => $q->where('level', '3'), // Assuming level is stored as string '3'
                         false: fn($q) => $q, // semua
                         blank: fn($q) => $q,
                     ),
             ])
-            ->defaultSort('kode_kbji')
+            ->defaultSort('kode')
             ->paginated([25, 50, 100]);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['title', 'desc', 'fid', 'kode_kbji', 'parent_fid', 'id'];
+        return ['judul', 'deskripsi', 'kode'];
     }
 
     public static function getEloquentQuery(): Builder
     {
         // hanya tampilkan unit group (4 digit)
-        return parent::getEloquentQuery()->where('lv', 3);
+        return parent::getEloquentQuery()->where('level', '3');
     }
 
     public static function getPages(): array

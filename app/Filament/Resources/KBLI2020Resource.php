@@ -24,7 +24,7 @@ class KBLI2020Resource extends Resource
     {
         return $form->schema([
             // Field yang sudah ada...
-            Forms\Components\TextInput::make('kode_5_digit')
+            Forms\Components\TextInput::make('kode')
                 ->label('Kode 5 Digit')
                 ->required()
                 ->disabled()
@@ -61,7 +61,7 @@ class KBLI2020Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kode_5_digit')
+                Tables\Columns\TextColumn::make('kode')
                     ->label('Kode')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('sektor')
                     ->badge()->color('info')->toggleable(),
@@ -77,13 +77,13 @@ class KBLI2020Resource extends Resource
                     ->wrap()->limit(120)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('kode_5_digit')   // <- pastikan field ada
+            ->defaultSort('kode')   // <- pastikan field ada
             ->paginated([25, 50, 100]);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['kode_5_digit', 'judul', 'deskripsi', 'sektor'];
+        return ['kode', 'judul', 'deskripsi', 'sektor'];
     }
 
     public static function getPages(): array
