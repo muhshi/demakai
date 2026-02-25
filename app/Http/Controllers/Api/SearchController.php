@@ -26,12 +26,13 @@ class SearchController extends Controller
 
         try {
             // 1. Generate Embedding for the query
-            $response = Http::post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
+            $response = Http::post("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={$apiKey}", [
                 'content' => [
                     'parts' => [
                         ['text' => $query]
                     ]
-                ]
+                ],
+                'outputDimensionality' => 768,
             ]);
 
             if (!$response->successful()) {

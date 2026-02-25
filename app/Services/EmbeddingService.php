@@ -10,7 +10,7 @@ class EmbeddingService
      * Generate embedding dari Ollama (bge-m3 default)
      */
     /**
-     * Generate embedding dari Gemini (text-embedding-004)
+     * Generate embedding dari Gemini (gemini-embedding-001)
      */
     public function embedText(string $text): array
     {
@@ -24,13 +24,14 @@ class EmbeddingService
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
-                    'model' => 'models/text-embedding-004',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={$apiKey}", [
+                    'model' => 'models/gemini-embedding-001',
                     'content' => [
                         'parts' => [
                             ['text' => $text]
                         ]
-                    ]
+                    ],
+                    'outputDimensionality' => 768,
                 ]);
 
         if ($response->failed()) {

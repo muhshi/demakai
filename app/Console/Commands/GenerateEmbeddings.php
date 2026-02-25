@@ -115,13 +115,14 @@ class GenerateEmbeddings extends Command
         while ($attempts < $maxAttempts) {
             try {
                 $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                    ->post("https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={$apiKey}", [
-                            'content' => [
-                                'parts' => [
-                                    ['text' => $text]
-                                ]
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={$apiKey}", [
+                        'content' => [
+                            'parts' => [
+                                ['text' => $text]
                             ]
-                        ]);
+                        ],
+                        'outputDimensionality' => 768,
+                    ]);
 
                 if ($response->successful()) {
                     $vector = $response->json()['embedding']['values'] ?? null;
