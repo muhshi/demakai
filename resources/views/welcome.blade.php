@@ -680,13 +680,32 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-            to {
-                opacity: 1;
-            }
+        /* --- Method Selector Buttons --- */
+        .method-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8;
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.75rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .method-btn:hover {
+            border-color: #6366f1;
+            color: #c7d2fe;
+        }
+        .method-btn.active {
+            background: rgba(99,102,241,0.2);
+            border-color: #6366f1;
+            color: #a5b4fc;
+            box-shadow: 0 0 12px -4px rgba(99,102,241,0.5);
         }
     </style>
 </head>
@@ -728,6 +747,37 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Cari kode, judul, atau deskripsi jabatan/bisnis...">
             <button class="search-btn" id="search-button">Telusuri Cerdas</button>
+        </div>
+
+        {{-- ── Panel Selector Metode (untuk penelitian) ── --}}
+        <div id="method-panel" style="
+            width:100%; max-width:700px; margin-top:1rem;
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+            border-radius:1.25rem; padding:1rem 1.25rem;
+            backdrop-filter:blur(10px);
+        ">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+                <span
+                    style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#6366f1;">🔬
+                    Metode Pencarian</span>
+                <span id="active-method-badge"
+                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">SQL
+                    + None</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                <button class="method-btn active" data-search="sql" data-proc="none" onclick="setMethod(this)">SQL ·
+                    None</button>
+                <button class="method-btn" data-search="sql" data-proc="basic" onclick="setMethod(this)">SQL ·
+                    Basic</button>
+                <button class="method-btn" data-search="sql" data-proc="advanced" onclick="setMethod(this)">SQL ·
+                    Advanced</button>
+                <button class="method-btn" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Hybrid ·
+                    None</button>
+                <button class="method-btn" data-search="hybrid" data-proc="basic" onclick="setMethod(this)">Hybrid ·
+                    Basic</button>
+                <button class="method-btn" data-search="hybrid" data-proc="advanced" onclick="setMethod(this)">Hybrid ·
+                    Advanced</button>
+            </div>
         </div>
 
         <div id="search-results-container" style="display: none;">
@@ -804,6 +854,27 @@
             kbji: true
         };
 
+        // ── Metode aktif saat ini ──
+        let activeSearch     = 'sql';
+        let activeProcessing = 'none';
+
+        window.setMethod = (btn) => {
+            // Hapus active dari semua tombol
+            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            activeSearch     = btn.dataset.search;
+            activeProcessing = btn.dataset.proc;
+
+            // Update badge
+            const label = `${activeSearch.toUpperCase()} + ${activeProcessing.charAt(0).toUpperCase() + activeProcessing.slice(1)}`;
+            document.getElementById('active-method-badge').textContent = label;
+
+            // Auto-search ulang kalau ada query aktif
+            const q = searchInput.value.trim();
+            if (q.length >= 3) performSearch(q);
+        };
+
         window.toggleFilter = (type, btn) => {
             activeFilters[type] = !activeFilters[type];
             btn.classList.toggle('active');
@@ -841,7 +912,7 @@
             emptyBox.style.display = 'none';
 
             try {
-                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&search_method=${activeSearch}&processing=${activeProcessing}`);
                 const data = await response.json();
 
                 renderResults(data);

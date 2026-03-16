@@ -63,7 +63,40 @@ class KBLI2025Resource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('kode')
-            ->paginated([25, 50, 100]);
+            ->paginated([25, 50, 100])
+            ->filters([
+                Tables\Filters\Filter::make('ai_search')
+                    ->form([
+                        Forms\Components\TextInput::make('query')
+                            ->label('AI Smart Search')
+                            ->placeholder('Deskripsikan bisnis Anda...')
+                            ->helperText('Mencari berdasarkan makna (Semantic Search)'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                        if (empty($data['query'])) {
+                            return $query;
+                        }
+
+                        // Call Hybrid Search
+                        /** @var \App\Services\SearchService $service */
+                        $service = app(\App\Services\SearchService::class);
+
+                        // Limit 100 results for relevancy
+                        $results = $service->search($data['query'], 100, 'KBLI');
+
+                        // Get IDs from results (which are Models)
+                        $ids = collect($results)->pluck('id')->toArray();
+
+                        if (empty($ids)) {
+                            return $query->whereRaw('1 = 0');
+                        }
+
+                        // Filter by IDs and preserve order (PostgreSQL specific)
+                        $idsString = implode(',', $ids);
+                        return $query->whereIn('id', $ids)
+                            ->orderByRaw("array_position(ARRAY[$idsString], id)");
+                    }),
+            ]);
     }
 
     public static function getGloballySearchableAttributes(): array

@@ -19,3 +19,20 @@ use App\Http\Controllers\FieldExampleSubmissionController;
 
 Route::get('/api/search', [SearchController::class, 'search'])->name('search.api');
 Route::post('/api/submissions', [FieldExampleSubmissionController::class, 'store'])->name('submissions.store');
+
+Route::get('/cekhasilmethod', function () {
+    $files = glob(base_path('python/output/*_Gabungan.html'));
+    
+    if (empty($files)) {
+        return response("Belum ada file evaluasi Gabungan yang dibuat. Silakan jalankan script python evaluate.py terlebih dahulu.", 404)
+            ->header('Content-Type', 'text/plain');
+    }
+    
+    // Urutkan file berdasarkan waktu modifikasi terbaru
+    usort($files, function($a, $b) {
+        return filemtime($b) - filemtime($a);
+    });
+    
+    return response(file_get_contents($files[0]))
+        ->header('Content-Type', 'text/html');
+});

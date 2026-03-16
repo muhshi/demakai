@@ -68,6 +68,7 @@ class KBJI2014Resource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
             ])
+            ->paginated([25, 50, 100])
             ->filters([
                 Tables\Filters\TernaryFilter::make('only4digit')
                     ->label('Hanya 4 digit')
@@ -76,9 +77,38 @@ class KBJI2014Resource extends Resource
                         false: fn($q) => $q, // semua
                         blank: fn($q) => $q,
                     ),
-            ])
-            ->defaultSort('kode')
-            ->paginated([25, 50, 100]);
+                Tables\Filters\Filter::make('ai_search')
+                    ->form([
+                        Forms\Components\TextInput::make('query')
+                            ->label('AI Smart Search')
+                            ->placeholder('Deskripsikan pekerjaan...')
+                            ->helperText('Mencari berdasarkan makna (Semantic Search)'),
+                    ])
+                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                        if (empty($data['query'])) {
+                            return $query;
+                        }
+
+                        // Call Hybrid Search
+                        /** @var \App\Services\SearchService $service */
+                        $service = app(\App\Services\SearchService::class);
+
+                        // Limit 100 results for relevancy
+                        $results = $service->search($data['query'], 100, 'KBJI');
+
+                        // Get IDs from results (which are Models)
+                        $ids = collect($results)->pluck('id')->toArray();
+
+                        if (empty($ids)) {
+                            return $query->whereRaw('1 = 0');
+                        }
+
+                        // Filter by IDs and preserve order (PostgreSQL specific)
+                        $idsString = implode(',', $ids);
+                        return $query->whereIn('id', $ids)
+                            ->orderByRaw("array_position(ARRAY[$idsString], id)");
+                    }),
+            ]);
     }
 
     public static function getGloballySearchableAttributes(): array

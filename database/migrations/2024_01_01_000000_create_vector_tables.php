@@ -5,17 +5,17 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    protected $connection = 'pgsql';
+    // protected $connection = 'pgsql';
 
     public function up(): void
     {
-        // Enable pgvector extension (only for pgsql)
-        if (DB::connection('pgsql')->getDriverName() === 'pgsql') {
-            DB::connection('pgsql')->statement('CREATE EXTENSION IF NOT EXISTS vector');
+        if (config('database.default') === 'pgsql') {
+            // Enable pgvector extension (only for pgsql)
+            DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
         }
 
-        if (!Schema::connection('pgsql')->hasTable('kbli2020s')) {
-            Schema::connection('pgsql')->create('kbli2020s', function (Blueprint $table) {
+        if (config('database.default') === 'pgsql' && !Schema::hasTable('kbli2020s')) {
+            Schema::create('kbli2020s', function (Blueprint $table) {
                 $table->id();
                 $table->string('sumber')->nullable();
                 $table->string('kode')->nullable()->index();
@@ -32,8 +32,8 @@ return new class extends Migration {
             });
         }
 
-        if (!Schema::connection('pgsql')->hasTable('kbji2014s')) {
-            Schema::connection('pgsql')->create('kbji2014s', function (Blueprint $table) {
+        if (config('database.default') === 'pgsql' && !Schema::hasTable('kbji2014s')) {
+            Schema::create('kbji2014s', function (Blueprint $table) {
                 $table->id();
                 $table->string('sumber')->nullable();
                 $table->string('kode')->nullable()->index();
@@ -53,7 +53,9 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::connection('pgsql')->dropIfExists('kbli2020s');
-        Schema::connection('pgsql')->dropIfExists('kbji2014s');
+        if (config('database.default') === 'pgsql') {
+            Schema::dropIfExists('kbli2020s');
+            Schema::dropIfExists('kbji2014s');
+        }
     }
 };

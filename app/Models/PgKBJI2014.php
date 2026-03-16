@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Pgvector\Laravel\Vector;
+use Pgvector\Laravel\HasNeighbors;
+// use Pgvector\Laravel\Vector;
 
 class PgKBJI2014 extends Model
 {
+    use HasNeighbors;
     protected $connection = 'pgsql';
     protected $table = 'kbji2014s'; // Assuming standard Laravel naming convention
-    public $timestamps = false;
-
+    public $timestamps = false; //
     protected $guarded = [];
 
     protected $casts = [

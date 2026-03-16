@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\KBJI2014Resource\Pages;
 
 use App\Filament\Resources\KBJI2014Resource;
-use App\Models\KBJI2014;
+use App\Models\PgKBJI2014;
 use Filament\Actions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -32,23 +32,23 @@ class ListKBJI2014s extends ListRecords //
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
                 ->form([
-                        FileUpload::make('file')
-                            ->label('File Excel/CSV')
-                            ->required()
-                            ->disk('public')
-                            ->directory('imports')
-                            ->acceptedFileTypes([
-                                    'text/csv',
-                                    'application/vnd.ms-excel',
-                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                ]),
-                        // Toggle append dihapus, default behavior sekarang selalu append
-                        TextInput::make('delimiter')
-                            ->label('Pemisah multi-contoh di satu sel')
-                            ->helperText('Jika satu sel berisi beberapa contoh, pisahkan dengan tanda ini. Mis: ;')
-                            ->default(';')
-                            ->maxLength(2),
-                    ])
+                    FileUpload::make('file')
+                        ->label('File Excel/CSV')
+                        ->required()
+                        ->disk('public')
+                        ->directory('imports')
+                        ->acceptedFileTypes([
+                            'text/csv',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        ]),
+                    // Toggle append dihapus, default behavior sekarang selalu append
+                    TextInput::make('delimiter')
+                        ->label('Pemisah multi-contoh di satu sel')
+                        ->helperText('Jika satu sel berisi beberapa contoh, pisahkan dengan tanda ini. Mis: ;')
+                        ->default(';')
+                        ->maxLength(2),
+                ])
                 ->action(function (array $data) {
                     try {
                         $path = Storage::disk('public')->path($data['file']);
@@ -145,7 +145,7 @@ class ListKBJI2014s extends ListRecords //
                                 ? array_values(array_filter(array_map('trim', explode($delimiter, $contohCell)), fn($v) => $v !== ''))
                                 : [];
 
-                            $doc = KBJI2014::where('kode_kbji', $kode)->first();   // <— GANTI: cari pakai kode_kbji
+                            $doc = PgKBJI2014::where('kode', $kode)->first();   // Cari di PostgreSQL
                             if (!$doc) {
                                 $missing++;
                                 continue;
