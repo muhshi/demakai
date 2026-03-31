@@ -1,0 +1,7 @@
+Metode,Top1,Top3,MRR
+SQL LIKE (Tanpa Preprocessing),0.1,0.4,0.24
+"SQL LIKE (Basic: Case-Fold, No-Punct, Token-OR)",0.1,0.4,0.24
+SQL LIKE (Advanced: Basic + Stopword + Stemming),0.067,0.3,0.179
+Hybrid Search (Tanpa Preprocessing),0.167,0.333,0.258
+"Hybrid Search (Basic: Case-Fold, No-Punct, Token-OR)",0.167,0.333,0.258
+Hybrid Search (Advanced: Basic + Stopword + Stemming),0.133,0.267,0.204
