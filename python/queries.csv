@@ -1,101 +1,41 @@
 no,query,kode_ground_truth,tipe
-1,bakso,56101,KBLI
-2,jualan bakso,56101,KBLI
-3,warung kopi,56303,KBLI
-4,usaha restoran,56101,KBLI
-5,usaha laundry,96100,KBLI
-6,jasa cuci pakaian,96100,KBLI
-7,bengkel motor,95320,KBLI
-8,servis mobil,95311,KBLI
-9,ekspedisi,53200,KBLI
-10,jasa pengiriman barang,53200,KBLI
-11,toko sembako,47112,KBLI
-12,sembako,47112,KBLI
-13,toko bangunan,47521,KBLI
-14,usaha kos-kosan,55909,KBLI
-15,usaha perkebunan cabe,01138,KBLI
-16,jual sayur di pasar,47213,KBLI
-17,toko pakaian,47711,KBLI
-18,jual baju online,47711,KBLI
-19,usaha katering,56210,KBLI
-20,produksi roti rumahan,10710,KBLI
-21,usaha air minum isi ulang,11052,KBLI
-22,toko elektronik,47592,KBLI
-23,jual pulsa,61201,KBLI
-24,jasa fotokopi,82100,KBLI
-25,usaha percetakan,18111,KBLI
-26,jasa cleaning service,81210,KBLI
-27,rental mobil,77100,KBLI
-28,usaha penginapan homestay,55201,KBLI
-29,peternakan ayam,01461,KBLI
-30,usaha online shop,47711,KBLI
-31,kasir,5230,KBJI
-32,kasir toko,5230,KBJI
-33,sopir,8322,KBJI
-34,sopir truk,8332,KBJI
-35,admin,4110,KBJI
-36,admin kantor,4110,KBJI
-37,kurir,9621,KBJI
-38,kurir paket,9621,KBJI
-39,tukang bangunan,7111,KBJI
-40,tukang listrik rumah,7411,KBJI
-41,teknisi ac,7127,KBJI
-42,cleaning service kantor,9112,KBJI
-43,buruh pabrik harian,9329,KBJI
-44,penjaga toko sembako,5223,KBJI
-45,tukang kayu bangunan,7115,KBJI
-46,resepsionis hotel,4224,KBJI
-47,petugas call center,4222,KBJI
-48,staf keuangan,4312,KBJI
-49,operator mesin pengemas,8183,KBJI
-50,operator forklift,8344,KBJI
-51,admin gudang,4321,KBJI
-52,sales toko,5223,KBJI
-53,teknisi jaringan komputer,3513,KBJI
-54,montir bengkel,7231,KBJI
-55,sopir pribadi,8322,KBJI
-56,koki restoran,5120,KBJI
-57,barista kafe,5132,KBJI
-58,satpam kantor,5414,KBJI
-59,guru sekolah dasar,2341,KBJI
-60,perawat rumah sakit,2221,KBJI
-61,mencabut rumput liar di sawah,01121,KBLI
-62,ibu-ibu bikin kue basah di rumah terus dijual,10710,KBLI
-63,buka warung tegal jualan nasi sayur,56102,KBLI
-64,jualan bakso dorong pakai gerobak,56103,KBLI
-65,buka toko kelontong jual sembako,47111,KBLI
-66,bengkel tambal ban mobil,45201,KBLI
-67,bengkel tambal ban motor pinggir jalan,45407,KBLI
-68,buka kapster potong rambut pria asgar,96210,KBLI
-69,jasa cuci setrika pakaian kiloan,96301,KBLI
-70,penjahit rumahan bikin baju kaos partai,14111,KBLI
-71,jualan baju anak anak di pasar tumpah,47711,KBLI
-72,tukang kayu bikin meja kursi dari jati,16221,KBLI
-73,membuat lemari kaca atau etalase panjang,23122,KBLI
-74,menyewakan kamar kos kosan murah untuk mahasiswa,68200,KBLI
-75,jasa angkut barang pindahan rumah pakai pick up,49422,KBLI
-76,berlayar nangkap ikan tongkol pakai jaring,03111,KBLI
-77,mengelola sekolah negeri tingkat sma,85220,KBLI
-78,buka toko obat atau apotek di ruko,47721,KBLI
-79,buka klinik praktek dokter 24 jam,86201,KBLI
-80,jasa antar paket barang e-commerce,53201,KBLI
-81,satpam jaga pintu gerbang di rumah sakit,5414,KBJI
-82,supir angkut pesanan lemari kaca pakai mobil carry,8322,KBJI
-83,karyawan bagian cuci piring di restoran,9412,KBJI
-84,asisten rumah tangga tugasnya bersih bersih rumah,9111,KBJI
-85,tukang servis ganti oli motor matic rusak,7231,KBJI
-86,orang yang macul tanah nanam padi di sawah,6111,KBJI
-87,mak emak jahit baju daster di rumah,7531,KBJI
-88,tukang potong kayu bikin kusen pintu,7115,KBJI
-89,mbak mbak kasir minimarket yang jaga mesin kas,5223,KBJI
-90,tukang tebang pohon jati di hutan,6210,KBJI
-91,ibu guru ngajar matematika anak kelas 1 sd,2341,KBJI
-92,dokter yang ngasih resep obat batuk pilek ke pasien,2211,KBJI
-93,suster yang nyuntik infus pasien di ruang ugd,3221,KBJI
-94,bapak bapak yang ambil sampah rumahtangga pakai gerobak,9611,KBJI
-95,supir tronton bawa kontainer antar provinsi,8332,KBJI
-96,mbak pramugari yang nawarin makan di pesawat terbang,5111,KBJI
-97,chef yang masak nasi goreng di hotel bintang lima,5120,KBJI
-98,kuli panggul beras di pasar induk,9333,KBJI
-99,admin kantor yang tugasnya ngetik surat di microsoft word,4111,KBJI
-100,orang bps yang nyari data kemiskinan dan bikin grafik,2120,KBJI
+1,mencabut rumput liar di sawah,01121,KBLI
+2,ibu-ibu bikin kue basah di rumah terus dijual,10710,KBLI
+3,buka warung tegal jualan nasi sayur,56102,KBLI
+4,jualan bakso dorong pakai gerobak,56103,KBLI
+5,buka toko kelontong jual sembako,47111,KBLI
+6,bengkel tambal ban mobil,45201,KBLI
+7,bengkel tambal ban motor pinggir jalan,45407,KBLI
+8,buka kapster potong rambut pria asgar,96210,KBLI
+9,jasa cuci setrika pakaian kiloan,96301,KBLI
+10,penjahit rumahan bikin baju kaos partai,14111,KBLI
+11,jualan baju anak anak di pasar tumpah,47711,KBLI
+12,tukang kayu bikin meja kursi dari jati,16221,KBLI
+13,membuat lemari kaca atau etalase panjang,23122,KBLI
+14,menyewakan kamar kos kosan murah untuk mahasiswa,68200,KBLI
+15,jasa angkut barang pindahan rumah pakai pick up,49422,KBLI
+16,berlayar nangkap ikan tongkol pakai jaring,03111,KBLI
+17,mengelola sekolah negeri tingkat sma,85220,KBLI
+18,buka toko obat atau apotek di ruko,47721,KBLI
+19,buka klinik praktek dokter 24 jam,86201,KBLI
+20,jasa antar paket barang e-commerce,53201,KBLI
+21,satpam jaga pintu gerbang di rumah sakit,5414,KBJI
+22,supir angkut pesanan lemari kaca pakai mobil carry,8322,KBJI
+23,karyawan bagian cuci piring di restoran,9412,KBJI
+24,asisten rumah tangga tugasnya bersih bersih rumah,9111,KBJI
+25,tukang servis ganti oli motor matic rusak,7231,KBJI
+26,orang yang macul tanah nanam padi di sawah,6111,KBJI
+27,mak emak jahit baju daster di rumah,7531,KBJI
+28,tukang potong kayu bikin kusen pintu,7115,KBJI
+29,mbak mbak kasir minimarket yang jaga mesin kas,5223,KBJI
+30,tukang tebang pohon jati di hutan,6210,KBJI
+31,ibu guru ngajar matematika anak kelas 1 sd,2341,KBJI
+32,dokter yang ngasih resep obat batuk pilek ke pasien,2211,KBJI
+33,suster yang nyuntik infus pasien di ruang ugd,3221,KBJI
+34,bapak bapak yang ambil sampah rumahtangga pakai gerobak,9611,KBJI
+35,supir tronton bawa kontainer antar provinsi,8332,KBJI
+36,mbak pramugari yang nawarin makan di pesawat terbang,5111,KBJI
+37,chef yang masak nasi goreng di hotel bintang lima,5120,KBJI
+38,kuli panggul beras di pasar induk,9333,KBJI
+39,admin kantor yang tugasnya ngetik surat di microsoft word,4111,KBJI
+40,orang bps yang nyari data kemiskinan dan bikin grafik,2120,KBJI
