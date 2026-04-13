@@ -767,16 +767,16 @@
             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
                 <button class="method-btn active" data-search="sql" data-proc="none" onclick="setMethod(this)">SQL ·
                     None</button>
-                <button class="method-btn" data-search="sql" data-proc="basic" onclick="setMethod(this)">SQL ·
-                    Basic</button>
                 <button class="method-btn" data-search="sql" data-proc="advanced" onclick="setMethod(this)">SQL ·
                     Advanced</button>
+                <button class="method-btn" data-search="sql" data-proc="expansion" onclick="setMethod(this)">SQL ·
+                    Expansion</button>
                 <button class="method-btn" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Hybrid ·
                     None</button>
-                <button class="method-btn" data-search="hybrid" data-proc="basic" onclick="setMethod(this)">Hybrid ·
-                    Basic</button>
                 <button class="method-btn" data-search="hybrid" data-proc="advanced" onclick="setMethod(this)">Hybrid ·
                     Advanced</button>
+                <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Hybrid ·
+                    Expansion</button>
             </div>
         </div>
 

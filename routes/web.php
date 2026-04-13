@@ -36,3 +36,12 @@ Route::get('/cekhasilmethod', function () {
     return response(file_get_contents($files[0]))
         ->header('Content-Type', 'text/html');
 });
+
+Route::get('/cekhasil-sebelum', function () {
+    $file = base_path('python/output/evaluasi_sebelum_db.html');
+    if (!file_exists($file)) {
+        return response("Belum ada laporan sebelum update (evaluasi_sebelum_db.html).", 404);
+    }
+    return response(file_get_contents($file))
+        ->header('Content-Type', 'text/html');
+});

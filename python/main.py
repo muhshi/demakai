@@ -18,21 +18,21 @@ Argumen opsional:
 import argparse
 
 # ── Import preprocessing ──────────────────────────────────────────────────────
-from preprocessing.basic    import preprocess_basic
+from preprocessing.expansion import preprocess_expansion
 from preprocessing.advanced import preprocess_advanced
 
 # ── Import search (SQL LIKE) ──────────────────────────────────────────────────
 from search.sql_like import (
     search_raw      as sql_raw,
-    search_basic    as sql_basic,
-    search_advanced as sql_advanced,
+    search_expansion as sql_expansion,
+    search_advanced  as sql_advanced,
 )
 
 # ── Import search (Hybrid) ────────────────────────────────────────────────────
 from search.hybrid import (
     search_raw      as hybrid_raw,
-    search_basic    as hybrid_basic,
-    search_advanced as hybrid_advanced,
+    search_expansion as hybrid_expansion,
+    search_advanced  as hybrid_advanced,
 )
 
 # ── Import utils ──────────────────────────────────────────────────────────────
@@ -51,15 +51,15 @@ SEARCH_RAW_FN = {
 
 # Query dengan preprocessing — terima dict dari preprocess_*()
 PREPROCESSING_FN = {
-    "basic":    preprocess_basic,
-    "advanced": preprocess_advanced,
+    "expansion": preprocess_expansion,
+    "advanced":  preprocess_advanced,
 }
 
 SEARCH_FN = {
-    ("sql",    "basic"):    sql_basic,
-    ("sql",    "advanced"): sql_advanced,
-    ("hybrid", "basic"):    hybrid_basic,
-    ("hybrid", "advanced"): hybrid_advanced,
+    ("sql",    "expansion"): sql_expansion,
+    ("sql",    "advanced"):  sql_advanced,
+    ("hybrid", "expansion"): hybrid_expansion,
+    ("hybrid", "advanced"):  hybrid_advanced,
 }
 
 
@@ -123,10 +123,10 @@ def run_all_combinations(query: str, limit: int = 10, model: str = None) -> dict
     """
     combos = [
         ("sql",    "none"),
-        ("sql",    "basic"),
+        ("sql",    "expansion"),
         ("sql",    "advanced"),
         ("hybrid", "none"),
-        ("hybrid", "basic"),
+        ("hybrid", "expansion"),
         ("hybrid", "advanced"),
     ]
 
@@ -153,8 +153,8 @@ def run_all_combinations(query: str, limit: int = 10, model: str = None) -> dict
 # ──────────────────────────────────────────────────────────────────────────────
 
 def example_combination_1(query: str) -> list:
-    """Kombinasi 1: SQL LIKE + Preprocessing Basic"""
-    return sql_basic(preprocess_basic(query))
+    """Kombinasi 1: SQL LIKE + Preprocessing Expansion"""
+    return sql_expansion(preprocess_expansion(query))
 
 
 def example_combination_2(query: str) -> list:
@@ -163,8 +163,8 @@ def example_combination_2(query: str) -> list:
 
 
 def example_combination_3(query: str) -> list:
-    """Kombinasi 3: Hybrid Search + Preprocessing Basic"""
-    return hybrid_basic(preprocess_basic(query))
+    """Kombinasi 3: Hybrid Search + Preprocessing Expansion"""
+    return hybrid_expansion(preprocess_expansion(query))
 
 
 def example_combination_4(query: str) -> list:
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=(
             "Contoh:\n"
-            "  python main.py --search sql    --processing basic\n"
+            "  python main.py --search sql    --processing expansion\n"
             "  python main.py --search hybrid --processing advanced --model KBLI\n"
             "  python main.py --all\n"
         ),
@@ -204,8 +204,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--processing", "-p",
         type=str,
-        choices=["none", "basic", "advanced"],
-        help="Metode preprocessing: none | basic | advanced",
+        choices=["none", "expansion", "advanced"],
+        help="Metode preprocessing: none | expansion | advanced",
     )
 
     # ── Argumen opsional ───────────────────────────────────────
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     if not args.all and (args.search is None or args.processing is None):
         parser.error(
             "Argumen --search dan --processing wajib diisi.\n"
-            "Contoh: python main.py --search sql --processing basic\n"
+            "Contoh: python main.py --search sql --processing expansion\n"
             "Atau gunakan --all untuk menjalankan semua kombinasi."
         )
 

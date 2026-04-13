@@ -2,10 +2,10 @@
 sql_like.py — SQL LIKE Search
 ------------------------------
 Modul pencarian menggunakan SQL ILIKE query ke database PostgreSQL.
-Mendukung tiga mode input:
+Mendukung dua mode input:
   - search_raw()      → query mentah, tanpa preprocessing apapun
-  - search_basic()    → dari hasil preprocess_basic()
   - search_advanced() → dari hasil preprocess_advanced() (pakai stemmed_clean)
+  - search_expansion()→ dari hasil preprocess_expansion() (pakai expanded_tokens)
 
 Cara kerja:
   Query dibersihkan oleh preprocessing, lalu digunakan sebagai pola ILIKE
@@ -14,6 +14,7 @@ Cara kerja:
 
 from config.database import get_connection, release_connection
 from config.settings import Settings
+from .utils import search_numeric_code
 
 
 def _run_query(cursor, table: str, pattern: str, limit: int) -> list:
@@ -25,6 +26,7 @@ def _run_query(cursor, table: str, pattern: str, limit: int) -> list:
         SELECT *
         FROM {table}
         WHERE
+            kode        ILIKE %(pattern)s OR
             judul       ILIKE %(pattern)s OR
             deskripsi   ILIKE %(pattern)s OR
             CAST(contoh_lapangan AS TEXT) ILIKE %(pattern)s
@@ -50,10 +52,10 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     for token in tokens:
         pat = f"%{token}%"
         score_parts.append(
-            "(CASE WHEN judul ILIKE %s OR deskripsi ILIKE %s "
+            "(CASE WHEN kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
             "OR CAST(contoh_lapangan AS TEXT) ILIKE %s THEN 1 ELSE 0 END)"
         )
-        params.extend([pat, pat, pat])
+        params.extend([pat, pat, pat, pat])
 
     # OR conditions untuk WHERE
     or_conditions = []
@@ -61,10 +63,10 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     for token in tokens:
         pat = f"%{token}%"
         or_conditions.append(
-            "(judul ILIKE %s OR deskripsi ILIKE %s "
+            "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
             "OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
         )
-        where_params.extend([pat, pat, pat])
+        where_params.extend([pat, pat, pat, pat])
 
     score_expr = " + ".join(score_parts)
     where_expr = " OR ".join(or_conditions)
@@ -80,60 +82,78 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     return cursor.fetchall()
 
 
-def search_basic(preprocessed: dict, limit: int = None, model: str = None) -> list:
+def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -> list:
     """
-    SQL LIKE search menggunakan hasil preprocessing BASIC.
-    Keyword yang digunakan: preprocessed['clean'] (tanpa stopword/stemming).
-    Jika frasa lengkap tidak ditemukan, fallback ke OR per token.
+    SQL LIKE search menggunakan hasil preprocessing QUERY EXPANSION.
+    Keunggulan: Menggunakan sinonim untuk menangkap kecocokan semantik.
 
     Args:
-        preprocessed : output dari preprocess_basic()
+        preprocessed : output dari preprocess_expansion()
         limit        : jumlah maksimum hasil. Default: Settings.DEFAULT_LIMIT
         model        : 'KBLI', 'KBJI', atau None (keduanya)
 
     Returns:
-        list of dict — setiap item adalah satu record dari DB
+        list of dict
     """
     limit = limit or Settings.DEFAULT_LIMIT
     keyword = preprocessed.get("clean", "")
     tokens  = preprocessed.get("tokens", [])
+    expanded_tokens = preprocessed.get("expanded_tokens", [])
+    
+    # Tambahkan variasi kueri lapangan (Augmentasi) ke dalam expanded_tokens
+    # sesuai dengan model yang sedang dicari
+    augmented_expanded = list(expanded_tokens)
+    if model == "KBLI":
+        augmented_expanded.extend(preprocessed.get("kbli_variations", []))
+    elif model == "KBJI":
+        augmented_expanded.extend(preprocessed.get("kbji_variations", []))
+    else:
+        # Jika model None, tambahkan keduanya demi Recall maksimal
+        augmented_expanded.extend(preprocessed.get("kbli_variations", []))
+        augmented_expanded.extend(preprocessed.get("kbji_variations", []))
+    
+    # Deduplikasi
+    augmented_expanded = sorted(list(set(augmented_expanded)))
+
     if not keyword:
         return []
 
-    pattern = f"%{keyword}%"
     results = []
     conn = get_connection()
     try:
         with conn.cursor() as cur:
-            # Step 1: Coba frasa lengkap
+            # ── PRIORITY: Numeric Code Match ─────────────────────────────────
+            if keyword.isdigit():
+                numeric_results = search_numeric_code(cur, keyword, limit, model)
+                if numeric_results:
+                    return numeric_results
+            # Step 1: Coba frasa asli lengkap (High Precision)
+            pattern = f"%{keyword}%"
             if model is None or model == "KBLI":
                 rows = _run_query(cur, Settings.TABLE_KBLI, pattern, limit)
-                results.extend([{**r, "_source": "KBLI", "_boost": "phrase"} for r in rows])
+                results.extend([{**r, "_source": "KBLI", "_boost": "original_phrase"} for r in rows])
 
             if model is None or model == "KBJI":
                 rows = _run_query(cur, Settings.TABLE_KBJI, pattern, limit)
-                results.extend([{**r, "_source": "KBJI", "_boost": "phrase"} for r in rows])
+                results.extend([{**r, "_source": "KBJI", "_boost": "original_phrase"} for r in rows])
 
-            # Step 2 (fallback): OR per token jika step 1 kosong
-            if not results and len(tokens) > 1:
+            # Step 2: OR per expanded token (High Recall) jika hasil step 1 kurang dari limit
+            if len(results) < limit and augmented_expanded:
+                existing_ids = {r.get("id") for r in results}
+                
                 if model is None or model == "KBLI":
-                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, tokens, limit)
-                    results.extend([{**r, "_source": "KBLI", "_boost": "or_token"} for r in rows])
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, augmented_expanded, limit)
+                    for r in rows:
+                        if r.get("id") not in existing_ids:
+                            results.append({**r, "_source": "KBLI", "_boost": "expanded_token"})
+                            existing_ids.add(r.get("id"))
 
                 if model is None or model == "KBJI":
-                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, tokens, limit)
-                    results.extend([{**r, "_source": "KBJI", "_boost": "or_token"} for r in rows])
-
-            # Step 3 (fallback ke-2): satu token terpanjang
-            if not results and tokens:
-                best_token = max(tokens, key=len)
-                single_pattern = f"%{best_token}%"
-                if model is None or model == "KBLI":
-                    rows = _run_query(cur, Settings.TABLE_KBLI, single_pattern, limit)
-                    results.extend([{**r, "_source": "KBLI", "_boost": "single_token"} for r in rows])
-                if model is None or model == "KBJI":
-                    rows = _run_query(cur, Settings.TABLE_KBJI, single_pattern, limit)
-                    results.extend([{**r, "_source": "KBJI", "_boost": "single_token"} for r in rows])
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, augmented_expanded, limit)
+                    for r in rows:
+                        if r.get("id") not in existing_ids:
+                            results.append({**r, "_source": "KBJI", "_boost": "expanded_token"})
+                            existing_ids.add(r.get("id"))
     finally:
         release_connection(conn)
 
@@ -165,6 +185,11 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
     conn = get_connection()
     try:
         with conn.cursor() as cur:
+            # ── PRIORITY: Numeric Code Match ─────────────────────────────────
+            if keyword.isdigit():
+                numeric_results = search_numeric_code(cur, keyword, limit, model)
+                if numeric_results:
+                    return numeric_results
             # Step 1: Coba frasa stemmed lengkap
             if model is None or model == "KBLI":
                 rows = _run_query(cur, Settings.TABLE_KBLI, pattern, limit)
@@ -234,10 +259,10 @@ def search_multi_token(preprocessed: dict, limit: int = None, model: str = None,
         for token in tokens:
             pat = f"%{token}%"
             conditions.append(
-                "(judul ILIKE %s OR deskripsi ILIKE %s OR "
+                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR "
                 "CAST(contoh_lapangan AS TEXT) ILIKE %s)"
             )
-            params.extend([pat, pat, pat])
+            params.extend([pat, pat, pat, pat])
 
         where_clause = " AND ".join(conditions)
         sql = f"SELECT * FROM {table} WHERE {where_clause} LIMIT %s"
@@ -289,6 +314,12 @@ def search_raw(query: str, limit: int = None, model: str = None) -> list:
     conn = get_connection()
     try:
         with conn.cursor() as cur:
+            # ── PRIORITY: Numeric Code Match ─────────────────────────────────
+            clean_query = query.strip()
+            if clean_query.isdigit():
+                numeric_results = search_numeric_code(cur, clean_query, limit, model)
+                if numeric_results:
+                    return numeric_results
             # Step 1: Coba frasa lengkap
             if model is None or model == "KBLI":
                 rows = _run_query(cur, Settings.TABLE_KBLI, pattern, limit)

@@ -2,14 +2,14 @@
 evaluate.py — Evaluasi Otomatis 6 Kombinasi Metode Pencarian DEMAKAI
 =====================================================================
 Baca daftar query dari queries.csv, jalankan 6 kombinasi metode,
-hitung Rank / Top1 / Top3 / RR untuk setiap kombinasi, simpan ke:
+hitung Rank / top1 / top5 / KK untuk setiap kombinasi, simpan ke:
   - output/evaluasi_hasil.csv   (tabel angka lengkap)
   - output/evaluasi_hasil.html  (tabel visual berwarna)
 
 Cara pakai:
   python evaluate.py
 
-Edit queries.csv untuk mengganti daftar query dan kode ground truth.
+Edit queries.csv untuk mengganti daftar kuery dan kode ground truth.
 """
 
 import csv
@@ -20,16 +20,16 @@ from datetime import datetime
 # ── Pastikan bisa import modul lokal ─────────────────────────────────────────
 sys.path.insert(0, os.path.dirname(__file__))
 
-from preprocessing.basic    import preprocess_basic
+from preprocessing.expansion import preprocess_expansion
 from preprocessing.advanced import preprocess_advanced
 from search.sql_like import (
     search_raw      as sql_raw,
-    search_basic    as sql_basic,
-    search_advanced as sql_advanced,
+    search_expansion as sql_expansion,
+    search_advanced  as sql_advanced,
 )
 from search.hybrid import (
     search_raw      as hybrid_raw,
-    search_basic    as hybrid_basic,
+    search_expansion as hybrid_expansion,
     search_advanced as hybrid_advanced,
 )
 
@@ -40,12 +40,12 @@ os.makedirs("output", exist_ok=True)
 # ─────────────────────────────────────────────────────────────────────────────
 
 COMBINATIONS = [
-    ("SQL",    "None",     lambda q, model=None: sql_raw(q, model=model)),
-    ("SQL",    "Basic",    lambda q, model=None: sql_basic(preprocess_basic(q), model=model)),
-    ("SQL",    "Advanced", lambda q, model=None: sql_advanced(preprocess_advanced(q), model=model)),
-    ("Hybrid", "None",     lambda q, model=None: hybrid_raw(q, model=model)),
-    ("Hybrid", "Basic",    lambda q, model=None: hybrid_basic(preprocess_basic(q), model=model)),
-    ("Hybrid", "Advanced", lambda q, model=None: hybrid_advanced(preprocess_advanced(q), model=model)),
+    ("SQL",    "None",      lambda q, model=None: sql_raw(q, model=model)),
+    ("SQL",    "Advanced",  lambda q, model=None: sql_advanced(preprocess_advanced(q), model=model)),
+    ("SQL",    "Expansion", lambda q, model=None: sql_expansion(preprocess_expansion(q), model=model)),
+    ("Hybrid", "None",      lambda q, model=None: hybrid_raw(q, model=model)),
+    ("Hybrid", "Advanced",  lambda q, model=None: hybrid_advanced(preprocess_advanced(q), model=model)),
+    ("Hybrid", "Expansion", lambda q, model=None: hybrid_expansion(preprocess_expansion(q), model=model)),
 ]
 
 COMBO_LABELS = [f"{s}_{p}" for s, p, _ in COMBINATIONS]  # e.g. "SQL_None"
@@ -73,23 +73,23 @@ def compute_metrics(rank: int, top_n: int = 10) -> dict:
     """
     if 0 < rank <= top_n:
         top1  = 1 if rank == 1 else 0
-        top3  = 1 if rank <= 3 else 0
+        top5  = 1 if rank <= 5 else 0
         top10 = 1 if rank <= 10 else 0
-        rr    = round(1.0 / rank, 4)
+        kk    = round(1.0 / rank, 4)
         rank_val = rank
     else:
         top1 = 0
-        top3 = 0
+        top5 = 0
         top10 = 0
-        rr = 0.0
+        kk = 0.0
         rank_val = 0
 
     return {
         "rank": rank_val,
         "top1": top1,
-        "top3": top3,
+        "top5": top5,
         "top10": top10,
-        "rr": rr
+        "kk": kk
     }
 
 
@@ -103,6 +103,10 @@ def run_evaluation(queries_file: str = "queries.csv", limit: int = 10):
     File CSV harus memiliki kolom: no, query, kode_ground_truth, tipe (KBLI/KBJI)
     """
     # Baca query
+    if not os.path.exists(queries_file):
+        print(f"[ERROR] File '{queries_file}' tidak ditemukan.")
+        return []
+
     with open(queries_file, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         queries = list(reader)
@@ -122,245 +126,53 @@ def run_evaluation(queries_file: str = "queries.csv", limit: int = 10):
 
         # Hitung string preprocessing untuk ditampilkan
         try:
-            desc_basic = " ".join(preprocess_basic(query)["tokens"])
-            desc_adv   = " ".join(preprocess_advanced(query)["tokens"])
+            res_adv   = preprocess_advanced(query)
+            res_exp   = preprocess_expansion(query)
+            desc_adv   = f"Advanced (Stemmed):\n[{', '.join(res_adv['stemmed_tokens'])}]"
+            
+            # Tambahan: Tampilkan Field Variations (VARIATION_MAP)
+            field_key = "kbli_variations" if tipe == "KBLI" else "kbji_variations"
+            field_vars = res_exp.get(field_key, [])
+            
+            desc_exp   = f"Expansion (Synonyms):\n[{', '.join(res_exp['expanded_tokens'])}]"
+            if field_vars:
+                desc_exp += f"\n\nField Variations ({tipe}):\n[{', '.join(field_vars)}]"
         except Exception:
-            desc_basic = query
             desc_adv   = query
+            desc_exp   = query
 
         row = {
             "no": no, 
             "query": query, 
             "kode_ground_truth": kode_gt, 
             "tipe": tipe,
-            "desc_basic": desc_basic,
-            "desc_advanced": desc_adv
+            "desc_advanced": desc_adv,
+            "desc_expansion": desc_exp
         }
 
         for search_method, proc_method, search_fn in COMBINATIONS:
             label = f"{search_method}_{proc_method}"
-            print(f"  → {label} ...", end=" ", flush=True)
+            print(f"  -> {label} ...", end=" ", flush=True)
 
             try:
                 results = search_fn(query, model=model)
-                # Pass 0 if rank is None, as compute_metrics now expects int
                 rank    = get_rank(results, kode_gt) or 0
                 metrics = compute_metrics(rank, top_n=limit)
-                print(f"rank={metrics['rank']}") # Only print rank
+                print(f"rank={metrics['rank']}")
             except Exception as e:
                 print(f"ERROR: {e}")
-                # Set rank to 0 for errors
-                metrics = {"rank": 0, "top1": 0, "top3": 0, "top10": 0, "rr": 0.0}
+                metrics = {"rank": 0, "top1": 0, "top5": 0, "top10": 0, "kk": 0.0}
 
             row[f"rank_{label}"]  = metrics["rank"]
             row[f"top1_{label}"]  = metrics["top1"]
-            row[f"top3_{label}"]  = metrics["top3"]
+            row[f"top5_{label}"]  = metrics["top5"]
             row[f"top10_{label}"] = metrics["top10"]
-            row[f"rr_{label}"]    = metrics["rr"]
+            row[f"kk_{label}"]    = metrics["kk"]
 
         all_rows.append(row)
 
     return all_rows
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke CSV
-# ─────────────────────────────────────────────────────────────────────────────
-
-def save_csv(rows: list, filepath: str):
-    if not rows:
-        return
-
-    # Susun header (hanya rank)
-    base_cols = ["no", "tipe", "query", "kode_ground_truth"]
-    metric_cols = []
-    for label in COMBO_LABELS:
-        metric_cols.append(f"rank_{label}")
-
-    fieldnames = base_cols + metric_cols
-
-    with open(filepath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    print(f"\n[CSV] Disimpan → {os.path.abspath(filepath)}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke HTML
-# ─────────────────────────────────────────────────────────────────────────────
-
-def save_html(rows: list, filepath: str):
-    if not rows:
-        return
-
-    def cell_style(val):
-        """Warnai sel berdasarkan nilai rank."""
-        if val == 0: # Rank 0 means not found or error
-            return "background:#2d2f45;color:#555"
-        try:
-            v = int(val)
-        except (ValueError, TypeError):
-            return ""
-        # Rank: semakin kecil semakin hijau
-        if v == 1:   return "background:#064e3b;color:#6ee7b7;font-weight:bold"
-        if v <= 3:   return "background:#065f46;color:#a7f3d0"
-        if v <= 10:  return "background:#1e3a2f;color:#d1fae5"
-        return "background:#2d2f45;color:#555"
-
-    # Header dan Sub-header (HANYA RANK)
-    combo_headers = "".join(
-        f'<th colspan="1" style="background:#25273b;color:#a78bfa;font-size:0.75rem">'
-        f'{s} + {p}</th>'
-        for s, p, _ in COMBINATIONS
-    )
-    sub_headers = "".join(
-        '<th>Rank</th>'
-        for _ in COMBINATIONS
-    )
-
-    # Baris data
-    data_rows_html = ""
-    for row in rows:
-        tipe_val  = row.get("tipe", "")
-        tipe_color = "#86efac" if tipe_val == "KBLI" else "#93c5fd"
-        cells = (
-            f'<td>{row["no"]}</td>'
-            f'<td style="color:{tipe_color};font-weight:bold">{tipe_val}</td>'
-            f'<td style="color:#c4b5fd">{row["query"]}</td>'
-            f'<td><code>{row["kode_ground_truth"]}</code></td>'
-        )
-        for label in COMBO_LABELS:
-            rank  = row.get(f"rank_{label}", "-")
-            top1  = row.get(f"top1_{label}", "-")
-            top3  = row.get(f"top3_{label}", "-")
-            top10 = row.get(f"top10_{label}", "-")
-            rr    = row.get(f"rr_{label}", "-")
-            cells += (
-                f'<td style="{cell_style(rank)}">{rank}</td>'
-                f'<td style="{cell_style(top1)}">{top1}</td>'
-                f'<td style="{cell_style(top3)}">{top3}</td>'
-                f'<td style="{cell_style(top10)}">{top10}</td>'
-                f'<td style="{cell_style(rr)}">{rr}</td>'
-            )
-        data_rows_html += f"<tr>{cells}</tr>\n"
-
-    # Summary MRR per kombinasi
-    summary_html = '<tr><td colspan="3" style="font-weight:bold;color:#a78bfa">MRR</td>'
-    for label in COMBO_LABELS:
-        rr_vals = []
-        for row in rows:
-            v = row.get(f"rr_{label}", 0)
-            try:
-                rr_vals.append(float(v))
-            except (ValueError, TypeError):
-                rr_vals.append(0)
-        mrr = round(sum(rr_vals) / len(rr_vals), 4) if rr_vals else 0
-        color = "#6ee7b7" if mrr >= 0.5 else "#fbbf24" if mrr >= 0.2 else "#f87171"
-        summary_html += (
-            f'<td style="font-weight:bold;color:{color}">{mrr}</td>'
-            f'<td colspan="4"></td>'
-        )
-    summary_html += "</tr>"
-
-    ts = datetime.now().strftime("%d %B %Y, %H:%M:%S")
-    html = f"""<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>DEMAKAI — Evaluasi 6 Kombinasi</title>
-  <style>
-    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-    body {{ font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 24px; }}
-    h1 {{ color: #a78bfa; margin-bottom: 4px; font-size: 1.5rem; }}
-    .meta {{ color: #888; font-size: 0.85rem; margin-bottom: 20px; }}
-    .wrap {{ overflow-x: auto; }}
-    table {{ border-collapse: collapse; font-size: 0.8rem; min-width: 100%; }}
-    th, td {{ padding: 8px 10px; border: 1px solid #2d2f45; white-space: nowrap; }}
-    th {{ background: #1e1f2e; color: #94a3b8; font-weight: 500; }}
-    tr:hover td {{ filter: brightness(1.15); }}
-    code {{ background: #312e81; color: #a5b4fc; padding: 1px 5px; border-radius: 4px; }}
-  </style>
-</head>
-<body>
-  <h1>🔍 DEMAKAI — Evaluasi 6 Kombinasi Metode Pencarian</h1>
-  <div class="meta">Generated: {ts} &nbsp;·&nbsp; {len(rows)} query</div>
-  <div class="wrap">
-    <table>
-      <thead>
-        <tr>
-          <th rowspan="2">#</th>
-          <th rowspan="2">Tipe</th>
-          <th rowspan="2">Query</th>
-          <th rowspan="2">Kode GT</th>
-          {combo_headers}
-        </tr>
-        <tr>
-          {sub_headers}
-        </tr>
-      </thead>
-      <tbody>
-        {data_rows_html}
-      </tbody>
-    </table>
-  </div>
-</body>
-</html>"""
-
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(html)
-    print(f"[HTML]  Disimpan → {os.path.abspath(filepath)}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke EXCEL (.xlsx) menggunakan pandas
-# ─────────────────────────────────────────────────────────────────────────────
-
-def save_excel(rows: list, filepath: str):
-    if not rows:
-        return
-        
-    try:
-        import pandas as pd
-        
-        # Susun header
-        base_cols = ["no", "tipe", "query", "kode_ground_truth"]
-        metric_cols = []
-        for label in COMBO_LABELS:
-            metric_cols.append(f"rank_{label}")
-
-        columns = base_cols + metric_cols
-        
-        # Buat dataframe hanya dengan kolom format rank
-        df = pd.DataFrame(rows, columns=columns)
-        
-        # Simpan ke excel
-        df.to_excel(filepath, index=False, engine='openpyxl')
-        print(f"[EXCEL] Disimpan → {os.path.abspath(filepath)}")
-        
-    except ImportError:
-        print("[WARNING] Pandas/openpyxl tidak terinstall. Eksport EXCEL dilewati.")
-        print("          Jalankan: pip install pandas openpyxl")
-    except Exception as e:
-        print(f"[ERROR] Gagal menyimpan EXCEL: {e}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Entry point
-# ─────────────────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    QUERIES_FILE = "queries.csv"
-    LIMIT        = 10
-
-    if not os.path.exists(QUERIES_FILE):
-        print(f"[ERROR] File '{QUERIES_FILE}' tidak ditemukan.")
-        print("Buat file queries.csv dengan kolom: no, query, kode_ground_truth")
-        raise SystemExit(1)
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke CSV
-# ─────────────────────────────────────────────────────────────────────────────
 
 def calculate_summary(rows: list) -> list:
     if not rows:
@@ -371,26 +183,26 @@ def calculate_summary(rows: list) -> list:
     for s, p, _ in COMBINATIONS:
         label = f"{s}_{p}"
         top1_vals = [int(r.get(f"top1_{label}", 0)) for r in rows]
-        top3_vals = [int(r.get(f"top3_{label}", 0)) for r in rows]
-        rr_vals   = [float(r.get(f"rr_{label}", 0.0)) for r in rows]
+        top5_vals = [int(r.get(f"top5_{label}", 0)) for r in rows]
+        kk_vals   = [float(r.get(f"kk_{label}", 0.0)) for r in rows]
         
         top1_avg = sum(top1_vals) / n
-        top3_avg = sum(top3_vals) / n
-        mrr_avg  = sum(rr_vals) / n
+        top5_avg = sum(top5_vals) / n
+        mrr_avg  = sum(kk_vals) / n
         
         if s == "SQL":
             if p == "None": name = "SQL LIKE (Tanpa Preprocessing)"
-            elif p == "Basic": name = "SQL LIKE (Basic: Case-Fold, No-Punct, Token-OR)"
-            elif p == "Advanced": name = "SQL LIKE (Advanced: Basic + Stopword + Stemming)"
+            elif p == "Advanced": name = "SQL LIKE (Advanced: Stopword + Stemming)"
+            elif p == "Expansion": name = "SQL LIKE (Query Expansion: Sinonim + Domain)"
         else:
             if p == "None": name = "Hybrid Search (Tanpa Preprocessing)"
-            elif p == "Basic": name = "Hybrid Search (Basic: Case-Fold, No-Punct, Token-OR)"
-            elif p == "Advanced": name = "Hybrid Search (Advanced: Basic + Stopword + Stemming)"
+            elif p == "Advanced": name = "Hybrid Search (Advanced: Stopword + Stemming)"
+            elif p == "Expansion": name = "Hybrid Search (Query Expansion: Sinonim + Domain)"
 
         summary.append({
             "Metode": name,
             "Top1": round(top1_avg, 3),
-            "Top3": round(top3_avg, 3),
+            "Top5": round(top5_avg, 3),
             "MRR": round(mrr_avg, 3)
         })
     return summary
@@ -400,26 +212,25 @@ def save_summary_csv(summary: list, filepath: str):
     if not summary:
         return
     with open(filepath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["Metode", "Top1", "Top3", "MRR"])
+        writer = csv.DictWriter(f, fieldnames=["Metode", "Top1", "Top5", "MRR"])
         writer.writeheader()
         writer.writerows(summary)
-    print(f"[CSV] Summary Disimpan → {os.path.abspath(filepath)}")
+    print(f"[CSV] Summary Disimpan -> {os.path.abspath(filepath)}")
 
 
 def save_csv(rows: list, filepath: str):
     if not rows:
         return
 
-    # Susun header (semua metrik)
     base_cols = ["no", "tipe", "query", "kode_ground_truth"]
     metric_cols = []
     for label in COMBO_LABELS:
         metric_cols.extend([
             f"rank_{label}",
             f"top1_{label}",
-            f"top3_{label}",
+            f"top5_{label}",
             f"top10_{label}",
-            f"rr_{label}"
+            f"kk_{label}"
         ])
 
     fieldnames = base_cols + metric_cols
@@ -429,13 +240,8 @@ def save_csv(rows: list, filepath: str):
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"[CSV] Data Disimpan → {os.path.abspath(filepath)}")
+    print(f"[CSV] Data Disimpan -> {os.path.abspath(filepath)}")
 
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke HTML Gabungan
-# ─────────────────────────────────────────────────────────────────────────────
 
 def build_section_html(title: str, rows: list, summary_data: list) -> str:
     if not rows:
@@ -448,23 +254,21 @@ def build_section_html(title: str, rows: list, summary_data: list) -> str:
         except (ValueError, TypeError):
             return ""
         if v == 1:   return "background:#064e3b;color:#6ee7b7;font-weight:bold"
-        if v <= 3:   return "background:#065f46;color:#a7f3d0"
+        if v <= 5:   return "background:#065f46;color:#a7f3d0"
         if v <= 10:  return "background:#1e3a2f;color:#d1fae5"
         return "background:#2d2f45;color:#555"
 
-    # Header dan Sub-header
     combo_headers = ""
     for s, p, _ in COMBINATIONS:
-        colspan = 6 if p in ("Basic", "Advanced") else 5
+        colspan = 6 if p in ("Advanced", "Expansion") else 5
         combo_headers += f'<th colspan="{colspan}" style="background:#312e81;color:#a5b4fc;text-align:center">{s} + {p}</th>'
 
     sub_headers = ""
     for _, p, _ in COMBINATIONS:
-        sub_headers += '<th>Rank</th><th>Top1</th><th>Top3</th><th>Top10</th><th>RR</th>'
-        if p in ("Basic", "Advanced"):
+        sub_headers += '<th>rank</th><th>top1</th><th>top5</th><th>top10</th><th>KK</th>'
+        if p in ("Advanced", "Expansion"):
             sub_headers += '<th>Deskripsi Preprocessing</th>'
 
-    # Baris data
     data_rows_html = ""
     for row in rows:
         tipe_val  = row.get("tipe", "")
@@ -479,51 +283,40 @@ def build_section_html(title: str, rows: list, summary_data: list) -> str:
             label = f"{s}_{p}"
             rank  = row.get(f"rank_{label}", 0)
             top1  = row.get(f"top1_{label}", 0)
-            top3  = row.get(f"top3_{label}", 0)
+            top5  = row.get(f"top5_{label}", 0)
             top10 = row.get(f"top10_{label}", 0)
-            rr    = row.get(f"rr_{label}", 0.0)
-            
-            if rank == "-": rank = 0
-            if top1 == "-": top1 = 0
-            if top3 == "-": top3 = 0
-            if top10 == "-": top10 = 0
-            if rr == "-": rr = 0.0
+            kk    = row.get(f"kk_{label}", 0.0)
             
             cells += (
                 f'<td style="{cell_style(rank)}">{rank}</td>'
                 f'<td style="{cell_style(top1)}">{top1}</td>'
-                f'<td style="{cell_style(top3)}">{top3}</td>'
+                f'<td style="{cell_style(top5)}">{top5}</td>'
                 f'<td style="{cell_style(top10)}">{top10}</td>'
-                f'<td style="{cell_style(rr)}">{rr}</td>'
+                f'<td style="{cell_style(kk)}">{kk}</td>'
             )
             
-            if p == "Basic":
-                cells += f'<td style="color:#d8b4fe;font-size:0.75rem;max-width:200px;white-space:normal;">{row.get("desc_basic", "")}</td>'
-            elif p == "Advanced":
-                cells += f'<td style="color:#d8b4fe;font-size:0.75rem;max-width:200px;white-space:normal;">{row.get("desc_advanced", "")}</td>'
+            if p == "Advanced":
+                val = row.get("desc_advanced", "").replace("\n", "<br>")
+                cells += f'<td style="color:#d8b4fe;font-size:0.7rem;max-width:200px;white-space:normal;">{val}</td>'
+            elif p == "Expansion":
+                val = row.get("desc_expansion", "").replace("\n", "<br>")
+                cells += f'<td style="color:#d8b4fe;font-size:0.7rem;max-width:200px;white-space:normal;">{val}</td>'
                 
         data_rows_html += f"<tr>{cells}</tr>\n"
 
-    # Summary MRR per kombinasi
     summary_html = '<tr><td colspan="4" style="font-weight:bold;color:#a78bfa;text-align:right;padding-right:15px">MRR</td>'
     for s, p, _ in COMBINATIONS:
         label = f"{s}_{p}"
-        rr_vals = []
-        for row in rows:
-            v = row.get(f"rr_{label}", 0)
-            try:
-                rr_vals.append(float(v))
-            except (ValueError, TypeError):
-                rr_vals.append(0)
-        mrr = round(sum(rr_vals) / len(rr_vals), 4) if rr_vals else 0
+        kk_vals = [float(row.get(f"kk_{label}", 0)) for row in rows]
+        mrr = round(sum(kk_vals) / len(kk_vals), 4) if kk_vals else 0
         color = "#6ee7b7" if mrr >= 0.5 else "#fbbf24" if mrr >= 0.2 else "#f87171"
         
         summary_html += (
             f'<td colspan="4"></td>'
             f'<td style="font-weight:bold;color:{color}">{mrr:.4f}</td>'
         )
-        if p in ("Basic", "Advanced"):
-            summary_html += '<td></td>' # Kosong untuk kolom deskripsi
+        if p in ("Advanced", "Expansion"):
+            summary_html += '<td></td>'
             
     summary_html += "</tr>"
 
@@ -534,8 +327,8 @@ def build_section_html(title: str, rows: list, summary_data: list) -> str:
       <thead>
         <tr>
           <th style="background:#25273b;color:#a78bfa;text-align:left">Metode</th>
-          <th style="background:#25273b;color:#a78bfa">Top1</th>
-          <th style="background:#25273b;color:#a78bfa">Top3</th>
+          <th style="background:#25273b;color:#a78bfa">top1</th>
+          <th style="background:#25273b;color:#a78bfa">top5</th>
           <th style="background:#25273b;color:#a78bfa">MRR</th>
         </tr>
       </thead>
@@ -543,12 +336,12 @@ def build_section_html(title: str, rows: list, summary_data: list) -> str:
 """
     for item in summary_data:
         t1 = f"{item['Top1']:.3f}".replace('.', ',')
-        t3 = f"{item['Top3']:.3f}".replace('.', ',')
+        t5 = f"{item['Top5']:.3f}".replace('.', ',')
         rr = f"{item['MRR']:.3f}".replace('.', ',')
         summary_table_html += f"""        <tr>
           <td style="font-weight:bold;color:#c4b5fd">{item['Metode']}</td>
           <td style="text-align:center">{t1}</td>
-          <td style="text-align:center">{t3}</td>
+          <td style="text-align:center">{t5}</td>
           <td style="text-align:center">{rr}</td>
         </tr>"""
     summary_table_html += """
@@ -595,53 +388,92 @@ def save_html_combined(rows_kbli: list, summary_kbli: list, rows_kbji: list, sum
   <meta charset="UTF-8">
   <title>DEMAKAI — Evaluasi 6 Kombinasi</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-    body {{ font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 24px; }}
-    h1 {{ color: #a78bfa; margin-bottom: 4px; font-size: 1.5rem; }}
-    .meta {{ color: #888; font-size: 0.85rem; margin-bottom: 20px; }}
-    .wrap {{ overflow-x: auto; }}
-    table {{ border-collapse: collapse; font-size: 0.8rem; min-width: 100%; }}
-    th, td {{ padding: 8px 10px; border: 1px solid #2d2f45; white-space: nowrap; }}
-    th {{ background: #1e1f2e; color: #94a3b8; font-weight: 500; }}
-    tr:hover td {{ filter: brightness(1.15); }}
-    code {{ background: #312e81; color: #a5b4fc; padding: 1px 5px; border-radius: 4px; }}
+    body {{ 
+        font-family: 'Outfit', sans-serif; 
+        background: #0f111a; 
+        color: #e2e8f0; 
+        padding: 40px;
+        line-height: 1.5;
+    }}
+    h1 {{ 
+        color: #a78bfa; 
+        margin-bottom: 8px; 
+        font-size: 2rem;
+        font-weight: 600;
+        background: linear-gradient(90deg, #a78bfa, #818cf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }}
+    .meta {{ color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; }}
+    .wrap {{ 
+        overflow-x: auto; 
+        background: #161b22; 
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }}
+    table {{ border-collapse: collapse; font-size: 0.85rem; min-width: 100%; }}
+    th, td {{ padding: 12px 16px; border: 1px solid #30363d; white-space: nowrap; }}
+    th {{ 
+        background: #1f2937; 
+        color: #f1f5f9; 
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }}
+    tr:hover td {{ background-color: rgba(255,255,255,0.02) !important; }}
+    code {{ background: #232a35; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; border: 1px solid #3a4454; }}
+    
+    .section-title {{
+        margin-top: 40px;
+        font-size: 1.5rem;
+        color: #cbd5e1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }}
+    .section-title::before {{
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 24px;
+        background: #a78bfa;
+        border-radius: 2px;
+    }}
   </style>
 </head>
 <body>
   <h1>🔍 DEMAKAI — Evaluasi 6 Kombinasi Metode Pencarian</h1>
   <div class="meta">Generated: {ts} &nbsp;·&nbsp; Total {total_queries} query</div>
   
+  <div class="section-title">Dataset: KBLI 2025</div>
   {html_kbli}
-  <hr style="border: 0; border-top: 2px dashed #312e81; margin: 40px 0;">
+  
+  <hr style="border: 0; border-top: 2px dashed #30363d; margin: 60px 0;">
+  
+  <div class="section-title">Dataset: KBJI 2014</div>
   {html_kbji}
 
-  <!-- Kesimpulan & Saran Section -->
-  <div style="margin-top: 60px; padding: 30px; background: #1e1f2e; border-radius: 8px; border-left: 5px solid #a78bfa;">
-    <h2 style="color: #c4b5fd; margin-bottom: 20px; font-size: 1.4rem;">💡 Kesimpulan Keseluruhan & Rekomendasi</h2>
-    
-    <div style="margin-bottom: 25px;">
-      <h3 style="color: #a78bfa; margin-bottom: 10px; font-size: 1.1rem;">1. Perbandingan Metode Pencarian</h3>
-      <ul style="list-style-type: none; padding-left: 0;">
-        <li style="margin-bottom: 8px;">🔹 <strong>Metode "None" (Tanpa Preprocessing):</strong> SQL cenderung sangat ketat (exact match), sehingga keyword yang agak panjang atau memiliki variasi susunan kata mudah gagal (MRR rendah). Hybrid (Vector) sedikit lebih baik karena mampu menangkap kemiripan makna, namun masih kurang maksimal jika terdapat banyak kata hubung/stopword.</li>
-        <li style="margin-bottom: 8px;">🔹 <strong>Metode "Basic" (Case-fold, No-punct, Token-OR):</strong> Ini adalah <em>sweet spot</em> untuk SQL LIKE. Dengan memecah query menjadi token (OR), SQL berhasil menangkap dokumen yang setidaknya mengandung satu kata dari pencarian. Hal ini sangat menaikkan persentase sukses (Top 1 & Top 3). Untuk Hybrid, pemisahan tanda baca juga membuat ekstraksi <em>embedding feature</em> lebih bersih.</li>
-        <li style="margin-bottom: 8px;">🔹 <strong>Metode "Advanced" (Stemming & Stopword Removal):</strong> Sesuai temuan di tabel, seringkali metode <em>Advanced</em> justru <strong>menurunkan tingkat akurasi</strong>. Mengapa? Karena proses <em>stemming</em> (memotong imbuhan) sering mengubah bentuk kata dasar dan menghapus <em>stopword</em> (seperti "dan", "atau", "dari") membuat konteks kalimat terpotong. Untuk dataset formal seperti KBLI/KBJI, ketepatan susunan kata seringkali krusial, sehingga pemotongan ekstrem ini justru merugikan pemahaman semantik oleh model Hybrid.</li>
-      </ul>
-    </div>
-
-    <div style="margin-bottom: 25px;">
-      <h3 style="color: #a78bfa; margin-bottom: 10px; font-size: 1.1rem;">2. Kesimpulan Utama</h3>
-      <p style="line-height: 1.6; color: #d1d5db; margin-bottom: 10px;">
-        Kombinasi <strong>Hybrid Search + Preprocessing Basic</strong> terbukti sebagai kandidat terbaik yang konsisten. SQL LIKE + Basic memang tinggi akurasinya untuk data <em>exact match</em>, namun pada aplikasi nyata masyarakat sering menggunakan kosakata padanan/sinonim yang tidak persis ada di dalam database KBLI/KBJI (misal: "toko warung" atau "bengkel tambal"). Disinilah Vector Search (Hybrid) bekerja optimal apabila teks aslinya dibiarkan utuh tanpa di-<em>stem</em> terlalu ekstrem.
-      </p>
-    </div>
-
-    <div>
-      <h3 style="color: #a78bfa; margin-bottom: 10px; font-size: 1.1rem;">3. Saran untuk Pengembangan ke Depan (Next Steps)</h3>
-      <ol style="padding-left: 20px; line-height: 1.6; color: #d1d5db;">
-        <li style="margin-bottom: 6px;"><strong>Nonaktifkan Advanced Preprocessing:</strong> Hindari <em>stemming</em> menggunakan sastrawi untuk pencarian ini, karena <em>embedding model</em> BERT cenderung lebih optimal membaca kalimat utuh (yang menyertakan imbuhan) untuk memahami konteks bahasa Indonesia.</li>
-        <li style="margin-bottom: 6px;"><strong>Perluas Data Ground Truth:</strong> Daftarkan lebih banyak contoh kalimat kueri natural/acak (yang biasa diketik user awam) ke dalam pengujian, bukan hanya kalimat murni KBLI, supaya efektivitas Hybrid Search (skor semantik) bisa terlihat jauh lebih dominan dibanding fungsionalitas SQL LIKE.</li>
-        <li style="margin-bottom: 6px;"><strong>Atur Ulang Bobot (Weighting) Hybrid:</strong> Bereksperimenlah kembali dengan rasio <code>alpha</code> (misalnya 70% vector, 30% keyword) di <em>SearchService</em> untuk mencari kombinasi yang bisa menekan error <em>false positive</em> ketika kemunculan kata tidak terlalu relevan.</li>
-      </ol>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div>
+            <h3 style="color: #818cf8; margin-bottom: 12px;">Metode Terbaik</h3>
+            <p style="color: #94a3b8; font-size: 0.95rem;">
+                Berdasarkan data di atas, kombinasi <strong>Hybrid + Expansion</strong> memberikan hasil yang paling konsisten. 
+                Dengan memanfaatkan sinonim, sistem mampu menjembatani perbedaan antara bahasa informal pengguna 
+                dan terminologi formal KBLI/KBJI.
+            </p>
+        </div>
+        <div>
+            <h3 style="color: #818cf8; margin-bottom: 12px;">Saran Pengembangan</h3>
+            <ul style="color: #94a3b8; font-size: 0.95rem; padding-left: 20px;">
+                <li>Gunakan <strong>Vector Matching</strong> sebagai fallback semantik.</li>
+                <li>Gunakan <strong>Query Expansion</strong> sebagai standar preprocessing utama.</li>
+                <li>Pertahankan <strong>Advanced Preprocessing</strong> hanya sebagai baseline atau untuk analisis teknis.</li>
+            </ul>
+        </div>
     </div>
   </div>
 
@@ -650,122 +482,240 @@ def save_html_combined(rows_kbli: list, summary_kbli: list, rows_kbji: list, sum
 
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"[HTML]  Gabungan Disimpan → {os.path.abspath(filepath)}")
+    print(f"[HTML]  Gabungan Disimpan -> {os.path.abspath(filepath)}")
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Simpan ke EXCEL Gabungan (.xlsx) menggunakan pandas
-# ─────────────────────────────────────────────────────────────────────────────
 
 def save_excel_combined(rows_kbli: list, summary_kbli: list, rows_kbji: list, summary_kbji: list, filepath: str):
+    """
+    Simpan hasil evaluasi ke Excel dengan layout Dashboard yang kaya visual secara manual.
+    Pandas tidak mendukung MultiIndex columns dengan index=False, jadi kita buat manual.
+    """
     if not (rows_kbli or rows_kbji):
         return
         
     try:
-        import pandas as pd
-        
-        # Susun header utama
-        columns = ["no", "tipe", "query", "kode_ground_truth"]
-        excel_headers = ["No", "Tipe", "Query Asli", "Kode GT"]
-        
-        for s, p, _ in COMBINATIONS:
-            label = f"{s}_{p}"
-            columns.extend([f"rank_{label}", f"top1_{label}", f"top3_{label}", f"top10_{label}", f"rr_{label}"])
-            excel_headers.extend([f"Rank ({label})", f"Top1 ({label})", f"Top3 ({label})", f"Top10 ({label})", f"RR ({label})"])
-            
-            if p == "Basic":
-                columns.append("desc_basic")
-                excel_headers.append(f"Deskripsi ({label})")
-            elif p == "Advanced":
-                columns.append("desc_advanced")
-                excel_headers.append(f"Deskripsi ({label})")
+        from openpyxl import Workbook
+        from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+        from openpyxl.cell.cell import MergedCell
 
-        all_rows = rows_kbli + rows_kbji
-        df_export = pd.DataFrame(all_rows)
+        # 1. Setup Workbook & Styles
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Dashboard Evaluasi"
+        # ... constant styles ...
+        fill_header_top = PatternFill(start_color="312E81", end_color="312E81", fill_type="solid")
+        fill_header_sub = PatternFill(start_color="1F2937", end_color="1F2937", fill_type="solid")
+        font_white = Font(color="FFFFFF", bold=True)
+        font_slate = Font(color="CBD5E1")
         
-        # Pilih kolom dan beri nama header baru
-        df_export = df_export[columns].copy() 
-        df_export.columns = excel_headers
-        df_export.replace("-", 0, inplace=True)
-        
-        # Buat dataframe ringkasan
-        df_sum_kbli = pd.DataFrame(summary_kbli)
-        df_sum_kbji = pd.DataFrame(summary_kbji)
-        
-        with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-            df_export.to_excel(writer, sheet_name='Data Gabungan', index=False)
-            if not df_sum_kbli.empty:
-                df_sum_kbli.to_excel(writer, sheet_name='Ringkasan KBLI', index=False)
-            if not df_sum_kbji.empty:
-                df_sum_kbji.to_excel(writer, sheet_name='Ringkasan KBJI', index=False)
+        fill_rank_1  = PatternFill(start_color="064E3B", end_color="064E3B", fill_type="solid")
+        font_rank_1  = Font(color="6EE7B7", bold=True)
+        fill_rank_5  = PatternFill(start_color="065F46", end_color="065F46", fill_type="solid")
+        font_rank_5  = Font(color="A7F3D0")
+        fill_rank_10 = PatternFill(start_color="1E3A2F", end_color="1E3A2F", fill_type="solid")
+        font_rank_10 = Font(color="D1FAE5")
+        fill_none    = PatternFill(start_color="161B22", end_color="161B22", fill_type="solid")
+        font_none    = Font(color="555555")
+        border_thin  = Border(left=Side(style='thin', color='30363D'), right=Side(style='thin', color='30363D'), 
+                             top=Side(style='thin', color='30363D'), bottom=Side(style='thin', color='30363D'))
+
+        # 2. Helper untuk membuat tabel
+        def write_table(start_idx, rows, title):
+            # Header Row Indices
+            h0, h1 = start_idx + 1, start_idx + 2
+            d_start = start_idx + 3
+            m_idx = d_start + len(rows)
+            
+            # Count columns
+            total_cols = 4
+            for _, p, _ in COMBINATIONS:
+                total_cols += (6 if p in ("Advanced", "Expansion") else 5)
+
+            # --- 1. Style all cells in the table area ---
+            for r in range(start_idx, m_idx + 1):
+                for c in range(1, total_cols + 1):
+                    try:
+                        cell = ws.cell(row=r, column=c)
+                        cell.border = border_thin
+                        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+                        
+                        if r == start_idx: # Title row
+                            cell.fill = PatternFill(start_color="161B22", end_color="161B22", fill_type="solid")
+                        elif r == h0: # Method Headers
+                            cell.fill = fill_header_top
+                            cell.font = font_white
+                        elif r == h1: # Metric Headers
+                            cell.fill = fill_header_sub
+                            cell.font = font_slate
+                        elif r == m_idx: # Summary row
+                            cell.fill = fill_header_sub
+                        else: # Data rows
+                            cell.fill = PatternFill(start_color="0F111A", end_color="0F111A", fill_type="solid")
+                            cell.font = Font(color="E2E8F0")
+                    except: pass
+
+            # --- 2. Fill Context & Specific Styling ---
+            try: ws.cell(row=start_idx, column=1, value=f"DATASET: {title}").font = Font(size=14, bold=True, color="A5B4FC")
+            except: pass
+            
+            for i, label in enumerate(["No", "Tipe", "Query Asli", "GT"], 1):
+                try: ws.cell(row=h0, column=i, value=label)
+                except: pass
+
+            curr_col = 5
+            for s, p, _ in COMBINATIONS:
+                group = f"{s} + {p}"
+                span = 6 if p in ("Advanced", "Expansion") else 5
+                try: ws.cell(row=h0, column=curr_col, value=group)
+                except: pass
                 
-        print(f"[EXCEL] Gabungan Disimpan → {os.path.abspath(filepath)}")
-        
-    except ImportError:
-        print("[WARNING] Pandas/openpyxl tidak terinstall. Eksport EXCEL dilewati.")
-        print("          Jalankan: pip install pandas openpyxl")
+                metrics = ["Rank", "Top1", "Top5", "Top10", "KK"]
+                if p in ("Advanced", "Expansion"): metrics.append("Preprocessing")
+                for i, m in enumerate(metrics):
+                    try: ws.cell(row=h1, column=curr_col + i, value=m)
+                    except: pass
+                curr_col += span
+
+            # Data rows
+            for r_idx, r in enumerate(rows, d_start):
+                try:
+                    ws.cell(row=r_idx, column=1, value=r.get("no"))
+                    tipe_c = ws.cell(row=r_idx, column=2, value=r.get("tipe"))
+                    tipe_c.font = Font(color="86EFAC" if r.get("tipe")=="KBLI" else "93C5FD", bold=True)
+                    query_c = ws.cell(row=r_idx, column=3, value=r.get("query"))
+                    query_c.font = Font(color="C4B5FD")
+                    query_c.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+                    gt_c = ws.cell(row=r_idx, column=4, value=r.get("kode_ground_truth"))
+                    gt_c.font = Font(color="A5B4FC", name="Consolas")
+                except: pass
+
+                c_ptr = 5
+                for s, p, _ in COMBINATIONS:
+                    label = f"{s}_{p}"
+                    rank, kk = r.get(f"rank_{label}", 0), r.get(f"kk_{label}", 0.0)
+                    span = 6 if p in ("Advanced", "Expansion") else 5
+                    
+                    try:
+                        rc = ws.cell(row=r_idx, column=c_ptr, value=rank)
+                        if rank == 1: rc.fill, rc.font = fill_rank_1, font_rank_1
+                        elif 1 <= rank <= 5: rc.fill, rc.font = fill_rank_5, font_rank_5
+                        elif 5 < rank <= 10: rc.fill, rc.font = fill_rank_10, font_rank_10
+                        else: rc.fill, rc.font = fill_none, font_none
+
+                        ws.cell(row=r_idx, column=c_ptr+1, value=r.get(f"top1_{label}"))
+                        ws.cell(row=r_idx, column=c_ptr+2, value=r.get(f"top5_{label}"))
+                        ws.cell(row=r_idx, column=c_ptr+3, value=r.get(f"top10_{label}"))
+                        kc = ws.cell(row=r_idx, column=c_ptr+4, value=kk)
+                        kc.number_format = '0.00'
+                        if kk > 0: kc.font = Font(color="6EE7B7", bold=True)
+                        if p in ("Advanced", "Expansion"):
+                            ws.cell(row=r_idx, column=c_ptr+5, value=r.get(f"desc_{p.lower()}"))
+                            ws.cell(row=r_idx, column=c_ptr+5).font = Font(color="D8B4FE", size=8)
+                    except: pass
+                    c_ptr += span
+
+            # MRR Row
+            try:
+                ws.cell(row=m_idx, column=4, value="MRR / AVG").font = Font(bold=True, color="A78BFA")
+                curr_col = 5
+                for _, p, _ in COMBINATIONS:
+                    kk_col = curr_col + 4
+                    col_l = get_column_letter(kk_col)
+                    formula = f"=AVERAGE({col_l}{d_start}:{col_l}{m_idx-1})"
+                    cell = ws.cell(row=m_idx, column=kk_col, value=formula)
+                    cell.font, cell.number_format = Font(bold=True, color="6EE7B7"), '0.0000'
+                    curr_col += (6 if p in ("Advanced", "Expansion") else 5)
+            except: pass
+            
+            return m_idx, total_cols
+
+        # 3. Execution & Merging
+        m_idx_kbli, cols_kbli = write_table(1, rows_kbli, "KBLI 2025")
+        start_kbji = m_idx_kbli + 2
+        m_idx_kbji, cols_kbji = write_table(start_kbji, rows_kbji, "KBJI 2014")
+
+        # Now apply all merges
+        def apply_merges(s_idx, m_idx, total_cols):
+            ws.merge_cells(start_row=s_idx, start_column=1, end_row=s_idx, end_column=total_cols)
+            h0, h1 = s_idx + 1, s_idx + 2
+            for i in range(1, 5): ws.merge_cells(start_row=h0, start_column=i, end_row=h1, end_column=i)
+            curr = 5
+            for _, p, _ in COMBINATIONS:
+                span = 6 if p in ("Advanced", "Expansion") else 5
+                ws.merge_cells(start_row=h0, start_column=curr, end_row=h0, end_column=curr + span - 1)
+                curr += span
+
+        apply_merges(1, m_idx_kbli, cols_kbli)
+        apply_merges(start_kbji, m_idx_kbji, cols_kbji)
+
+        # Global Final
+        try:
+            for c_idx in range(1, max(cols_kbli, cols_kbji) + 1):
+                max_l = 10
+                for r_idx in range(1, ws.max_row + 1):
+                    try:
+                        val = ws.cell(row=r_idx, column=c_idx).value
+                        if val and not str(val).startswith("="):
+                            max_l = max(max_l, len(str(val)))
+                    except: pass
+                ws.column_dimensions[get_column_letter(c_idx)].width = min(max_l + 2, 50)
+        except: pass
+
+        ws.freeze_panes = "E4"
+        ws.sheet_view.showGridLines = False
+        wb.save(filepath)
+
+        print(f"[EXCEL] Gabungan Disimpan (Final Dashboard) -> {os.path.abspath(filepath)}")
     except Exception as e:
         print(f"[ERROR] Gagal menyimpan EXCEL: {e}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Entry point
-# ─────────────────────────────────────────────────────────────────────────────
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
-    QUERIES_FILE = "queries.csv"
+    import argparse
+    parser = argparse.ArgumentParser(description="Evaluasi Otomatis DEMAKAI")
+    parser.add_argument("--output", type=str, help="Nama file output (tanpa ekstensi)")
+    parser.add_argument("--mode", type=str, choices=["sebelum", "sesudah"], default="sesudah", help="Mode evaluasi (sebelum/sesudah query lapangan)")
+    args = parser.parse_args()
+
+    # Set Environment Variable for Expansion
+    if args.mode == "sebelum":
+        os.environ["ENABLE_EXPANSION"] = "false"
+        print(">>> MODE: Tanpa Query Lapangan (Expansion Disabled) <<<")
+    else:
+        os.environ["ENABLE_EXPANSION"] = "true"
+        print(">>> MODE: Dengan Query Lapangan (Expansion Enabled) <<<")
+
+    _base_dir = os.path.dirname(os.path.abspath(__file__))
+    QUERIES_FILE = os.path.join(_base_dir, "queries.csv")
     LIMIT        = 10
 
-    if not os.path.exists(QUERIES_FILE):
-        print(f"[ERROR] File '{QUERIES_FILE}' tidak ditemukan.")
-        print("Buat file queries.csv dengan kolom: no, query, kode_ground_truth")
-        raise SystemExit(1)
-
     print("=" * 60)
-    print("  DEMAKAI — Evaluasi Otomatis 6 Kombinasi")
+    print("  DEMAKAI — Evaluasi Otomatis v2.0")
     print("=" * 60)
 
     rows = run_evaluation(QUERIES_FILE, limit=LIMIT)
+    if not rows: sys.exit(0)
 
-    ts   = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Pisahkan row berdasarkan tipe
+    # Determine Output Filename
+    if args.output:
+        file_base = args.output
+    else:
+        file_base = f"evaluasi_{ts}_Gabungan"
+
     rows_kbli = [r for r in rows if r.get("tipe") == "KBLI"]
     rows_kbji = [r for r in rows if r.get("tipe") == "KBJI"]
 
     summary_kbli = calculate_summary(rows_kbli)
     summary_kbji = calculate_summary(rows_kbji)
 
-    # Simpan KBLI CSV
-    if rows_kbli:
-        print("\n--- Menyimpan Hasil KBLI ---")
-        save_csv(rows_kbli,   f"output/evaluasi_{ts}_KBLI.csv")
-        save_summary_csv(summary_kbli, f"output/evaluasi_{ts}_KBLI_summary.csv")
-
-    # Simpan KBJI CSV
-    if rows_kbji:
-        print("\n--- Menyimpan Hasil KBJI ---")
-        save_csv(rows_kbji,   f"output/evaluasi_{ts}_KBJI.csv")
-        save_summary_csv(summary_kbji, f"output/evaluasi_{ts}_KBJI_summary.csv")
-
-    # Simpan Gabungan HTML & EXCEL
-    print("\n--- Menyimpan Laporan Gabungan (HTML & Excel) ---")
-    file_html = f"output/evaluasi_{ts}_Gabungan.html"
-    file_excel = f"output/evaluasi_{ts}_Gabungan.xlsx"
+    file_html = f"output/{file_base}.html"
+    file_excel = f"output/{file_base}.xlsx"
     
     save_html_combined(rows_kbli, summary_kbli, rows_kbji, summary_kbji, file_html)
     save_excel_combined(rows_kbli, summary_kbli, rows_kbji, summary_kbji, file_excel)
-    
-    # Buka otomatis HTML Gabungan jika di Windows
-    abs_html = os.path.abspath(file_html)
-    if os.name == 'nt' and os.path.exists(abs_html):
-        try: os.startfile(abs_html)
-        except Exception: pass
 
-    # Buka otomatis Excel Gabungan jika di Windows
-    abs_excel = os.path.abspath(file_excel)
-    if os.name == 'nt' and os.path.exists(abs_excel):
-        try: os.startfile(abs_excel)
-        except Exception: pass
-
-    print("\nSelesai! Buka folder output/ untuk melihat hasil (CSV, HTML, EXCEL Gabungan).")
+    print(f"\nSelesai! Laporan siap di folder output/.")

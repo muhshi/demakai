@@ -1,10 +1,10 @@
 # preprocessing package
-from .basic import preprocess_basic
 from .advanced import preprocess_advanced, SASTRAWI_AVAILABLE
+from .expansion import preprocess_expansion
 from .stopwords import STOPWORDS
 
 __all__ = [
-    "preprocess_basic",
+    "preprocess_expansion",
     "preprocess_advanced",
     "SASTRAWI_AVAILABLE",
     "STOPWORDS",

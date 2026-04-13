@@ -30,7 +30,7 @@ class Settings:
 
     # ── Gemini API (untuk Hybrid Search) ──────────────────────
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    EMBEDDING_MODEL: str = "models/embedding-001"
+    EMBEDDING_MODEL: str = "models/gemini-embedding-001"
 
     # ── Default limit hasil ────────────────────────────────────
     DEFAULT_LIMIT: int = 10

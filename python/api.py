@@ -24,17 +24,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 
-from preprocessing.basic    import preprocess_basic
+from preprocessing.expansion import preprocess_expansion
 from preprocessing.advanced import preprocess_advanced
 from search.sql_like import (
     search_raw      as sql_raw,
-    search_basic    as sql_basic,
-    search_advanced as sql_advanced,
+    search_expansion as sql_expansion,
+    search_advanced  as sql_advanced,
 )
 from search.hybrid import (
     search_raw      as hybrid_raw,
-    search_basic    as hybrid_basic,
-    search_advanced as hybrid_advanced,
+    search_expansion as hybrid_expansion,
+    search_advanced  as hybrid_advanced,
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -66,15 +66,15 @@ SEARCH_RAW_FN = {
 }
 
 PREPROCESSING_FN = {
-    "basic":    preprocess_basic,
-    "advanced": preprocess_advanced,
+    "expansion": preprocess_expansion,
+    "advanced":  preprocess_advanced,
 }
 
 SEARCH_FN = {
-    ("sql",    "basic"):    sql_basic,
-    ("sql",    "advanced"): sql_advanced,
-    ("hybrid", "basic"):    hybrid_basic,
-    ("hybrid", "advanced"): hybrid_advanced,
+    ("sql",    "expansion"): sql_expansion,
+    ("sql",    "advanced"):  sql_advanced,
+    ("hybrid", "expansion"): hybrid_expansion,
+    ("hybrid", "advanced"):  hybrid_advanced,
 }
 
 
@@ -85,9 +85,10 @@ SEARCH_FN = {
 class SearchRequest(BaseModel):
     query:      str
     search:     str = "sql"       # sql | hybrid
-    processing: str = "none"      # none | basic | advanced
+    processing: str = "none"      # none | expansion | advanced
     limit:      int = 10
     model:      Optional[str] = None   # KBLI | KBJI | None (keduanya)
+    mode:       Optional[str] = None   # sql_expansion | hybrid_expansion | dll
 
 
 class SearchResponse(BaseModel):
@@ -113,11 +114,11 @@ def methods():
     """Daftar metode pencarian dan preprocessing yang tersedia."""
     return {
         "search":     ["sql", "hybrid"],
-        "processing": ["none", "basic", "advanced"],
+        "processing": ["none", "expansion", "advanced"],
         "combinations": [
             f"{s}+{p}"
             for s in ["sql", "hybrid"]
-            for p in ["none", "basic", "advanced"]
+            for p in ["none", "expansion", "advanced"]
         ]
     }
 
@@ -131,7 +132,7 @@ def search(req: SearchRequest):
     {
         "query":      "petani sawah",
         "search":     "sql",        // sql | hybrid
-        "processing": "basic",      // none | basic | advanced
+        "processing": "none",       // none | expansion | advanced
         "limit":      10,
         "model":      "KBLI"        // KBLI | KBJI | null
     }
@@ -139,10 +140,20 @@ def search(req: SearchRequest):
     # Validasi
     if req.search not in ("sql", "hybrid"):
         raise HTTPException(status_code=400, detail="search harus 'sql' atau 'hybrid'")
-    if req.processing not in ("none", "basic", "advanced"):
-        raise HTTPException(status_code=400, detail="processing harus 'none', 'basic', atau 'advanced'")
+    if req.processing not in ("none", "expansion", "advanced"):
+        raise HTTPException(status_code=400, detail="processing harus 'none', 'expansion', atau 'advanced'")
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="query tidak boleh kosong")
+
+    # Mapping mode ke search & processing
+    if req.mode:
+        if req.mode == "sql_expansion":
+            req.search = "sql"
+            req.processing = "expansion"
+        elif req.mode == "hybrid_expansion":
+            req.search = "hybrid"
+            req.processing = "expansion"
+        # Tambahkan mode lain jika perlu
 
     try:
         if req.processing == "none":

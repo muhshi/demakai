@@ -244,11 +244,16 @@ class SearchService
         $searchMethod = config('services.python_search.method', 'sql');
         $processing = config('services.python_search.processing', 'none');
 
+        $mode = null;
+        if ($searchMethod === 'sql' && $processing === 'expansion') $mode = 'sql_expansion';
+        if ($searchMethod === 'hybrid' && $processing === 'expansion') $mode = 'hybrid_expansion';
+
         try {
             $response = Http::timeout(15)->post("{$url}/search", [
                 'query' => $query,
                 'search' => $searchMethod,
                 'processing' => $processing,
+                'mode' => $mode,
                 'limit' => $limit,
                 'model' => $model,
             ]);
