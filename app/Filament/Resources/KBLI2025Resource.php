@@ -2,10 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
+use App\Services\SearchService;
+use App\Filament\Resources\KBLI2025Resource\Pages\ListKBLI2025s;
+use App\Filament\Resources\KBLI2025Resource\Pages\EditKBLI2025;
 use App\Filament\Resources\KBLI2025Resource\Pages;
 use App\Models\PgKBLI2025;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -13,28 +22,28 @@ use Filament\Tables\Table;
 class KBLI2025Resource extends Resource
 {
     protected static ?string $model = PgKBLI2025::class;
-    protected static ?string $navigationGroup = 'Klasifikasi';
+    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2025';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\TextInput::make('kode')
+        return $schema->components([
+            TextInput::make('kode')
                 ->label('Kode')
                 ->required()
                 ->disabled()
                 ->maxLength(10),
-            Forms\Components\TextInput::make('judul')
+            TextInput::make('judul')
                 ->label('Judul')
                 ->required()
                 ->disabled()
                 ->maxLength(300),
-            Forms\Components\Textarea::make('deskripsi')
+            Textarea::make('deskripsi')
                 ->label('Deskripsi')
                 ->disabled()
                 ->rows(6),
-            Forms\Components\TagsInput::make('contoh_lapangan')
+            TagsInput::make('contoh_lapangan')
                 ->label('Contoh Lapangan')
                 ->placeholder('Tambah contoh lalu Enter')
                 ->reorderable()
@@ -46,40 +55,40 @@ class KBLI2025Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kode')
+                TextColumn::make('kode')
                     ->label('Kode')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('kategori')
+                TextColumn::make('kategori')
                     ->label('Kategori')->badge()->color('info')->toggleable(),
-                Tables\Columns\TextColumn::make('judul')
+                TextColumn::make('judul')
                     ->searchable()->wrap()->limit(60),
-                Tables\Columns\TextColumn::make('contoh_lapangan')
+                TextColumn::make('contoh_lapangan')
                     ->label('Contoh Lapangan')
                     ->wrap()
                     ->limit(150)
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deskripsi')
+                TextColumn::make('deskripsi')
                     ->wrap()->limit(120)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('kode')
             ->paginated([25, 50, 100])
             ->filters([
-                Tables\Filters\Filter::make('ai_search')
-                    ->form([
-                        Forms\Components\TextInput::make('query')
+                Filter::make('ai_search')
+                    ->schema([
+                        TextInput::make('query')
                             ->label('AI Smart Search')
                             ->placeholder('Deskripsikan bisnis Anda...')
                             ->helperText('Mencari berdasarkan makna (Semantic Search)'),
                     ])
-                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                    ->query(function (Builder $query, array $data) {
                         if (empty($data['query'])) {
                             return $query;
                         }
 
                         // Call Hybrid Search
-                        /** @var \App\Services\SearchService $service */
-                        $service = app(\App\Services\SearchService::class);
+                        /** @var SearchService $service */
+                        $service = app(SearchService::class);
 
                         // Limit 100 results for relevancy
                         $results = $service->search($data['query'], 100, 'KBLI');
@@ -107,8 +116,8 @@ class KBLI2025Resource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListKBLI2025s::route('/'),
-            'edit' => Pages\EditKBLI2025::route('/{record}/edit'),
+            'index' => ListKBLI2025s::route('/'),
+            'edit' => EditKBLI2025::route('/{record}/edit'),
         ];
     }
 }

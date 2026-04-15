@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\KBLI2020Resource\Pages;
 
+use Filament\Actions\Action;
+use Throwable;
 use App\Filament\Resources\KBLI2020Resource;
 use App\Models\PgKBLI2020;
 use Filament\Actions;
@@ -21,17 +23,17 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
     {
         return [
             // 📥 Download Template
-            Actions\Action::make('downloadTemplate')
+            Action::make('downloadTemplate')
                 ->label('Download Template KBLI')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->url(fn() => route('template.kbli2020'))
                 ->openUrlInNewTab(),
 
             // 📤 Import dari Excel/CSV (header-aware)
-            Actions\Action::make('importContoh')
+            Action::make('importContoh')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->form([
+                ->schema([
                     FileUpload::make('file')
                         ->label('File Excel/CSV')
                         ->required()
@@ -177,7 +179,7 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
                             ->body("Updated: {$updated}, Missing kode: {$missing}, Skipped: {$skipped}")
                             ->send();
 
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         Notification::make()
                             ->danger()
                             ->title('Import gagal')

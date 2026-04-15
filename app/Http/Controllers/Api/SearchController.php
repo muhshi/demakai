@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\SearchService;
 use App\Http\Controllers\Controller;
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2020;
@@ -12,9 +13,9 @@ use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
-    protected \App\Services\SearchService $searchService;
+    protected SearchService $searchService;
 
-    public function __construct(\App\Services\SearchService $searchService)
+    public function __construct(SearchService $searchService)
     {
         $this->searchService = $searchService;
     }

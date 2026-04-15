@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use App\Imports\KBLI2025Import;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
@@ -39,7 +40,7 @@ class ImportKBLI2025 extends Command
         try {
             Excel::import(new KBLI2025Import, $filePath);
             $this->info('Import completed successfully!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Import failed: ' . $e->getMessage());
             return Command::FAILURE;
         }

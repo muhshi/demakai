@@ -2,11 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use App\Services\SearchService;
+use App\Filament\Resources\KBJI2014Resource\Pages\ListKBJI2014s;
+use App\Filament\Resources\KBJI2014Resource\Pages\CreateKBJI2014;
+use App\Filament\Resources\KBJI2014Resource\Pages\EditKBJI2014;
 use App\Filament\Resources\KBJI2014Resource\Pages;
 use App\Filament\Resources\KBJI2014Resource\RelationManagers;
 use App\Models\PgKBJI2014;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,21 +26,21 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KBJI2014Resource extends Resource
 {
     protected static ?string $model = PgKBJI2014::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Klasifikasi';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBJI 2014';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\TextInput::make('kode')
+        return $schema->components([
+            TextInput::make('kode')
                 ->label('KBJI')->disabled()->dehydrated(false),
-            Forms\Components\TextInput::make('judul')
+            TextInput::make('judul')
                 ->label('Judul')->disabled()->dehydrated(false),
-            Forms\Components\Textarea::make('deskripsi')
+            Textarea::make('deskripsi')
                 ->label('Deskripsi')->disabled()->dehydrated(false),
 
-            Forms\Components\TagsInput::make('contoh_lapangan')
+            TagsInput::make('contoh_lapangan')
                 ->label('Contoh Lapangan')
                 ->separator(';')
                 ->placeholder('Tambah contoh lalu Enter'),
@@ -41,7 +51,7 @@ class KBJI2014Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kode')
+                TextColumn::make('kode')
                     ->label('KBJI')
                     ->formatStateUsing(
                         fn($state) => strlen((string) $state) > 4
@@ -50,18 +60,18 @@ class KBJI2014Resource extends Resource
                     )
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('judul')
+                TextColumn::make('judul')
                     ->label('Judul')
                     ->wrap()
                     ->limit(80)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deskripsi')
+                TextColumn::make('deskripsi')
                     ->label('Deskripsi')
                     ->wrap()
                     ->limit(150)
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contoh_lapangan')
+                TextColumn::make('contoh_lapangan')
                     ->label('Contoh Lapangan')
                     ->wrap()
                     ->limit(150)
@@ -70,28 +80,28 @@ class KBJI2014Resource extends Resource
             ])
             ->paginated([25, 50, 100])
             ->filters([
-                Tables\Filters\TernaryFilter::make('only4digit')
+                TernaryFilter::make('only4digit')
                     ->label('Hanya 4 digit')
                     ->queries(
                         true: fn($q) => $q->where('level', '3'), // Assuming level is stored as string '3'
                         false: fn($q) => $q, // semua
                         blank: fn($q) => $q,
                     ),
-                Tables\Filters\Filter::make('ai_search')
-                    ->form([
-                        Forms\Components\TextInput::make('query')
+                Filter::make('ai_search')
+                    ->schema([
+                        TextInput::make('query')
                             ->label('AI Smart Search')
                             ->placeholder('Deskripsikan pekerjaan...')
                             ->helperText('Mencari berdasarkan makna (Semantic Search)'),
                     ])
-                    ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data) {
+                    ->query(function (Builder $query, array $data) {
                         if (empty($data['query'])) {
                             return $query;
                         }
 
                         // Call Hybrid Search
-                        /** @var \App\Services\SearchService $service */
-                        $service = app(\App\Services\SearchService::class);
+                        /** @var SearchService $service */
+                        $service = app(SearchService::class);
 
                         // Limit 100 results for relevancy
                         $results = $service->search($data['query'], 100, 'KBJI');
@@ -125,9 +135,9 @@ class KBJI2014Resource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListKBJI2014s::route('/'),
-            'create' => Pages\CreateKBJI2014::route('/create'),
-            'edit' => Pages\EditKBJI2014::route('/{record}/edit'),
+            'index' => ListKBJI2014s::route('/'),
+            'create' => CreateKBJI2014::route('/create'),
+            'edit' => EditKBJI2014::route('/{record}/edit'),
         ];
     }
 }

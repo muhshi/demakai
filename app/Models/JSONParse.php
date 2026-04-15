@@ -7,7 +7,7 @@ use MongoDB\Laravel\Eloquent\Model;
 class JSONParse extends Model
 {
     protected $connection = 'mongodb';
-    protected $collection = 'Document';   // case-sensitive, samakan dengan koleksi
+    protected $table = 'Document';   // case-sensitive, samakan dengan koleksi
     public $timestamps = false;
 
     // biar fleksibel

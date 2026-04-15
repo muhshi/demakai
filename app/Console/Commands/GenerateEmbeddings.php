@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2020;
 use App\Models\PgKBLI2025;
@@ -141,7 +142,7 @@ class GenerateEmbeddings extends Command
                     $this->error("\nRequest failed (Status: " . $response->status() . "): " . $response->body());
                     return false;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $attempts++;
                 $this->error("\nError: " . $e->getMessage());
                 sleep(2);

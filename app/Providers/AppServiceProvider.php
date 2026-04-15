@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Pgvector\Laravel\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Pgvector\Laravel\Schema::register();
+        Schema::register();
     }
 }

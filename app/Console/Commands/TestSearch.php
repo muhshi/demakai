@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
+use Exception;
 use App\Services\SearchService;
 use Illuminate\Console\Command;
 
@@ -62,11 +64,11 @@ class TestSearch extends Command
 
                 $this->line("<comment>#{$rank} [{$source}] {$item->kode} - {$item->judul}</comment>");
                 $this->line("   Similarity: {$score}");
-                $this->line("   Deskripsi: " . \Illuminate\Support\Str::limit($item->deskripsi, 100));
+                $this->line("   Deskripsi: " . Str::limit($item->deskripsi, 100));
                 $this->newLine();
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Search Error: " . $e->getMessage());
         }
     }

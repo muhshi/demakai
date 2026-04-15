@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use App\Services\TikaService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -106,7 +107,7 @@ class PrepareClassificationData extends Command
             $this->writeCsv($csvPath, $data);
             $this->info("KBLI 2025 data saved to: $csvPath. Total items: " . count($uniqueData));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error processing KBLI: " . $e->getMessage());
         }
     }
@@ -162,7 +163,7 @@ class PrepareClassificationData extends Command
             $this->writeCsv($csvPath, $data);
             $this->info("KBJI 2014 data saved to: $csvPath. Total items: " . count($uniqueData));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error processing KBJI: " . $e->getMessage());
         }
     }

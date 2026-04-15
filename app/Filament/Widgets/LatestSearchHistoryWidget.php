@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use Filament\Tables\Columns\TextColumn;
 use App\Models\SearchHistory;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,14 +21,14 @@ class LatestSearchHistoryWidget extends BaseWidget
                 SearchHistory::query()->latest()
             )
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Waktu')
                     ->dateTime('d M H:i')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('query')
+                TextColumn::make('query')
                     ->label('Kata Kunci')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('results_count')
+                TextColumn::make('results_count')
                     ->label('Hasil')
                     ->badge()
                     ->color(fn(int $state): string => match (true) {
@@ -35,10 +36,10 @@ class LatestSearchHistoryWidget extends BaseWidget
                         $state < 5 => 'warning',
                         default => 'success',
                     }),
-                Tables\Columns\TextColumn::make('detected_type')
+                TextColumn::make('detected_type')
                     ->label('Tipe')
                     ->badge(),
-                Tables\Columns\TextColumn::make('ip_address')
+                TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

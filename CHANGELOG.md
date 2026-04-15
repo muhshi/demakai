@@ -4,6 +4,27 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-04-14] - Major Framework & Platform Upgrade (Laravel 13 & Filament 5)
+### Added
+- **Laravel 13 Support**: Migrasi penuh ke Laravel v13.4.0 yang mendukung fitur-fitur PHP 8.3+ dan arsitektur core terbaru.
+- **Filament v5 Support**: Upgrade panel admin ke Filament v5.5.0 yang terintegrasi dengan Livewire v4 "Islands".
+- **PHP 8.4 compatibility**: Penyesuaian environment agar optimal berjalan di PHP 8.4.19.
+- **Tailwind CSS v4**: Penggunaan sistem styling terbaru dari Tailwind yang menjadi standar di Filament v5.
+- **Survey BPS Stack Audit**: Verifikasi teknis stack pada project Survey: Laravel v13.2.0, Filament v5.4.3, Livewire v4.2.3, dan PHP v8.4.19.
+- **Dependency Audit**: Audit versi tools pendukung project Survey: Laravel Boost v2.4.1, Pest v4.4.3, Laravel Pail v1.2.6, dan Laravel Pint v1.29.0.
+
+### Changed
+- **Refactoring Resource API**: Migrasi seluruh resource Filament (Document, KBLI, KBJI) dari `Filament\Forms\Form` ke API baru `Filament\Schemas\Schema`.
+- **Database Driver Update**: Upgrade `mongodb/laravel-mongodb` ke versi 5.2+ untuk mendukung Laravel 13 dan memperbaiki struktur model MongoDB (`$collection` → `$table`).
+- **Dependency Refresh**: Pembaruan major pada `phpunit/phpunit` (^12.0), `laravel/tinker` (^3.0), dan `openai-php/client` (^0.19.0).
+- **Asset Publishing**: Re-publishing seluruh aset frontend Filament untuk memastikan kompatibilitas dengan Livewire v4.
+
+### Fixed
+- **Breaking Changes Mitigation**: Perbaikan manual pada `DocumentResource.php` terkait `BadgeColumn` dan method deprecated pada `Repeater` (`addable`/`deletable`).
+- **Autoload Synchronization**: Perbaikan error autoloader setelah penghapusan tool migrasi dan sinkronisasi vendor metadata.
+
+---
+
 ## [2026-04-13] - Integrasi Query Expansion & Evaluasi Komparatif
 ### Added
 - **Modul `preprocessing/expansion.py`**: Pipeline preprocessing baru (Metode 3) yang menggabungkan stopword removal, sinonim dasar, dan VARIATION_MAP berbasis konteks industri/pekerjaan.

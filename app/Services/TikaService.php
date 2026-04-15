@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use RuntimeException;
+use Exception;
 use Illuminate\Support\Facades\Http;
 
 class TikaService
@@ -24,7 +26,7 @@ class TikaService
             ->put("{$this->url}/tika");
 
         if (!$resp->successful()) {
-            throw new \RuntimeException('Tika parse failed: '.$resp->status().' '.$resp->body());
+            throw new RuntimeException('Tika parse failed: '.$resp->status().' '.$resp->body());
         }
 
         return $resp->body() ?? '';
@@ -40,7 +42,7 @@ class TikaService
             ->put("{$this->url}/tika");
 
         if ($resp->failed()) {
-            throw new \Exception('Tika HTML parse failed: '.$resp->body());
+            throw new Exception('Tika HTML parse failed: '.$resp->body());
         }
 
         return $resp->body();
@@ -53,7 +55,7 @@ class TikaService
             ->put("{$this->url}/meta");
 
         if (!$resp->successful()) {
-            throw new \RuntimeException('Tika metadata failed: '.$resp->status().' '.$resp->body());
+            throw new RuntimeException('Tika metadata failed: '.$resp->status().' '.$resp->body());
         }
 
         return $resp->json();

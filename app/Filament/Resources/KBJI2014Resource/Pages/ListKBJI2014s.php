@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\KBJI2014Resource\Pages;
 
+use Filament\Actions\Action;
+use Throwable;
 use App\Filament\Resources\KBJI2014Resource;
 use App\Models\PgKBJI2014;
 use Filament\Actions;
@@ -21,17 +23,17 @@ class ListKBJI2014s extends ListRecords //
     {
         return [
             // 📥 Download Template (langsung ke URL storage)
-            Actions\Action::make('downloadTemplate')
+            Action::make('downloadTemplate')
                 ->label('Download Template KBJI')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->url(fn() => route('template.kbji2014'))
                 ->openUrlInNewTab(),
 
             // 📤 Import dari Excel/CSV (header-aware: fid & contoh_lapangan)
-            Actions\Action::make('importContohKBJI')
+            Action::make('importContohKBJI')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->form([
+                ->schema([
                     FileUpload::make('file')
                         ->label('File Excel/CSV')
                         ->required()
@@ -167,7 +169,7 @@ class ListKBJI2014s extends ListRecords //
                             ->body("Updated: {$updated}, Missing fid: {$missing}, Skipped: {$skipped}")
                             ->send();
 
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         Notification::make()
                             ->danger()
                             ->title('Import gagal')

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
+use App\Models\SearchHistory;
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2025;
 use Illuminate\Support\Collection;
@@ -268,7 +270,7 @@ class SearchService
             $this->logHistory($query, $results->all());
             return $results->all();
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Python search API unreachable: ' . $e->getMessage());
             return [];
         }
@@ -295,7 +297,7 @@ class SearchService
                 }
             }
 
-            \App\Models\SearchHistory::create([
+            SearchHistory::create([
                 'query'          => $query,
                 'results_count'  => $count,
                 'detected_type'  => $type,
@@ -303,7 +305,7 @@ class SearchService
                 'user_agent'     => request()->userAgent(),
                 'user_id'        => auth()->id(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning('Search history logging failed: ' . $e->getMessage());
         }
     }

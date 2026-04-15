@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use App\Models\PgKBJI2014;
 use App\Models\PgKBLI2025;
 use App\Services\GeminiService;
@@ -88,7 +89,7 @@ class IndexKBLI extends Command
                     $record->embedding = $vector; // PGVector otomatis handle array -> vector
                     $record->save();
                     $this->info("Saved embedding for {$record->kode}");
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->error("Failed to save embedding for {$record->kode}: " . $e->getMessage());
                     Log::error("Failed to save embedding for {$record->id}: " . $e->getMessage());
                 }

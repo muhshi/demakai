@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\JSONParseResource\Pages;
 
+use Throwable;
+use Illuminate\Validation\ValidationException;
+use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\JSONParseResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Storage;
@@ -61,7 +64,7 @@ class CreateJSONParse extends CreateRecord
                 ->success()
                 ->send();
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Notification::make()
                 ->title('Parsing gagal')
                 ->body($e->getMessage())
@@ -81,7 +84,7 @@ class CreateJSONParse extends CreateRecord
                     ->danger()
                     ->send();
 
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'title'       => 'Judul wajib diisi.',
                     'source_type' => 'Sumber Data wajib diisi.',
                 ]);
@@ -136,7 +139,7 @@ class CreateJSONParse extends CreateRecord
                         'text'      => $chunk,
                         'embedding' => $embedding,
                     ];
-                } catch (\Throwable $ex) {
+                } catch (Throwable $ex) {
                     // skip kalau ada error di satu chunk
                     $chunkData[] = [
                         'chunk_id'  => $i,
@@ -157,7 +160,7 @@ class CreateJSONParse extends CreateRecord
                     $totalSim += $embed->cosineSimilarity($fullEmbedding, $chunkEmb);
                 }
                 $sim = $totalSim / max(1, count($chunks));
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $sim = 0;
             }
 
@@ -190,7 +193,7 @@ class CreateJSONParse extends CreateRecord
 
             return $data;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Notification::make()
                 ->title('Gagal menyimpan dokumen')
                 ->body($e->getMessage())
@@ -203,7 +206,7 @@ class CreateJSONParse extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return \App\Filament\Resources\DocumentResource::getUrl('index');
+        return DocumentResource::getUrl('index');
     }
 
     /** Chunking natural berbasis kalimat */

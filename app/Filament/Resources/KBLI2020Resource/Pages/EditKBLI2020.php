@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\KBLI2020Resource\Pages;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\KBLI2020Resource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -20,7 +21,7 @@ class EditKBLI2020 extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 

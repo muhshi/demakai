@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\Action;
+use App\Models\PgKBLI2025;
+use App\Models\PgKBLI2020;
+use App\Models\PgKBJI2014;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\FieldExampleSubmissionResource\Pages\ListFieldExampleSubmissions;
+use App\Filament\Resources\FieldExampleSubmissionResource\Pages\CreateFieldExampleSubmission;
+use App\Filament\Resources\FieldExampleSubmissionResource\Pages\EditFieldExampleSubmission;
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages;
 use App\Filament\Resources\FieldExampleSubmissionResource\RelationManagers;
 use App\Models\FieldExampleSubmission;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,23 +30,23 @@ class FieldExampleSubmissionResource extends Resource
 {
     protected static ?string $model = FieldExampleSubmission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-plus-circle';
     protected static ?string $navigationLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $modelLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $pluralModelLabel = 'Pengajuan Contoh Lapangan';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('type')
+        return $schema
+            ->components([
+                TextInput::make('type')
                     ->readOnly(),
-                Forms\Components\TextInput::make('kode')
+                TextInput::make('kode')
                     ->readOnly(),
-                Forms\Components\Textarea::make('content')
+                Textarea::make('content')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('status')
+                TextInput::make('status')
                     ->readOnly(),
             ]);
     }
@@ -42,16 +55,16 @@ class FieldExampleSubmissionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->searchable()
                     ->badge(),
-                Tables\Columns\TextColumn::make('kode')
+                TextColumn::make('kode')
                     ->searchable()
                     ->copyable()
                     ->weight('bold'),
-                Tables\Columns\TextColumn::make('content')
+                TextColumn::make('content')
                     ->limit(50),
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
@@ -59,24 +72,24 @@ class FieldExampleSubmissionResource extends Resource
                         'rejected' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\Action::make('approve')
+            ->recordActions([
+                Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->visible(fn(FieldExampleSubmission $record) => $record->status === 'pending')
                     ->action(function (FieldExampleSubmission $record) {
                         $model = match ($record->type) {
-                            'KBLI 2025' => \App\Models\PgKBLI2025::class,
-                            'KBLI 2020' => \App\Models\PgKBLI2020::class,
-                            'KBJI 2014' => \App\Models\PgKBJI2014::class,
+                            'KBLI 2025' => PgKBLI2025::class,
+                            'KBLI 2020' => PgKBLI2020::class,
+                            'KBJI 2014' => PgKBJI2014::class,
                             default => null,
                         };
 
@@ -96,18 +109,18 @@ class FieldExampleSubmissionResource extends Resource
                         $record->update(['status' => 'approved']);
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->label('Reject')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->visible(fn(FieldExampleSubmission $record) => $record->status === 'pending')
                     ->action(fn(FieldExampleSubmission $record) => $record->update(['status' => 'rejected']))
                     ->requiresConfirmation(),
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -122,9 +135,9 @@ class FieldExampleSubmissionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFieldExampleSubmissions::route('/'),
-            'create' => Pages\CreateFieldExampleSubmission::route('/create'),
-            'edit' => Pages\EditFieldExampleSubmission::route('/{record}/edit'),
+            'index' => ListFieldExampleSubmissions::route('/'),
+            'create' => CreateFieldExampleSubmission::route('/create'),
+            'edit' => EditFieldExampleSubmission::route('/{record}/edit'),
         ];
     }
 }

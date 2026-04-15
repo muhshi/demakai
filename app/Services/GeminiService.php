@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -63,7 +64,7 @@ class GeminiService
 
             return $data['embedding']['values'];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Gemini Connection Error: ' . $e->getMessage());
             return null;
         }
