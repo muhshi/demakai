@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use RuntimeException;
 use Illuminate\Support\Facades\Http;
 
 class EmbeddingService
@@ -19,7 +20,7 @@ class EmbeddingService
         $apiKey = config('services.gemini.api_key');
 
         if (empty($apiKey)) {
-            throw new \RuntimeException('GEMINI_API_KEY is missing in .env');
+            throw new RuntimeException('GEMINI_API_KEY is missing in .env');
         }
 
         $response = Http::withHeaders([
@@ -35,13 +36,13 @@ class EmbeddingService
                 ]);
 
         if ($response->failed()) {
-            throw new \RuntimeException('Gemini API Error: ' . $response->body());
+            throw new RuntimeException('Gemini API Error: ' . $response->body());
         }
 
         $embedding = $response->json('embedding.values');
 
         if (empty($embedding)) {
-            throw new \RuntimeException('No embedding returned from Gemini API');
+            throw new RuntimeException('No embedding returned from Gemini API');
         }
 
         return $embedding; // Gemini embeddings are already normalized usually, but can re-normalize if needed

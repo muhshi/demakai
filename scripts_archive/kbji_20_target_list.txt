@@ -1,0 +1,20 @@
+011124 | Kepala Badan Perbekalan TNI (Kababek TNI)
+341107 | Justice Of The Peace
+341299 | Asisten Profesional Pekerjaan Sosial Lainnya
+9332 | Pengemudi Kendaraan Dan Peralatan Yang Ditarik Hewan
+343 | Asisten Profesional Kesenian, Budaya Dan Kuliner
+011329 | Kepala Dinas Psikologi TNI Angkatan Laut (Kadispsial)
+265905 | Pesulap
+265908 | Ventriloquist
+31 | Asisten Ahli Ilmu Pengetahuan Dan Teknik
+311203 | Teknisi Teknik Sipil
+214208 | Ahli Teknik Pengairan
+031500 | Tamtama POLRI
+111199 | Pejabat Pembuat Peraturan Perundang-undangan Lainnya
+3113 | Teknisi Teknik Listrik
+3114 | Teknisi Teknik Elektronik
+2143 | Ahli Teknik Lingkungan
+134299 | Manajer Jasa Kesehatan Lainnya
+343203 | Visual Merchandiser
+421402 | Kolektor sumbangan
+214302 | Analis Lingkungan

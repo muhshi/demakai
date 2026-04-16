@@ -44,4 +44,14 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
     ],
 
+    // ── Python Search Microservice ────────────────────────────────────────────
+    // Aktifkan dengan PYTHON_SEARCH_ENABLED=true di .env
+    // Jalankan server dulu: uvicorn api:app --host 127.0.0.1 --port 8000
+    'python_search' => [
+        'enabled' => env('PYTHON_SEARCH_ENABLED', false),
+        'url' => env('PYTHON_SEARCH_URL', 'http://127.0.0.1:8000'),
+        'method' => env('PYTHON_SEARCH_METHOD', 'sql'),      // sql | hybrid
+        'processing' => env('PYTHON_SEARCH_PROCESSING', 'none'), // none | basic | advanced
+    ],
+
 ];

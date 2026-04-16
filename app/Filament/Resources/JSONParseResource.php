@@ -2,22 +2,30 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Actions;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TagsInput;
+use App\Filament\Resources\JSONParseResource\Pages\ListJSONParses;
+use App\Filament\Resources\JSONParseResource\Pages\CreateJSONParse;
 use App\Filament\Resources\JSONParseResource\Pages;
 use App\Models\JSONParse;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Actions; 
+use Filament\Forms; 
 use Filament\Resources\Resource;
 
 class JSONParseResource extends Resource
 {
     protected static ?string $model = JSONParse::class;
 
-    protected static ?string $navigationGroup = 'Parsing Documents';
+    protected static string | \UnitEnum | null $navigationGroup = 'Parsing Documents';
     protected static ?string $modelLabel = 'Upload Documents';
     protected static ?string $pluralModelLabel = 'Parsing Documents';
     protected static ?string $navigationLabel = 'Upload Documents';
-    protected static ?string $navigationIcon  = 'heroicon-o-arrow-up-on-square';
+    protected static string | \BackedEnum | null $navigationIcon  = 'heroicon-o-arrow-up-on-square';
     protected static ?string $slug = 'upload-documents';
 
     // biar URL rapi dan klik menu langsung ke create
@@ -26,12 +34,12 @@ class JSONParseResource extends Resource
         return static::getUrl('create');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\Section::make('Upload & Preview')
+        return $schema->components([
+            Section::make('Upload & Preview')
                 ->schema([
-                    Forms\Components\FileUpload::make('document')
+                    FileUpload::make('document')
                         ->label('Upload Dokumen')
                         ->disk('local')               // simpan di storage/app
                         ->directory('uploads')        // storage/app/uploads
@@ -40,12 +48,12 @@ class JSONParseResource extends Resource
                         ->required(),
                     // Dua tombol aksi
                     Actions::make([
-                        Actions\Action::make('parse')
+                        Action::make('parse')
                             ->label('Parse Dokumen')
                             ->color('warning')
                             ->action('previewParse'),
 
-                        Actions\Action::make('preview')
+                        Action::make('preview')
                             ->label('Preview Parsing')
                             ->color('info')
                             ->modalHeading('Preview Dokumen')
@@ -61,9 +69,9 @@ class JSONParseResource extends Resource
                 ])
                 ->columns(1),
 
-            Forms\Components\Section::make('Metadata')
+            Section::make('Metadata')
                 ->schema([
-                    Forms\Components\Select::make('source_type')
+                    Select::make('source_type')
                         ->label('Sumber Data')
                         ->options([
                             'publikasi' => 'Publikasi BPS',
@@ -71,20 +79,20 @@ class JSONParseResource extends Resource
                             'data' => 'Data Statistik',
                         ]),
 
-                    Forms\Components\TextInput::make('title')
+                    TextInput::make('title')
                         ->label('Judul'),
                         
-                    Forms\Components\TextInput::make('authors')
+                    TextInput::make('authors')
                         ->label('Penulis/Instansi'),
 
-                    Forms\Components\TextInput::make('year')
+                    TextInput::make('year')
                         ->numeric()
                         ->label('Tahun'),
 
-                    Forms\Components\TextInput::make('doi')
+                    TextInput::make('doi')
                         ->label('DOI (opsional)'),
 
-                    Forms\Components\TagsInput::make('tags')
+                    TagsInput::make('tags')
                         ->label('Kata Kunci'),
                 ])
                 ->columns(2),
@@ -95,8 +103,8 @@ class JSONParseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListJSONParses::route('/'),     
-            'create' => Pages\CreateJSONParse::route('/create'),
+            'index'  => ListJSONParses::route('/'),     
+            'create' => CreateJSONParse::route('/create'),
         ];
     }
 }

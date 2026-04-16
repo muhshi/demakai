@@ -21,5 +21,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin')
         ]);
+        if (config('database.default') === 'sqlite') {
+            $this->call(SqliteDataSeeder::class);
+        }
     }
 }

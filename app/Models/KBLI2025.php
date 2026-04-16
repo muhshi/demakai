@@ -7,7 +7,7 @@ use MongoDB\Laravel\Eloquent\Model;
 class KBLI2025 extends Model
 {
     protected $connection = 'mongodb';
-    protected $collection = 'KBLI2025';   // case-sensitive
+    protected $table = 'KBLI2025';   // case-sensitive
     public $timestamps = false;
 
     protected $guarded = [];
@@ -17,7 +17,5 @@ class KBLI2025 extends Model
         'contoh_lapangan' => 'array',
     ];
 
-    protected $primaryKey = '_id';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    // MongoDB v5: _id dikelola otomatis oleh driver
 }

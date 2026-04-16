@@ -2,11 +2,17 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\KBLI2020Resource\Pages\ListKBLI2020s;
+use App\Filament\Resources\KBLI2020Resource\Pages\EditKBLI2020;
 use App\Filament\Resources\KBLI2020Resource\Pages;
 use App\Filament\Resources\KBLI2020Resource\RelationManagers;
 use App\Models\PgKBLI2020;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,31 +22,31 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KBLI2020Resource extends Resource
 {
     protected static ?string $model = PgKBLI2020::class;
-    protected static ?string $navigationGroup = 'Klasifikasi';
+    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2020';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             // Field yang sudah ada...
-            Forms\Components\TextInput::make('kode')
+            TextInput::make('kode')
                 ->label('Kode 5 Digit')
                 ->required()
                 ->disabled()
                 ->maxLength(10),
-            Forms\Components\TextInput::make('judul')
+            TextInput::make('judul')
                 ->label('Judul')
                 ->required()
                 ->disabled()
                 ->maxLength(300),
-            Forms\Components\Textarea::make('deskripsi')
+            Textarea::make('deskripsi')
                 ->label('Deskripsi')
                 ->disabled()
                 ->rows(6),
 
             // 🔹 Field baru:
-            Forms\Components\TagsInput::make('contoh_lapangan')
+            TagsInput::make('contoh_lapangan')
                 ->label('Contoh Lapangan')
                 ->placeholder('Tambah contoh lalu Enter')
                 ->reorderable()
@@ -50,7 +56,7 @@ class KBLI2020Resource extends Resource
             //     ->label('Catatan Internal')
             //     ->rows(4),
 
-            Forms\Components\TextInput::make('last_updated_by')
+            TextInput::make('last_updated_by')
                 ->label('Diupdate oleh')
                 ->disabled()
                 ->maxLength(50),
@@ -61,19 +67,19 @@ class KBLI2020Resource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kode')
+                TextColumn::make('kode')
                     ->label('Kode')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('sektor')
+                TextColumn::make('sektor')
                     ->badge()->color('info')->toggleable(),
-                Tables\Columns\TextColumn::make('judul')
+                TextColumn::make('judul')
                     ->searchable()->wrap()->limit(60),
-                Tables\Columns\TextColumn::make('contoh_lapangan')
+                TextColumn::make('contoh_lapangan')
                     ->label('Contoh Lapangan')
                     ->wrap()
                     ->limit(150)
                     ->toggleable(isToggledHiddenByDefault: false)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deskripsi')
+                TextColumn::make('deskripsi')
                     ->wrap()->limit(120)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -89,9 +95,9 @@ class KBLI2020Resource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListKBLI2020s::route('/'),
+            'index' => ListKBLI2020s::route('/'),
             //'create' => Pages\CreateKBLI2020::route('/create'),
-            'edit' => Pages\EditKBLI2020::route('/{record}/edit'),
+            'edit' => EditKBLI2020::route('/{record}/edit'),
         ];
     }
 }

@@ -7,7 +7,7 @@ use MongoDB\Laravel\Eloquent\Model;
 class KBLI2020 extends Model
 {
     protected $connection = 'mongodb';
-    protected $collection = 'KBLI2020';   // case-sensitive, samakan dengan koleksi
+    protected $table = 'KBLI2020';   // case-sensitive, samakan dengan koleksi
     public $timestamps = false;
 
     // biar fleksibel
@@ -20,8 +20,5 @@ class KBLI2020 extends Model
         'contoh_lapangan' => 'array',
     ];
 
-    // (opsional, tapi aman) tegaskan primary key ObjectId
-    protected $primaryKey = '_id';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    // MongoDB v5: _id dikelola otomatis oleh driver, tidak perlu deklarasi manual
 }

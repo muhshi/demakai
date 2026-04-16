@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Pgvector\Laravel\Vector;
+// use Pgvector\Laravel\Vector;
 
 class PgKBLI2020 extends Model
 {
@@ -14,7 +14,7 @@ class PgKBLI2020 extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'embedding' => Vector::class,
+        // 'embedding' => Vector::class,
         'contoh_lapangan' => 'array',
     ];
 }

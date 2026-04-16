@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\KBLI2025Resource\Pages;
 
+use Filament\Actions\Action;
+use Throwable;
 use App\Filament\Resources\KBLI2025Resource;
-use App\Models\KBLI2025;
+use App\Models\PgKBLI2025;
 use Filament\Actions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -20,34 +22,34 @@ class ListKBLI2025s extends ListRecords
     {
         return [
             // 📥 Download Template
-            Actions\Action::make('downloadTemplate')
+            Action::make('downloadTemplate')
                 ->label('Download Template KBLI 2025')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->url(fn() => route('template.kbli2025'))
                 ->openUrlInNewTab(),
 
             // 📤 Import dari Excel/CSV (header-aware)
-            Actions\Action::make('importContoh')
+            Action::make('importContoh')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->form([
-                        FileUpload::make('file')
-                            ->label('File Excel/CSV')
-                            ->required()
-                            ->disk('public')
-                            ->directory('imports')
-                            ->acceptedFileTypes([
-                                    'text/csv',
-                                    'application/vnd.ms-excel',
-                                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                ]),
+                ->schema([
+                    FileUpload::make('file')
+                        ->label('File Excel/CSV')
+                        ->required()
+                        ->disk('public')
+                        ->directory('imports')
+                        ->acceptedFileTypes([
+                            'text/csv',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        ]),
 
-                        TextInput::make('delimiter')
-                            ->label('Pemisah multi-contoh di sel')
-                            ->helperText('Jika satu sel berisi banyak contoh, pisahkan dengan tanda ini. Mis: ;')
-                            ->default(';')
-                            ->maxLength(2),
-                    ])
+                    TextInput::make('delimiter')
+                        ->label('Pemisah multi-contoh di sel')
+                        ->helperText('Jika satu sel berisi banyak contoh, pisahkan dengan tanda ini. Mis: ;')
+                        ->default(';')
+                        ->maxLength(2),
+                ])
                 ->action(function (array $data) {
                     try {
                         $path = Storage::disk('public')->path($data['file']);
@@ -126,8 +128,8 @@ class ListKBLI2025s extends ListRecords
                                 $contohList = array_values(array_filter($parts, fn($v) => $v !== ''));
                             }
 
-                            // Cari dokumen KBLI 2025 (menggunakan field 'Kode')
-                            $doc = KBLI2025::where('Kode', $kode)->first();
+                            // Cari dokumen KBLI 2025 di PostgreSQL (field 'kode')
+                            $doc = PgKBLI2025::where('kode', $kode)->first();
 
                             if (!$doc) {
                                 $missing++;
@@ -146,7 +148,7 @@ class ListKBLI2025s extends ListRecords
                             ->body("Updated: {$updated}, Missing kode: {$missing}, Skipped: {$skipped}")
                             ->send();
 
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         Notification::make()
                             ->danger()
                             ->title('Import gagal')

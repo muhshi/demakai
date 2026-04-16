@@ -6,12 +6,12 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
-    protected $connection = 'pgsql';
+    // protected $connection = 'pgsql';
 
     public function up(): void
     {
-        if (!Schema::connection('pgsql')->hasTable('kbli2025s')) {
-            Schema::connection('pgsql')->create('kbli2025s', function (Blueprint $table) {
+        if (config('database.default') === 'pgsql' && !Schema::hasTable('kbli2025s')) {
+            Schema::create('kbli2025s', function (Blueprint $table) {
                 $table->id();
                 $table->string('sumber')->nullable();
                 $table->string('kode')->nullable()->index();
@@ -31,6 +31,8 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::connection('pgsql')->dropIfExists('kbli2025s');
+        if (config('database.default') === 'pgsql') {
+            Schema::dropIfExists('kbli2025s');
+        }
     }
 };
