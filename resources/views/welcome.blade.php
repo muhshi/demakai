@@ -761,22 +761,16 @@
                     style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#6366f1;">🔬
                     Metode Pencarian</span>
                 <span id="active-method-badge"
-                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">SQL
+                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
                     + None</span>
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-                <button class="method-btn active" data-search="sql" data-proc="none" onclick="setMethod(this)">SQL ·
-                    None</button>
-                <button class="method-btn" data-search="sql" data-proc="advanced" onclick="setMethod(this)">SQL ·
-                    Advanced</button>
-                <button class="method-btn" data-search="sql" data-proc="expansion" onclick="setMethod(this)">SQL ·
-                    Expansion</button>
-                <button class="method-btn" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Hybrid ·
-                    None</button>
-                <button class="method-btn" data-search="hybrid" data-proc="advanced" onclick="setMethod(this)">Hybrid ·
-                    Advanced</button>
-                <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Hybrid ·
-                    Expansion</button>
+                <button class="method-btn" data-search="sql" data-proc="none" onclick="setMethod(this)">SQL · None</button>
+                <button class="method-btn" data-search="sql" data-proc="advanced" onclick="setMethod(this)">SQL · Advanced</button>
+                <button class="method-btn" data-search="sql" data-proc="expansion" onclick="setMethod(this)">SQL · Expansion</button>
+                <button class="method-btn active" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Hybrid · None</button>
+                <button class="method-btn" data-search="hybrid" data-proc="advanced" onclick="setMethod(this)">Hybrid · Advanced</button>
+                <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Hybrid · Expansion</button>
             </div>
         </div>
 
@@ -855,7 +849,7 @@
         };
 
         // ── Metode aktif saat ini ──
-        let activeSearch     = 'sql';
+        let activeSearch     = 'hybrid';
         let activeProcessing = 'none';
 
         window.setMethod = (btn) => {

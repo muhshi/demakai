@@ -78,56 +78,83 @@ def _vector_search(cursor, table: str, embedding: list, limit: int) -> list:
 # Helper: keyword LIKE search (multi-token AND logic)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _keyword_search(cursor, table: str, tokens: list, limit: int) -> list:
+def _keyword_search(cursor, table: str, token_groups: list, limit: int, variations: list = None) -> list:
     """
-    SQL LIKE dengan AND logic (semua token harus ada).
-    Jika menghasilkan kosong, fallback ke OR logic (cukup salah satu token cocok).
-    Diurutkan berdasarkan jumlah token yang cocok (DESC).
+    SQL LIKE dengan AND logic per grup token.
+    Setiap grup (misal: ["pabrik", "industri"]) adalah OR.
+    Sedangkan antar grup adalah AND.
+    Bisa diekstensi dengan variations sebagai OR fallback di level atas.
     """
-    if not tokens:
+    if not token_groups and not variations:
         return []
+    variations = variations or []
+    token_groups = [g for g in token_groups if g]
 
-    # ── Step 1: AND logic (strict) ────────────────────────────────────────────
     and_conditions = []
     and_params = []
-    for token in tokens:
-        pat = f"%{token}%"
-        and_conditions.append(
-            "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR "
-            "CAST(contoh_lapangan AS TEXT) ILIKE %s)"
-        )
-        and_params.extend([pat, pat, pat, pat])
+    for group in token_groups:
+        group_conds = []
+        for token in group:
+            pat = f"%{token}%"
+            group_conds.append(
+                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+            )
+            and_params.extend([pat, pat, pat, pat])
+        and_conditions.append("(" + " OR ".join(group_conds) + ")")
 
-    and_clause = " AND ".join(and_conditions)
-    sql_and = f"SELECT *, 0.05 AS distance FROM {table} WHERE {and_clause} LIMIT %s"
-    and_params.append(limit)
-    cursor.execute(sql_and, and_params)
-    rows = cursor.fetchall()
+    if and_conditions:
+        and_clause = " AND ".join(and_conditions)
+    else:
+        and_clause = "1=0"
 
-    if rows:
-        return rows
+    if variations:
+        var_conds = []
+        for var in variations:
+            pat = f"%{var}%"
+            var_conds.append(
+                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+            )
+            and_params.extend([pat, pat, pat, pat])
+        var_clause = " OR ".join(var_conds)
+        combined_clause = f"({and_clause}) OR ({var_clause})" if and_conditions else var_clause
+    else:
+        combined_clause = and_clause
+
+    if combined_clause and combined_clause != "1=0":
+        sql_and = f"SELECT *, 0.05 AS distance FROM {table} WHERE {combined_clause} LIMIT %s"
+        cursor.execute(sql_and, and_params + [limit])
+        rows = cursor.fetchall()
+        if rows:
+            return rows
 
     # ── Step 2: OR fallback (lebih longgar) ───────────────────────────────────
-    # Hitung skor: jumlah token yang cocok per record (untuk ordering)
-    score_parts = []
-    score_params = []
-    or_conditions = []
+    all_tokens = []
+    for group in token_groups:
+        all_tokens.extend(group)
+    all_tokens.extend(variations)
+    all_tokens = list(set(all_tokens))
+    
+    if not all_tokens:
+        return []
+
+    score_expr_parts = []
+    or_conds = []
     or_params = []
-    for token in tokens:
+    for token in all_tokens:
         pat = f"%{token}%"
-        score_parts.append(
+        score_expr_parts.append(
             "(CASE WHEN kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
             "OR CAST(contoh_lapangan AS TEXT) ILIKE %s THEN 1 ELSE 0 END)"
         )
-        score_params.extend([pat, pat, pat, pat])
-        or_conditions.append(
+        or_params.extend([pat, pat, pat, pat])
+        or_conds.append(
             "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
             "OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
         )
         or_params.extend([pat, pat, pat, pat])
 
-    score_expr = " + ".join(score_parts)
-    or_clause  = " OR ".join(or_conditions)
+    score_expr = " + ".join(score_expr_parts)
+    or_clause  = " OR ".join(or_conds)
 
     sql_or = f"""
         SELECT *, 0.05 AS distance, ({score_expr}) AS _match_score
@@ -136,7 +163,7 @@ def _keyword_search(cursor, table: str, tokens: list, limit: int) -> list:
         ORDER BY _match_score DESC
         LIMIT %s
     """
-    cursor.execute(sql_or, score_params + or_params + [limit])
+    cursor.execute(sql_or, or_params + [limit])
     return cursor.fetchall()
 
 
@@ -168,7 +195,6 @@ def _merge_and_boost(semantic: list, keyword: list, tokens: list) -> list:
         desc    = (item.get("deskripsi") or "").lower()
         contoh  = item.get("contoh_lapangan")
 
-        # contoh_lapangan bisa berupa JSONB list atau string
         if isinstance(contoh, list):
             contoh_str = " ".join(contoh).lower()
         elif isinstance(contoh, str):
@@ -198,7 +224,6 @@ def _merge_and_boost(semantic: list, keyword: list, tokens: list) -> list:
 
         boosted.append(item)
 
-    # Urutkan berdasarkan distance (ascending = lebih relevan)
     boosted.sort(key=lambda x: x.get("distance", 1.0))
     return boosted
 
@@ -208,22 +233,8 @@ def _merge_and_boost(semantic: list, keyword: list, tokens: list) -> list:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -> list:
-    """
-    Hybrid Search menggunakan hasil preprocessing QUERY EXPANSION.
-      - Embedding dibuat dari 'clean' (teks asli lebih baik untuk semantik)
-      - Keyword tokens diambil dari 'expanded_tokens' (menangkap sinonim)
-
-    Args:
-        preprocessed : output dari preprocess_expansion()
-        limit        : jumlah maksimum hasil. Default: Settings.DEFAULT_LIMIT
-        model        : 'KBLI', 'KBJI', atau None (keduanya)
-
-    Returns:
-        list of dict — hasil pencarian yang sudah di-merge dan di-boost
-    """
     limit = limit or Settings.DEFAULT_LIMIT
 
-    # ── PRIORITY: Numeric Code Match (Skip Embedding) ─────────────────
     clean_val = preprocessed.get("original", "").strip()
     if clean_val.isdigit():
         conn = get_connection()
@@ -234,11 +245,10 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
                     return numeric_results
         finally:
             conn.close()
-    base_tokens = preprocessed.get("expanded_tokens", [])
-    
-    # Siapkan token augmentasi untuk masing-masing model secara terpisah
-    kbli_tokens = sorted(list(set(base_tokens + preprocessed.get("kbli_variations", []))))
-    kbji_tokens = sorted(list(set(base_tokens + preprocessed.get("kbji_variations", []))))
+
+    token_groups = preprocessed.get("expanded_groups", [])
+    kbli_vars = preprocessed.get("kbli_variations", [])
+    kbji_vars = preprocessed.get("kbji_variations", [])
 
     embed_text = preprocessed.get("clean", "")
     embedding = _generate_embedding(embed_text)
@@ -252,48 +262,29 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
             if model is None or model == "KBLI":
                 if embedding:
                     semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
-                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, kbli_tokens, limit)
+                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit, kbli_vars)
 
             if model is None or model == "KBJI":
                 if embedding:
                     semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
-                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, kbji_tokens, limit)
+                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit, kbji_vars)
     finally:
         conn.close()
 
-    semantic = [
-        {**r, "_source": "KBLI"} for r in semantic_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in semantic_kbji
-    ]
-    keyword = [
-        {**r, "_source": "KBLI"} for r in keyword_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in keyword_kbji
-    ]
-    all_tokens = sorted(list(set(kbli_tokens + kbji_tokens)))
+    semantic = [{**r, "_source": "KBLI"} for r in semantic_kbli] + \
+               [{**r, "_source": "KBJI"} for r in semantic_kbji]
+    keyword = [{**r, "_source": "KBLI"} for r in keyword_kbli] + \
+              [{**r, "_source": "KBJI"} for r in keyword_kbji]
+
+    all_tokens = preprocessed.get("expanded_tokens", []) + kbli_vars + kbji_vars
+    all_tokens = list(set(all_tokens))
 
     return _merge_and_boost(semantic, keyword, all_tokens)[:limit]
 
 
 def search_advanced(preprocessed: dict, limit: int = None, model: str = None) -> list:
-    """
-    Hybrid Search menggunakan hasil preprocessing ADVANCED.
-      - Basic preprocessing telah dihapus.
-      - Embedding dibuat dari 'stemmed_clean' (lebih bersih)
-      - Keyword tokens diambil dari 'stemmed_tokens'
-
-    Args:
-        preprocessed : output dari preprocess_advanced()
-        limit        : jumlah maksimum hasil. Default: Settings.DEFAULT_LIMIT
-        model        : 'KBLI', 'KBJI', atau None (keduanya)
-
-    Returns:
-        list of dict — hasil pencarian yang sudah di-merge dan di-boost
-    """
     limit = limit or Settings.DEFAULT_LIMIT
 
-    # ── PRIORITY: Numeric Code Match (Skip Embedding) ─────────────────
     clean_val = preprocessed.get("original", "").strip()
     if clean_val.isdigit():
         conn = get_connection()
@@ -304,8 +295,10 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
                     return numeric_results
         finally:
             conn.close()
+
     embed_text = preprocessed.get("stemmed_clean") or preprocessed.get("clean", "")
     tokens     = preprocessed.get("stemmed_tokens") or preprocessed.get("tokens", [])
+    token_groups = [[t] for t in tokens]
 
     embedding = _generate_embedding(embed_text)
 
@@ -318,46 +311,26 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
             if model is None or model == "KBLI":
                 if embedding:
                     semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
-                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, tokens, limit)
+                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit)
 
             if model is None or model == "KBJI":
                 if embedding:
                     semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
-                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, tokens, limit)
+                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit)
     finally:
         conn.close()
 
-    semantic = [
-        {**r, "_source": "KBLI"} for r in semantic_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in semantic_kbji
-    ]
-    keyword = [
-        {**r, "_source": "KBLI"} for r in keyword_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in keyword_kbji
-    ]
+    semantic = [{**r, "_source": "KBLI"} for r in semantic_kbli] + \
+               [{**r, "_source": "KBJI"} for r in semantic_kbji]
+    keyword = [{**r, "_source": "KBLI"} for r in keyword_kbli] + \
+              [{**r, "_source": "KBJI"} for r in keyword_kbji]
 
     return _merge_and_boost(semantic, keyword, tokens)[:limit]
 
 
 def search_raw(query: str, limit: int = None, model: str = None) -> list:
-    """
-    Hybrid Search tanpa preprocessing — query digunakan apa adanya (mentah).
-      - Embedding dibuat langsung dari raw query
-      - Keyword tokens = split whitespace dari raw query (tanpa cleaning)
-
-    Args:
-        query : string query langsung dari user (tidak diproses)
-        limit : jumlah maksimum hasil. Default: Settings.DEFAULT_LIMIT
-        model : 'KBLI', 'KBJI', atau None (keduanya)
-
-    Returns:
-        list of dict — hasil pencarian yang sudah di-merge dan di-boost
-    """
     limit = limit or Settings.DEFAULT_LIMIT
 
-    # ── PRIORITY: Numeric Code Match (Skip Embedding) ─────────────────
     clean_val = query.strip()
     if clean_val.isdigit():
         conn = get_connection()
@@ -373,6 +346,7 @@ def search_raw(query: str, limit: int = None, model: str = None) -> list:
 
     embed_text = query
     tokens     = [t for t in query.split() if t]
+    token_groups = [[t] for t in tokens]
 
     embedding = _generate_embedding(embed_text)
 
@@ -385,24 +359,18 @@ def search_raw(query: str, limit: int = None, model: str = None) -> list:
             if model is None or model == "KBLI":
                 if embedding:
                     semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
-                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, tokens, limit)
+                keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit)
 
             if model is None or model == "KBJI":
                 if embedding:
                     semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
-                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, tokens, limit)
+                keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit)
     finally:
         conn.close()
 
-    semantic = [
-        {**r, "_source": "KBLI"} for r in semantic_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in semantic_kbji
-    ]
-    keyword = [
-        {**r, "_source": "KBLI"} for r in keyword_kbli
-    ] + [
-        {**r, "_source": "KBJI"} for r in keyword_kbji
-    ]
+    semantic = [{**r, "_source": "KBLI"} for r in semantic_kbli] + \
+               [{**r, "_source": "KBJI"} for r in semantic_kbji]
+    keyword = [{**r, "_source": "KBLI"} for r in keyword_kbli] + \
+              [{**r, "_source": "KBJI"} for r in keyword_kbji]
 
     return _merge_and_boost(semantic, keyword, tokens)[:limit]

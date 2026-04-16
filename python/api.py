@@ -99,6 +99,20 @@ class SearchResponse(BaseModel):
     results:      list
 
 
+class ClassifyResult(BaseModel):
+    kode: str
+    judul: str
+    deskripsi: str
+
+
+class ClassifyResponse(BaseModel):
+    query: str
+    kbli: Optional[ClassifyResult]
+    kbji: Optional[ClassifyResult]
+    confidence_score: float
+    method: str
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Endpoints
 # ─────────────────────────────────────────────────────────────────────────────
@@ -188,5 +202,63 @@ def search(req: SearchRequest):
             results=serialized,
         )
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/classify-pekerjaan", response_model=ClassifyResponse)
+def classify_pekerjaan(req: SearchRequest):
+    """
+    Classifier Endpoint v1:
+    Mengambil Top-1 KBLI dan Top-1 KBJI berdasarkan hasil Hybrid Expansion terbaik.
+    """
+    if not req.query.strip():
+        raise HTTPException(status_code=400, detail="query tidak boleh kosong")
+
+    try:
+        # Override setting ke Hybrid Expansion teroptimasi dengan jumlah kandidat cukup
+        limit = 30
+        preprocessed = preprocess_expansion(req.query)
+        candidates = hybrid_expansion(preprocessed, limit=limit, model=None)
+
+        # Pisahkan berdasar sumber
+        kblis = [c for c in candidates if c["_source"] == "KBLI"]
+        kbjis = [c for c in candidates if c["_source"] == "KBJI"]
+
+        # Ambil Top-1
+        best_kbli = kblis[0] if kblis else None
+        best_kbji = kbjis[0] if kbjis else None
+
+        # Confidence Scoring: Distance kecil -> Score tinggi
+        # (Hook untuk integrasi Gemini di Phase 2 bila score < threshold ditempatkan di sini nanti)
+        confidence = 0.0
+        dist_kbli = best_kbli.get("distance", 1.0) if best_kbli else 1.0
+        dist_kbji = best_kbji.get("distance", 1.0) if best_kbji else 1.0
+
+        if best_kbli or best_kbji:
+            # Hitung rata-rata distance dari yg ditemukan
+            found_dists = []
+            if best_kbli: found_dists.append(dist_kbli)
+            if best_kbji: found_dists.append(dist_kbji)
+            
+            avg_dist = sum(found_dists) / len(found_dists)
+            # Normalisasi ke skala 0-100
+            confidence = max(0.0, min(100.0, (1.0 - float(avg_dist)) * 100))
+
+        def fmt(item):
+            if not item: return None
+            return {
+                "kode": str(item["kode"]),
+                "judul": str(item["judul"]),
+                "deskripsi": str(item.get("deskripsi", ""))
+            }
+
+        return ClassifyResponse(
+            query=req.query,
+            kbli=fmt(best_kbli),
+            kbji=fmt(best_kbji),
+            confidence_score=round(confidence, 2),
+            method="hybrid_expansion_top1"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

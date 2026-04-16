@@ -100,14 +100,21 @@ def preprocess_expansion(query: str) -> dict:
 
     # 5. Synonym Expansion (menggunakan kamus sinonim dasar)
     expanded_set = set(original_tokens)
+    expanded_groups = []
     
     # TOGGLE: Disable expansion if requested
     enable_expansion = os.environ.get("ENABLE_EXPANSION", "true").lower() == "true"
 
     if enable_expansion:
         for token in original_tokens:
+            group = {token}
             if token in SYNONYM_DICT:
-                expanded_set.update(SYNONYM_DICT[token])
+                group.update(SYNONYM_DICT[token])
+            expanded_set.update(group)
+            expanded_groups.append(sorted(list(group)))
+    else:
+        for token in original_tokens:
+            expanded_groups.append([token])
     
     expanded_tokens = sorted(list(expanded_set))
 
@@ -142,6 +149,7 @@ def preprocess_expansion(query: str) -> dict:
         "clean": text,
         "tokens": original_tokens,
         "expanded_tokens": expanded_tokens,
+        "expanded_groups": expanded_groups,
         "expanded_clean": " ".join(expanded_tokens),
         "kbli_variations": kbli_variations,
         "kbji_variations": kbji_variations
