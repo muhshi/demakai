@@ -69,6 +69,7 @@ All notable changes to this project will be documented in this section.
 
 ### [Changed]
 - Upgraded project to Laravel 13 and Filament 5 panel.
+- Upgraded environment to PHP 8.4 via FrankenPHP Docker image.
 - Merged `feat/hybrid-search-opt` into `main`.
 
 ---
