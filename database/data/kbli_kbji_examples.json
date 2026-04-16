@@ -1,0 +1,246 @@
+{
+  "kbli_examples": [
+    {
+      "code": "01122",
+      "example": "Kegiatan mencabut rumput liar di sawah(maton)"
+    },
+    {
+      "code": "31011",
+      "example": "Kegiatan membuat lemari kaca/ etalase,mengantar pesanan lemari kaca"
+    },
+    {
+      "code": "01122",
+      "example": "Kegiatan pertanian inbrida"
+    },
+    {
+      "code": "47249",
+      "example": "Kegiatan membuat resoles untuk dijual dipasar kampung"
+    },
+    {
+      "code": "85316",
+      "example": "Kegiatan mengajar mata pelajaran pkn di mts tahassus alquran"
+    },
+    {
+      "code": "16211",
+      "example": "Kegiatan karyawan bagian produksi ,pemotongan kayu sesuai ukuran akhir dipabrik kayu lapis"
+    },
+    {
+      "code": "01122",
+      "example": "Kegiatan pertanian padi inbrida"
+    },
+    {
+      "code": "01134",
+      "example": "Kegiatan pertanian bawang merah hortikultural di sawah milik orang lain"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan kontruksi rumah di desa"
+    },
+    {
+      "code": "47749",
+      "example": "Kegiatan perdagangan barang bekas untuk dijual lagi"
+    },
+    {
+      "code": "47832",
+      "example": "Kegiatan pedagang motor di rumah sendiri"
+    },
+    {
+      "code": "49231",
+      "example": "Kegiatan jasa transportasi"
+    },
+    {
+      "code": "47213",
+      "example": "Kegiatan penyedia bhan baku makanan"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan tukang batu"
+    },
+    {
+      "code": "01134",
+      "example": "Kegiatan pertanian bawang merah hortikultural sawah milik orang lain"
+    },
+    {
+      "code": "01122",
+      "example": "Kegiatan pertanian padi di sawah milik sendiri"
+    },
+    {
+      "code": "47112",
+      "example": "Kegiatan buruh (pelayan di toko klontong)"
+    },
+    {
+      "code": "81290",
+      "example": "Kegiatan mencuci motor dan mobil"
+    },
+    {
+      "code": "56101",
+      "example": "Kegiatan menjual botok pelas dan pecel"
+    },
+    {
+      "code": "56210",
+      "example": "Kegiatan penyediaan makanan"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan buruh bangunan, mengaduk semen"
+    },
+    {
+      "code": "56303",
+      "example": "Kegiatan menjual es teh jumbo"
+    },
+    {
+      "code": "96900",
+      "example": "Kegiatan jasa antar undangan acara"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan jasa kontruksi tukang bangunan harian"
+    },
+    {
+      "code": "56102",
+      "example": "Kegiatan peyedia makanan siomay keliling dengan sepeda"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan mencampur semen, mengangkut material, memasang bata, plester dinding, dan menyelesaikan bangunan"
+    },
+    {
+      "code": "16101",
+      "example": "Kegiatan mengoperasikan dan memperbaiki mesin produksi dan perawatan berkala"
+    },
+    {
+      "code": "01134",
+      "example": "Kegiatan pertanian bawang merah milik orang lain"
+    },
+    {
+      "code": "41011",
+      "example": "Kegiatan kontrusi rumah"
+    },
+    {
+      "code": "11052",
+      "example": "Kegiatan industri air isi ulang"
+    }
+  ],
+  "kbji_examples": [
+    {
+      "code": "9211",
+      "example": "Deskripsi tugas: mencabut rumput liar di sawah(maton)"
+    },
+    {
+      "code": "7523",
+      "example": "Deskripsi tugas: membuat lemari kaca/ etalase,mengantar pesanan lemari kaca"
+    },
+    {
+      "code": "9211",
+      "example": "Deskripsi tugas: pertanian"
+    },
+    {
+      "code": "5212",
+      "example": "Deskripsi tugas: membuat resoles untuk dijual dipasar kampung"
+    },
+    {
+      "code": "2330",
+      "example": "Deskripsi tugas: mengajar mata pelajaran pkn di mts tahassus alquran"
+    },
+    {
+      "code": "9329",
+      "example": "Deskripsi tugas: karyawan bagian produksi ,pemotongan kayu sesuai ukuran akhir dipabrik kayu lapis"
+    },
+    {
+      "code": "6111",
+      "example": "Deskripsi tugas: pertanian padi"
+    },
+    {
+      "code": "9211",
+      "example": "Deskripsi tugas: pertanian bawang merah hortikultural di sawah milik orang lain"
+    },
+    {
+      "code": "7112",
+      "example": "Deskripsi tugas: kontruksi rumah di desa"
+    },
+    {
+      "code": "5249",
+      "example": "Deskripsi tugas: perdagangan barang bekas untuk dijual lagi"
+    },
+    {
+      "code": "5249",
+      "example": "Deskripsi tugas: pedagang motor di rumah sendiri"
+    },
+    {
+      "code": "8322",
+      "example": "Deskripsi tugas: jasa transportasi"
+    },
+    {
+      "code": "9520",
+      "example": "Deskripsi tugas: penyedia bhan baku makanan"
+    },
+    {
+      "code": "7111",
+      "example": "Deskripsi tugas: tukang batu"
+    },
+    {
+      "code": "9211",
+      "example": "Deskripsi tugas: pertanian bawang merah hortikultural sawah milik orang lain"
+    },
+    {
+      "code": "6111",
+      "example": "Deskripsi tugas: pertanian padi di sawah milik sendiri"
+    },
+    {
+      "code": "5223",
+      "example": "Deskripsi tugas: buruh (pelayan di toko klontong)"
+    },
+    {
+      "code": "9122",
+      "example": "Deskripsi tugas: mencuci motor dan mobil"
+    },
+    {
+      "code": "5212",
+      "example": "Deskripsi tugas: menjual botok pelas dan pecel"
+    },
+    {
+      "code": "9412",
+      "example": "Deskripsi tugas: penyediaan makanan"
+    },
+    {
+      "code": "7111",
+      "example": "Deskripsi tugas: buruh bangunan, mengaduk semen"
+    },
+    {
+      "code": "5223",
+      "example": "Deskripsi tugas: menjual es teh jumbo"
+    },
+    {
+      "code": "5169",
+      "example": "Deskripsi tugas: jasa antar undangan acara"
+    },
+    {
+      "code": "7111",
+      "example": "Deskripsi tugas: jasa kontruksi tukang bangunan harian"
+    },
+    {
+      "code": "5212",
+      "example": "Deskripsi tugas: peyedia makanan siomay keliling dengan sepeda"
+    },
+    {
+      "code": "7111",
+      "example": "Deskripsi tugas: mencampur semen, mengangkut material, memasang bata, plester dinding, dan menyelesaikan bangunan"
+    },
+    {
+      "code": "3122",
+      "example": "Deskripsi tugas: mengoperasikan dan memperbaiki mesin produksi dan perawatan berkala"
+    },
+    {
+      "code": "9211",
+      "example": "Deskripsi tugas: pertanian bawang merah milik orang lain"
+    },
+    {
+      "code": "7112",
+      "example": "Deskripsi tugas: kontrusi rumah"
+    },
+    {
+      "code": "8183",
+      "example": "Deskripsi tugas: industri air isi ulang"
+    }
+  ]
+}

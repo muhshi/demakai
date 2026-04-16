@@ -14,7 +14,8 @@ class GenerateEmbeddings extends Command
     protected $signature = 'embeddings:generate 
                             {--limit=5000 : Limit the number of records processed} 
                             {--delay=100 : Delay in ms between requests (default 100ms)}
-                            {--model= : Focus on a specific model (KBJI2014, KBLI2020, KBLI2025)}';
+                            {--model= : Focus on a specific model (KBJI2014, KBLI2020, KBLI2025)}
+                            {--sync : Process records where the content has changed (detected via hash)}';
 
     protected $description = 'Generate vector embeddings using Google Gemini embedContent API with Smart Update and Rate Limit handling';
 
@@ -50,10 +51,17 @@ class GenerateEmbeddings extends Command
 
     protected function processModel($modelClass, $apiKey, $limit, $delay)
     {
+        $sync = $this->option('sync');
+
         $q = $modelClass::where(function ($query) {
             $query->whereNull('embedding')
                 ->orWhereRaw('embedding IS NULL');
         });
+
+        // If sync is enabled, we process everything but rely on hash check to call API
+        if ($sync) {
+            $q = $modelClass::query();
+        }
 
         $totalToProcess = min($q->count(), $limit);
 
@@ -62,16 +70,15 @@ class GenerateEmbeddings extends Command
             return;
         }
 
-        $this->info("Found {$totalToProcess} pending records. Processing...");
+        $this->info("Found {$totalToProcess} records to check. Processing...");
         $bar = $this->output->createProgressBar($totalToProcess);
         $bar->start();
 
         $processedCount = 0;
 
-        $modelClass::whereNull('embedding')
-            ->chunkById(50, function ($records) use ($apiKey, $delay, $bar, &$processedCount, $limit) {
-                if ($processedCount >= $limit)
-                    return false;
+        $q->chunkById(100, function ($records) use ($apiKey, $delay, $bar, &$processedCount, $limit) {
+            if ($processedCount >= $limit)
+                return false;
 
                 foreach ($records as $record) {
                     $text = $this->constructPayload($record);

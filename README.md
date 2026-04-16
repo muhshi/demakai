@@ -49,6 +49,30 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 - **[byte5](https://byte5.de)**
 - **[OP.GG](https://op.gg)**
 
+## Features
+
+- **Project Automation**: Added `composer dev` (native) and `composer dev:docker` (Docker) for seamless local development.
+- **Smart Vector Search**: Upgraded `embeddings:generate` command with a `--sync` flag to automatically detect and update changed content.
+- **Database Seeding**: Implemented `FieldExampleSeeder` for bulk importing KBLI and KBJI field examples from JSON data.
+- **Modern Tech Stack**: Upgraded to Laravel 13 and Filament 5.
+
+## Changelog
+
+All notable changes to this project will be documented in this section.
+
+### [Added] - 2026-04-16
+- `composer dev` and `composer dev:docker` scripts in `composer.json`.
+- `database/data/kbli_kbji_examples.json` with KBLI/KBJI field examples.
+- `FieldExampleSeeder` to import field examples into PostgreSQL.
+- `--sync` option to `embeddings:generate` artisan command.
+- `docker-compose.override.yml` for local development bind mounts.
+
+### [Changed]
+- Upgraded project to Laravel 13 and Filament 5 panel.
+- Merged `feat/hybrid-search-opt` into `main`.
+
+---
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
