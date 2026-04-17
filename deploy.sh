@@ -3,9 +3,10 @@ set -e
 
 echo "🚀 Deploying updates..."
 
-# 1. Pull latest code
+# 1. Pull latest code — reset local changes dulu agar pull tidak gagal
 echo "📥 Pulling from git..."
-git pull origin main
+git fetch origin main
+git reset --hard origin/main
 
 # 2. Rebuild the image (Required since code is baked into image)
 echo "🔨 Building Docker image..."
