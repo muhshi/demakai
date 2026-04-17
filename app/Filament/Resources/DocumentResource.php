@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -52,7 +52,7 @@ class DocumentResource extends Resource
                     ->label('Similarity')
                     ->formatStateUsing(fn ($state) => $state ? number_format($state * 100, 2).'%' : '-'),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ]);

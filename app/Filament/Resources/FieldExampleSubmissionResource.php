@@ -6,19 +6,19 @@ use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\Action;
-use App\Models\PgKBLI2025;
-use App\Models\PgKBLI2020;
-use App\Models\PgKBJI2014;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages\ListFieldExampleSubmissions;
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages\CreateFieldExampleSubmission;
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages\EditFieldExampleSubmission;
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages;
 use App\Filament\Resources\FieldExampleSubmissionResource\RelationManagers;
 use App\Models\FieldExampleSubmission;
+use App\Models\PgKBLI2025;
+use App\Models\PgKBLI2020;
+use App\Models\PgKBJI2014;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -78,7 +78,7 @@ class FieldExampleSubmissionResource extends Resource
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
                 Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check')
