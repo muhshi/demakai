@@ -88,7 +88,7 @@ class KBJI2014Resource extends Resource
                         blank: fn($q) => $q,
                     ),
                 Filter::make('ai_search')
-                    ->schema([
+                    ->form([
                         TextInput::make('query')
                             ->label('AI Smart Search')
                             ->placeholder('Deskripsikan pekerjaan...')

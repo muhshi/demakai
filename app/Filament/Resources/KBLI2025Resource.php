@@ -75,7 +75,7 @@ class KBLI2025Resource extends Resource
             ->paginated([25, 50, 100])
             ->filters([
                 Filter::make('ai_search')
-                    ->schema([
+                    ->form([
                         TextInput::make('query')
                             ->label('AI Smart Search')
                             ->placeholder('Deskripsikan bisnis Anda...')
