@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class PopularQueriesChart extends ChartWidget
 {
-    protected static ?string $heading = 'Pencarian Terpopuler';
+    protected ?string $heading = 'Pencarian Terpopuler';
     protected static ?int $sort = 2;
 
     protected function getData(): array

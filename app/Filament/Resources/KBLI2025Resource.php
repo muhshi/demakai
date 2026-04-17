@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
@@ -22,13 +22,13 @@ use Filament\Tables\Table;
 class KBLI2025Resource extends Resource
 {
     protected static ?string $model = PgKBLI2025::class;
-    protected static ?string $navigationGroup = 'Klasifikasi';
+    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2025';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             TextInput::make('kode')
                 ->label('Kode')
                 ->required()

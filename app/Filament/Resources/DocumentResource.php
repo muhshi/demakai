@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -24,11 +24,11 @@ class DocumentResource extends Resource
 {
     protected static ?string $model = JSONParse::class;
 
-    protected static ?string $navigationGroup = 'Parsing Documents';
+    protected static string | \UnitEnum | null $navigationGroup = 'Parsing Documents';
     protected static ?string $modelLabel = 'Manage Documents';
     protected static ?string $pluralModelLabel = 'Manage Documents';
     protected static ?string $navigationLabel = 'Manage Documents';
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string | \BackedEnum | null $navigationIcon  = 'heroicon-o-document-magnifying-glass';
     protected static ?string $slug = 'documents';
 
     public static function table(Table $table): Table
@@ -58,9 +58,9 @@ class DocumentResource extends Resource
             ]);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             TextInput::make('title')->required(),
             Select::make('source_type')
                 ->options([

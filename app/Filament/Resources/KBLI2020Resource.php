@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
@@ -22,13 +22,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KBLI2020Resource extends Resource
 {
     protected static ?string $model = PgKBLI2020::class;
-    protected static ?string $navigationGroup = 'Klasifikasi';
+    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBLI 2020';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             // Field yang sudah ada...
             TextInput::make('kode')
                 ->label('Kode 5 Digit')
