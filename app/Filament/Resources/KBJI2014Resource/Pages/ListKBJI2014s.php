@@ -33,7 +33,7 @@ class ListKBJI2014s extends ListRecords //
             Action::make('importContohKBJI')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->schema([
+                ->form([
                     FileUpload::make('file')
                         ->label('File Excel/CSV')
                         ->required()

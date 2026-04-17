@@ -117,7 +117,7 @@ class FieldExampleSubmissionResource extends Resource
                     ->requiresConfirmation(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
