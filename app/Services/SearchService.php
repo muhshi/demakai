@@ -194,11 +194,11 @@ class SearchService
      */
     public function search(string $query, int $limit = 10, ?string $model = null): array
     {
-        // ============================================================
-        // PYTHON API MODE — aktifkan dengan PYTHON_SEARCH_ENABLED=true di .env
-        // ============================================================
         if (config('services.python_search.enabled', false)) {
-            return $this->searchViaPython($query, $limit, $model);
+            $pythonResults = $this->searchViaPython($query, $limit, $model);
+            if ($pythonResults !== null) {
+                return $pythonResults;
+            }
         }
 
         // Step 0: Preprocess query — normalisasi, stopword removal, synonym expansion
@@ -240,7 +240,7 @@ class SearchService
      *   PYTHON_SEARCH_METHOD=sql          (sql | hybrid)
      *   PYTHON_SEARCH_PROCESSING=none     (none | basic | advanced)
      */
-    public function searchViaPython(string $query, int $limit = 10, ?string $model = null): array
+    public function searchViaPython(string $query, int $limit = 10, ?string $model = null): ?array
     {
         $url = config('services.python_search.url', 'http://127.0.0.1:8000');
         $searchMethod = config('services.python_search.method', 'sql');
@@ -262,7 +262,7 @@ class SearchService
 
             if ($response->failed()) {
                 Log::error('Python search API error: ' . $response->body());
-                return [];
+                return null;
             }
 
             $data = $response->json();
@@ -272,7 +272,7 @@ class SearchService
 
         } catch (Exception $e) {
             Log::error('Python search API unreachable: ' . $e->getMessage());
-            return [];
+            return null;
         }
     }
 
