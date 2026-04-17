@@ -30,7 +30,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 
 # Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts
+RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts --ignore-platform-req=ext-mongodb
 
 # Copy package.json for node deps (layer caching)
 COPY package.json vite.config.js ./
@@ -42,7 +42,7 @@ RUN npm install
 COPY . /app
 
 # Run composer scripts (post-autoload-dump etc) now that code is present
-RUN composer dump-autoload --optimize
+RUN composer dump-autoload --optimize --ignore-platform-req=ext-mongodb
 
 # Build frontend assets
 RUN npm run build
