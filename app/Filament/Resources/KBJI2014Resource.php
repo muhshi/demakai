@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
@@ -26,13 +26,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KBJI2014Resource extends Resource
 {
     protected static ?string $model = PgKBJI2014::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static string | \UnitEnum | null $navigationGroup = 'Klasifikasi';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Klasifikasi';
     protected static ?string $navigationLabel = 'KBJI 2014';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             TextInput::make('kode')
                 ->label('KBJI')->disabled()->dehydrated(false),
             TextInput::make('judul')

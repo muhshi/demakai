@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Form;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Actions;
+use Filament\Forms\Components\Actions;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,11 +21,11 @@ class JSONParseResource extends Resource
 {
     protected static ?string $model = JSONParse::class;
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Parsing Documents';
+    protected static ?string $navigationGroup = 'Parsing Documents';
     protected static ?string $modelLabel = 'Upload Documents';
     protected static ?string $pluralModelLabel = 'Parsing Documents';
     protected static ?string $navigationLabel = 'Upload Documents';
-    protected static string | \BackedEnum | null $navigationIcon  = 'heroicon-o-arrow-up-on-square';
+    protected static ?string $navigationIcon  = 'heroicon-o-arrow-up-on-square';
     protected static ?string $slug = 'upload-documents';
 
     // biar URL rapi dan klik menu langsung ke create
@@ -34,9 +34,9 @@ class JSONParseResource extends Resource
         return static::getUrl('create');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Section::make('Upload & Preview')
                 ->schema([
                     FileUpload::make('document')

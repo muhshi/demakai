@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
@@ -30,15 +30,14 @@ class FieldExampleSubmissionResource extends Resource
 {
     protected static ?string $model = FieldExampleSubmission::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-plus-circle';
+    protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
     protected static ?string $navigationLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $modelLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $pluralModelLabel = 'Pengajuan Contoh Lapangan';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form->schema([
                 TextInput::make('type')
                     ->readOnly(),
                 TextInput::make('kode')

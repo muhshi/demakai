@@ -63,6 +63,9 @@ All notable changes to this project will be documented in this section.
 ### [Fixed] - 2026-04-17
 - Fixed Python search configuration in `SearchController` to elegantly fallback to PHP SQL search if the Python search server is disconnected or disabled.
 - Modified `SearchService` to return graceful null and bypass failure when hitting unreachable Python API.
+- Fixed Filament v5 compatibility: replaced `Filament\Schemas\Schema` with `Filament\Forms\Form` in all Resource files.
+- Fixed Filament v5 compatibility: changed `string | \UnitEnum | null` and `string | \BackedEnum | null` type hints to `?string` in all Resource files.
+- Fixed `PopularQueriesChart` widget `$heading` property to be `static` (required by Filament v5).
 
 ### [Added] - 2026-04-16
 - `composer dev` and `composer dev:docker` scripts in `composer.json`.
