@@ -5,15 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
-      - PUID=1000
-      - PGID=1000
       - APP_ENV=production
       - APP_DEBUG=false
       - SERVER_NAME=:80
     ports:
       - "8003:80"
-    # Removed volume bind mount for production to use built image code
+    volumes:
+      - app-storage:/app/storage
+      - app-database:/app/database
     networks:
       - postgres-stack_ai_net
 
@@ -23,15 +25,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
-      - PUID=1000
-      - PGID=1000
       - APP_ENV=production
       - QUEUE_CONNECTION=database
     command: "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
-    # Removed volume bind mount for production
+    volumes:
+      - app-storage:/app/storage
+      - app-database:/app/database
     networks:
       - postgres-stack_ai_net
+
+volumes:
+  app-storage:
+  app-database:
 
 networks:
   postgres-stack_ai_net:

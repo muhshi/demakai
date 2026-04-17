@@ -26,17 +26,34 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Copy composer files first (for better layer caching)
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts
+
+# Copy package.json for node deps (layer caching)
+COPY package.json vite.config.js ./
+
+# Install Node.js dependencies
+RUN npm install
+
 # Copy application code
 COPY . /app
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Run composer scripts (post-autoload-dump etc) now that code is present
+RUN composer dump-autoload --optimize
 
-# Install Node.js dependencies and build assets
-RUN npm install && npm run build
+# Build frontend assets
+RUN npm run build
 
 # Set permissions
-RUN touch /app/database/database.sqlite \
+RUN mkdir -p /app/storage/logs \
+    /app/storage/framework/cache \
+    /app/storage/framework/sessions \
+    /app/storage/framework/views \
+    /app/bootstrap/cache \
+    && touch /app/database/database.sqlite \
     && chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/database \
     && chmod -R 775 /app/storage /app/bootstrap/cache /app/database
 

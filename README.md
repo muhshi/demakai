@@ -66,6 +66,15 @@ All notable changes to this project will be documented in this section.
 - Fixed Filament v5 compatibility: replaced `Filament\Schemas\Schema` with `Filament\Forms\Form` in all Resource files.
 - Fixed Filament v5 compatibility: changed `string | \UnitEnum | null` and `string | \BackedEnum | null` type hints to `?string` in all Resource files.
 - Fixed `PopularQueriesChart` widget `$heading` property to be `static` (required by Filament v5).
+- Fixed `Caddyfile` invalid `cgi-php` and `index.php` directives.
+- Fixed `.gitignore` corrupted null bytes at end of file.
+
+### [Improved] - 2026-04-17
+- Improved `Dockerfile` with better layer caching (deps first, code second) and proper build steps.
+- Improved `docker-compose.yml` with `env_file`, persistent volumes for `storage/` and `database/`.
+- Improved `deploy.sh` with migrations, `optimize`, queue restart, and error handling (`set -e`).
+- Added `.dockerignore` to exclude `.git`, `vendor`, `node_modules` from build context.
+- Updated `.env.example` with all project-specific variables (MongoDB, PG, Python Search).
 
 ### [Added] - 2026-04-16
 - `composer dev` and `composer dev:docker` scripts in `composer.json`.
