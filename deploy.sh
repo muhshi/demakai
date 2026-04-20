@@ -29,7 +29,11 @@ echo "🧹 Clearing and optimizing cache..."
 docker compose exec -T demakai-franken php artisan optimize:clear
 docker compose exec -T demakai-franken php artisan optimize
 
-# 7. Restart queue workers to pick up new code
+# 7. Publish Livewire assets (ensures JS assets match installed Livewire version)
+echo "📦 Publishing Livewire assets..."
+docker compose exec -T demakai-franken php artisan livewire:publish --assets
+
+# 8. Restart queue workers to pick up new code
 echo "🔄 Restarting queue workers..."
 docker compose exec -T demakai-franken php artisan queue:restart
 
