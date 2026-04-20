@@ -30,7 +30,7 @@ class FieldExampleSubmissionResource extends Resource
 {
     protected static ?string $model = FieldExampleSubmission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-plus-circle';
     protected static ?string $navigationLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $modelLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $pluralModelLabel = 'Pengajuan Contoh Lapangan';
