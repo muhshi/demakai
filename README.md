@@ -60,6 +60,9 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Fixed] - 2026-04-20
+- Fixed Docker build error: changed `GeminiService::$apiKey` type from `string` to `?string` and defaulted `env('GEMINI_API_KEY')` to empty string so `artisan package:discover` does not crash when env vars are unavailable at build time.
+
 ### [Fixed] - 2026-04-17
 - Fixed Python search configuration in `SearchController` to elegantly fallback to PHP SQL search if the Python search server is disconnected or disabled.
 - Modified `SearchService` to return graceful null and bypass failure when hitting unreachable Python API.
