@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Log;
 
 class GeminiService
 {
-    protected string $apiKey;
+    protected ?string $apiKey = null;
     protected string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent';
 
     public function __construct()
     {
-        $this->apiKey = env('GEMINI_API_KEY');
+        $this->apiKey = env('GEMINI_API_KEY', '');
     }
 
     /**
