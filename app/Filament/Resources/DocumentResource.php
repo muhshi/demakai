@@ -28,8 +28,8 @@ class DocumentResource extends Resource
     protected static ?string $modelLabel = 'Manage Documents';
     protected static ?string $pluralModelLabel = 'Manage Documents';
     protected static ?string $navigationLabel = 'Manage Documents';
-    protected static string | \BackedEnum | null $navigationIcon  = 'heroicon-o-document-text';
-    protected static ?string $slug            = 'documents';
+    protected static string | \BackedEnum | null $navigationIcon  = 'heroicon-o-document-magnifying-glass';
+    protected static ?string $slug = 'documents';
 
     public static function table(Table $table): Table
     {
@@ -50,9 +50,9 @@ class DocumentResource extends Resource
 
                 TextColumn::make('similarity_score')
                     ->label('Similarity')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state * 100, 2).'%' : '-'),
+                    ->formatStateUsing(fn($state) => $state ? number_format($state * 100, 2) . '%' : '-'),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
@@ -90,7 +90,7 @@ class DocumentResource extends Resource
     {
         return [
             'index' => ListDocuments::route('/'),
-            'edit'  => EditDocument::route('/{record}/edit'),
+            'edit' => EditDocument::route('/{record}/edit'),
         ];
     }
 }

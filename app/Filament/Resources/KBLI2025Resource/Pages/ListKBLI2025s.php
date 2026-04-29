@@ -32,7 +32,7 @@ class ListKBLI2025s extends ListRecords
             Action::make('importContoh')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->schema([
+                ->form([
                     FileUpload::make('file')
                         ->label('File Excel/CSV')
                         ->required()

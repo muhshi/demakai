@@ -7,9 +7,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\Action;
-use App\Models\PgKBLI2025;
-use App\Models\PgKBLI2020;
-use App\Models\PgKBJI2014;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -19,6 +16,9 @@ use App\Filament\Resources\FieldExampleSubmissionResource\Pages\EditFieldExample
 use App\Filament\Resources\FieldExampleSubmissionResource\Pages;
 use App\Filament\Resources\FieldExampleSubmissionResource\RelationManagers;
 use App\Models\FieldExampleSubmission;
+use App\Models\PgKBLI2025;
+use App\Models\PgKBLI2020;
+use App\Models\PgKBJI2014;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -37,18 +37,17 @@ class FieldExampleSubmissionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('type')
-                    ->readOnly(),
-                TextInput::make('kode')
-                    ->readOnly(),
-                Textarea::make('content')
-                    ->required()
-                    ->columnSpanFull(),
-                TextInput::make('status')
-                    ->readOnly(),
-            ]);
+        return $schema->components([
+            TextInput::make('type')
+                ->readOnly(),
+            TextInput::make('kode')
+                ->readOnly(),
+            Textarea::make('content')
+                ->required()
+                ->columnSpanFull(),
+            TextInput::make('status')
+                ->readOnly(),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -79,7 +78,7 @@ class FieldExampleSubmissionResource extends Resource
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
                 Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check')
@@ -118,7 +117,7 @@ class FieldExampleSubmissionResource extends Resource
                     ->requiresConfirmation(),
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

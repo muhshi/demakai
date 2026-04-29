@@ -60,6 +60,27 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Fixed] - 2026-04-20
+- Fixed Docker build error: changed `GeminiService::$apiKey` type from `string` to `?string` and defaulted `env('GEMINI_API_KEY')` to empty string so `artisan package:discover` does not crash when env vars are unavailable at build time.
+- Fixed Filament v5 namespace migration across all resource files: `Filament\Tables\Actions\*` → `Filament\Actions\*`, `Filament\Forms\Components\Section` → `Filament\Schemas\Components\Section`, `Filament\Forms\Components\Actions` → `Filament\Schemas\Components\Actions`.
+- Fixed Livewire "assets out of date" console error and `interceptMessage`/`interceptRequest` TypeError: added `php artisan livewire:publish --assets` step to `deploy.sh`.
+
+### [Fixed] - 2026-04-17
+- Fixed Python search configuration in `SearchController` to elegantly fallback to PHP SQL search if the Python search server is disconnected or disabled.
+- Modified `SearchService` to return graceful null and bypass failure when hitting unreachable Python API.
+- Fixed Filament v5 compatibility: replaced `Filament\Schemas\Schema` with `Filament\Forms\Form` in all Resource files.
+- Fixed Filament v5 compatibility: changed `string | \UnitEnum | null` and `string | \BackedEnum | null` type hints to `?string` in all Resource files.
+- Fixed `PopularQueriesChart` widget `$heading` property to be `static` (required by Filament v5).
+- Fixed `Caddyfile` invalid `cgi-php` and `index.php` directives.
+- Fixed `.gitignore` corrupted null bytes at end of file.
+
+### [Improved] - 2026-04-17
+- Improved `Dockerfile` with better layer caching (deps first, code second) and proper build steps.
+- Improved `docker-compose.yml` with `env_file`, persistent volumes for `storage/` and `database/`.
+- Improved `deploy.sh` with migrations, `optimize`, queue restart, and error handling (`set -e`).
+- Added `.dockerignore` to exclude `.git`, `vendor`, `node_modules` from build context.
+- Updated `.env.example` with all project-specific variables (MongoDB, PG, Python Search).
+
 ### [Added] - 2026-04-16
 - `composer dev` and `composer dev:docker` scripts in `composer.json`.
 - `database/data/kbli_kbji_examples.json` with KBLI/KBJI field examples.

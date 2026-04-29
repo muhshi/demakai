@@ -194,9 +194,6 @@ class SearchService
      */
     public function search(string $query, int $limit = 10, ?string $model = null): array
     {
-        // ============================================================
-        // PYTHON API MODE — aktifkan dengan PYTHON_SEARCH_ENABLED=true di .env
-        // ============================================================
         if (config('services.python_search.enabled', false)) {
             $results = $this->searchViaPython($query, $limit, $model);
             

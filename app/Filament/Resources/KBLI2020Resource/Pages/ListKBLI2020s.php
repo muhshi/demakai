@@ -33,7 +33,7 @@ class ListKBLI2020s extends ListRecords // ← pastikan 's'
             Action::make('importContoh')
                 ->label('Import Contoh (Excel/CSV)')
                 ->icon('heroicon-o-arrow-up-tray')
-                ->schema([
+                ->form([
                     FileUpload::make('file')
                         ->label('File Excel/CSV')
                         ->required()

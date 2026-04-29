@@ -39,8 +39,9 @@ class SearchController extends Controller
         );
 
         // Simpan sementara ke config agar SearchService bisa membacanya
+        $pythonEnabled = config('services.python_search.enabled', false);
         config([
-            'services.python_search.enabled' => true,
+            'services.python_search.enabled' => $pythonEnabled,
             'services.python_search.method' => $searchMethod,
             'services.python_search.processing' => $processing,
         ]);
