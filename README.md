@@ -60,6 +60,13 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-04-29
+- Implemented SIPETRA SSO (OAuth2) integration using Laravel Socialite.
+- Created custom `SipetraSocialiteProvider` for SSO authentication.
+- Added `SsoController` to handle redirect and callback logic.
+- Updated `users` table with SSO-specific fields (`sipetra_id`, `nip`, `jabatan`, etc.).
+- Integrated SSO login button into Filament admin panel using `AUTH_LOGIN_FORM_AFTER` hook.
+
 ### [Fixed] - 2026-04-20
 - Fixed Docker build error: changed `GeminiService::$apiKey` type from `string` to `?string` and defaulted `env('GEMINI_API_KEY')` to empty string so `artisan package:discover` does not crash when env vars are unavailable at build time.
 - Fixed Filament v5 namespace migration across all resource files: `Filament\Tables\Actions\*` → `Filament\Actions\*`, `Filament\Forms\Components\Section` → `Filament\Schemas\Components\Section`, `Filament\Forms\Components\Actions` → `Filament\Schemas\Components\Actions`.
@@ -110,3 +117,6 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+git pull
+./deploy.sh
