@@ -42,9 +42,9 @@ class SipetraSocialiteProvider extends AbstractProvider implements ProviderInter
     {
         // Pastikan field minimal ada untuk mencegah 500 TypeError
         return (new User)->setRaw($user)->map([
-            'id'     => $user['id'] ?? null,
-            'name'   => $user['name'] ?? ($user['email'] ?? 'User SIPETRA'),
-            'email'  => $user['email'] ?? null,
+            'id' => $user['id'] ?? null,
+            'name' => $user['name'] ?? ($user['email'] ?? 'User SIPETRA'),
+            'email' => $user['email'] ?? null,
             'avatar' => $user['avatar'] ?? null,
         ]);
     }
