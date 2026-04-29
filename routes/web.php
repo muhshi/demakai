@@ -16,6 +16,10 @@ Route::get('/templates/kbji2014', fn() => Excel::download(new KBJI2014TemplateEx
 
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\FieldExampleSubmissionController;
+use App\Http\Controllers\Auth\SsoController;
+
+Route::get('/auth/sipetra/redirect', [SsoController::class, 'redirect'])->name('sipetra.login');
+Route::get('/auth/sipetra/callback', [SsoController::class, 'callback']);
 
 Route::get('/api/search', [SearchController::class, 'search'])->name('search.api');
 Route::post('/api/submissions', [FieldExampleSubmissionController::class, 'store'])->name('submissions.store');

@@ -20,6 +20,8 @@ from config.database import get_connection
 from config.settings import Settings
 from .utils import search_numeric_code
 
+USE_CL = True  # Global flag for toggling contoh_lapangan eval
+
 # ── Gemini embedding (opsional) ───────────────────────────────────────────────
 try:
     import google.generativeai as genai
@@ -97,7 +99,7 @@ def _keyword_search(cursor, table: str, token_groups: list, limit: int, variatio
         for token in group:
             pat = f"%{token}%"
             group_conds.append(
-                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+                f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
             )
             and_params.extend([pat, pat, pat, pat])
         and_conditions.append("(" + " OR ".join(group_conds) + ")")
@@ -112,7 +114,7 @@ def _keyword_search(cursor, table: str, token_groups: list, limit: int, variatio
         for var in variations:
             pat = f"%{var}%"
             var_conds.append(
-                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+                f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
             )
             and_params.extend([pat, pat, pat, pat])
         var_clause = " OR ".join(var_conds)
@@ -144,12 +146,11 @@ def _keyword_search(cursor, table: str, token_groups: list, limit: int, variatio
         pat = f"%{token}%"
         score_expr_parts.append(
             "(CASE WHEN kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
-            "OR CAST(contoh_lapangan AS TEXT) ILIKE %s THEN 1 ELSE 0 END)"
+            f"OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 1 ELSE 0 END)"
         )
         or_params.extend([pat, pat, pat, pat])
         or_conds.append(
-            "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
-            "OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+            f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
         )
         or_params.extend([pat, pat, pat, pat])
 
@@ -171,12 +172,24 @@ def _keyword_search(cursor, table: str, token_groups: list, limit: int, variatio
 # Helper: merge + boost results
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ── Boost weights (proporsional, bukan override hardcoded) ──────────────────
+# Nilai = persen pengurangan distance. Semakin besar = semakin banyak boost.
+# Semantic score tetap dominan karena hasilnya proporsional terhadap distance asli.
+_BOOST_CONTOH   = 0.20   # contoh_lapangan match  → kurangi 20% dari distance
+_BOOST_JUDUL    = 0.12   # judul match             → kurangi 12%
+_BOOST_DESKRIPSI = 0.06  # deskripsi match         → kurangi 6%
+
+
 def _merge_and_boost(semantic: list, keyword: list, tokens: list) -> list:
     """
-    Menggabungkan hasil semantic dan keyword, lalu menerapkan boosting:
-      - Match di contoh_lapangan → distance dikurangi (prioritas tertinggi)
-      - Match di judul           → prioritas menengah
-      - Match di deskripsi saja  → prioritas terendah
+    Menggabungkan hasil semantic dan keyword, lalu menerapkan boosting proporsional:
+      - Match di contoh_lapangan → distance * (1 - 0.20)  [prioritas tertinggi]
+      - Match di judul           → distance * (1 - 0.12)  [prioritas menengah]
+      - Match di deskripsi saja  → distance * (1 - 0.06)  [prioritas terendah]
+
+    CATATAN: Boost bersifat proporsional — item yang relevan secara semantik
+    (distance kecil) tetap unggul atas item yang hanya kebetulan match teks.
+    Ini mencegah false-positive dari keyword expansion menyerobot ranking.
     """
     all_results = list(semantic) + list(keyword)
 
@@ -207,20 +220,27 @@ def _merge_and_boost(semantic: list, keyword: list, tokens: list) -> list:
             contoh_str = ""
 
         original_distance = float(item.get("distance") or 1.0)
+        boost_factor = 0.0
+        boost_label  = None
 
-        match_example = any(t in contoh_str for t in tokens)
-        match_title   = any(t in judul       for t in tokens)
-        match_desc    = any(t in desc         for t in tokens)
+        # FIX: Gunakan proporsi — bukan override paksa ke nilai tetap.
+        # Efek: item relevan semantik (distance=0.15) dengan match CL:
+        #   → 0.15 * (1 - 0.20) = 0.12  (naik sedikit)
+        # Item tidak relevan (distance=0.65) dengan match CL:
+        #   → 0.65 * (1 - 0.20) = 0.52  (masih jauh di bawah item relevan)
+        if any(t in contoh_str for t in tokens):
+            boost_factor = _BOOST_CONTOH
+            boost_label  = "contoh_lapangan"
+        elif any(t in judul for t in tokens):
+            boost_factor = _BOOST_JUDUL
+            boost_label  = "judul"
+        elif any(t in desc for t in tokens):
+            boost_factor = _BOOST_DESKRIPSI
+            boost_label  = "deskripsi"
 
-        if match_example:
-            item["distance"] = 0.04 + original_distance * 0.001
-            item["_boost"]   = "contoh_lapangan"
-        elif match_title:
-            item["distance"] = 0.08 + original_distance * 0.001
-            item["_boost"]   = "judul"
-        elif match_desc:
-            item["distance"] = 0.12 + original_distance * 0.001
-            item["_boost"]   = "deskripsi"
+        if boost_label:
+            item["distance"] = max(0.005, original_distance * (1.0 - boost_factor))
+            item["_boost"]   = boost_label
 
         boosted.append(item)
 
@@ -250,7 +270,10 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     kbli_vars = preprocessed.get("kbli_variations", [])
     kbji_vars = preprocessed.get("kbji_variations", [])
 
-    embed_text = preprocessed.get("clean", "")
+    # FIX #1: Embed dari query ORIGINAL (bukan clean/expanded).
+    # Model Gemini lebih akurat untuk teks pendek natural.
+    # Teks expansion yang panjang menambah noise ke representasi vektor.
+    embed_text = preprocessed.get("original", "") or preprocessed.get("clean", "")
     embedding = _generate_embedding(embed_text)
 
     semantic_kbli, semantic_kbji = [], []
@@ -261,12 +284,20 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
         with conn.cursor() as cur:
             if model is None or model == "KBLI":
                 if embedding:
-                    semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    try:
+                        semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBLI failed: {e}")
+                        semantic_kbli = []
                 keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit, kbli_vars)
 
             if model is None or model == "KBJI":
                 if embedding:
-                    semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    try:
+                        semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBJI failed: {e}")
+                        semantic_kbji = []
                 keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit, kbji_vars)
     finally:
         conn.close()
@@ -276,10 +307,13 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     keyword = [{**r, "_source": "KBLI"} for r in keyword_kbli] + \
               [{**r, "_source": "KBJI"} for r in keyword_kbji]
 
-    all_tokens = preprocessed.get("expanded_tokens", []) + kbli_vars + kbji_vars
-    all_tokens = list(set(all_tokens))
+    # FIX #2: Gunakan core tokens (token asli tanpa expansion) untuk boost matching.
+    # Expanded tokens (25+ kata) menyebabkan terlalu banyak false-positive match
+    # di field contoh_lapangan/judul, sehingga item tidak relevan di-boost secara salah.
+    # Core tokens (~5 kata) jauh lebih presisi untuk menentukan boost.
+    core_tokens = preprocessed.get("tokens", [])
 
-    return _merge_and_boost(semantic, keyword, all_tokens)[:limit]
+    return _merge_and_boost(semantic, keyword, core_tokens)[:limit]
 
 
 def search_advanced(preprocessed: dict, limit: int = None, model: str = None) -> list:
@@ -296,7 +330,9 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
         finally:
             conn.close()
 
-    embed_text = preprocessed.get("stemmed_clean") or preprocessed.get("clean", "")
+    # FIX: Embed dari query original — stemmed_clean lebih baik dari expanded,
+    # tapi query original paling akurat untuk Gemini embedding.
+    embed_text = preprocessed.get("original", "") or preprocessed.get("stemmed_clean") or preprocessed.get("clean", "")
     tokens     = preprocessed.get("stemmed_tokens") or preprocessed.get("tokens", [])
     token_groups = [[t] for t in tokens]
 
@@ -310,12 +346,20 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
         with conn.cursor() as cur:
             if model is None or model == "KBLI":
                 if embedding:
-                    semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    try:
+                        semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBLI failed: {e}")
+                        semantic_kbli = []
                 keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit)
 
             if model is None or model == "KBJI":
                 if embedding:
-                    semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    try:
+                        semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBJI failed: {e}")
+                        semantic_kbji = []
                 keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit)
     finally:
         conn.close()
@@ -325,6 +369,7 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
     keyword = [{**r, "_source": "KBLI"} for r in keyword_kbli] + \
               [{**r, "_source": "KBJI"} for r in keyword_kbji]
 
+    # Gunakan stemmed tokens (bukan expanded) — presisi lebih tinggi untuk boost
     return _merge_and_boost(semantic, keyword, tokens)[:limit]
 
 
@@ -344,8 +389,9 @@ def search_raw(query: str, limit: int = None, model: str = None) -> list:
     if not query:
         return []
 
-    embed_text = query
-    tokens     = [t for t in query.split() if t]
+    embed_text   = query
+    # Gunakan hanya kata bermakna (bukan stopword pendek) untuk boost matching
+    tokens       = [t.lower() for t in query.split() if len(t) > 2]
     token_groups = [[t] for t in tokens]
 
     embedding = _generate_embedding(embed_text)
@@ -358,12 +404,20 @@ def search_raw(query: str, limit: int = None, model: str = None) -> list:
         with conn.cursor() as cur:
             if model is None or model == "KBLI":
                 if embedding:
-                    semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    try:
+                        semantic_kbli = _vector_search(cur, Settings.TABLE_KBLI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBLI failed: {e}")
+                        semantic_kbli = []
                 keyword_kbli = _keyword_search(cur, Settings.TABLE_KBLI, token_groups, limit)
 
             if model is None or model == "KBJI":
                 if embedding:
-                    semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    try:
+                        semantic_kbji = _vector_search(cur, Settings.TABLE_KBJI, embedding, limit)
+                    except Exception as e:
+                        print(f"[ERROR] Semantic search KBJI failed: {e}")
+                        semantic_kbji = []
                 keyword_kbji = _keyword_search(cur, Settings.TABLE_KBJI, token_groups, limit)
     finally:
         conn.close()

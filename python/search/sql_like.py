@@ -16,6 +16,9 @@ from config.database import get_connection, release_connection
 from config.settings import Settings
 from .utils import search_numeric_code
 
+USE_CL = True  # Global flag for toggling contoh_lapangan eval
+
+
 
 def _run_query(cursor, table: str, pattern: str, limit: int) -> list:
     """
@@ -29,7 +32,7 @@ def _run_query(cursor, table: str, pattern: str, limit: int) -> list:
             kode        ILIKE %(pattern)s OR
             judul       ILIKE %(pattern)s OR
             deskripsi   ILIKE %(pattern)s OR
-            CAST(contoh_lapangan AS TEXT) ILIKE %(pattern)s
+            (CAST(contoh_lapangan AS TEXT) ILIKE %(pattern)s AND {1 if USE_CL else 0}=1)
         LIMIT %(limit)s
     """
     cursor.execute(sql, {"pattern": pattern, "limit": limit})
@@ -40,20 +43,29 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     """
     Fallback: SQL ILIKE per token dengan OR logic.
     Setiap token dicek di judul/deskripsi/contoh_lapangan.
-    Record yang match token APAPUN (bukan semua) akan dikembalikan.
-    Diurutkan berdasarkan jumlah token yang cocok (DESC).
+    Diurutkan berdasarkan skor yang memprioritaskan match di judul lebih tinggi.
+
+    FIX: Bobot match:
+      - judul match  = 3 poin (paling relevan)
+      - deskripsi    = 2 poin
+      - contoh_lapangan = 1 poin (paling longgar, kurangi bobotnya)
+    Ini mencegah item yang hanya kebetulan muncul di contoh_lapangan
+    menyerobot item yang judul-nya benar-benar cocok.
     """
     if not tokens:
         return []
 
-    # Bangun CASE untuk menghitung token yang cocok (untuk ordering)
     score_parts = []
     params = []
     for token in tokens:
         pat = f"%{token}%"
+        # Skor berbobot: judul=3, deskripsi=2, contoh_lapangan=1
         score_parts.append(
-            "(CASE WHEN kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
-            "OR CAST(contoh_lapangan AS TEXT) ILIKE %s THEN 1 ELSE 0 END)"
+            "(CASE WHEN kode ILIKE %s THEN 4 "
+            "WHEN judul ILIKE %s THEN 3 "
+            "WHEN deskripsi ILIKE %s THEN 2 "
+            f"WHEN (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 1 "
+            "ELSE 0 END)"
         )
         params.extend([pat, pat, pat, pat])
 
@@ -64,7 +76,7 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
         pat = f"%{token}%"
         or_conditions.append(
             "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
-            "OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+            f"OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
         )
         where_params.extend([pat, pat, pat, pat])
 
@@ -96,7 +108,7 @@ def _run_query_and_token_groups(cursor, table: str, token_groups: list, limit: i
         for token in group:
             pat = f"%{token}%"
             group_conds.append(
-                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+                f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
             )
             and_params.extend([pat, pat, pat, pat])
         and_conditions.append("(" + " OR ".join(group_conds) + ")")
@@ -111,7 +123,7 @@ def _run_query_and_token_groups(cursor, table: str, token_groups: list, limit: i
         for var in variations:
             pat = f"%{var}%"
             var_conds.append(
-                "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+                f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
             )
             and_params.extend([pat, pat, pat, pat])
         var_clause = " OR ".join(var_conds)
@@ -135,7 +147,7 @@ def _run_query_and_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     for token in tokens:
         pat = f"%{token}%"
         conditions.append(
-            "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR CAST(contoh_lapangan AS TEXT) ILIKE %s)"
+            f"(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
         )
         params.extend([pat, pat, pat, pat])
 
@@ -150,6 +162,15 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     SQL LIKE search menggunakan hasil preprocessing QUERY EXPANSION.
     Keunggulan: Menggunakan sinonim untuk menangkap kecocokan semantik.
 
+    Urutan eksekusi (precision-first):
+      Step 1: Frasa asli lengkap (exactness tinggi)
+      Step 2: AND groups + domain variations (presisi menengah)
+      Step 3: OR per expanded token HANYA jika Step 1 & 2 BENAR-BENAR kosong
+              (recall tinggi tapi precision rendah — dipakai sebagai last resort)
+
+    FIX: Step 3 hanya berjalan jika hasil kosong (bukan < limit),
+    agar tidak mencemari hasil yang sudah baik dengan OR yang terlalu longgar.
+
     Args:
         preprocessed : output dari preprocess_expansion()
         limit        : jumlah maksimum hasil. Default: Settings.DEFAULT_LIMIT
@@ -162,7 +183,7 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     keyword = preprocessed.get("clean", "")
     tokens  = preprocessed.get("tokens", [])
     expanded_tokens = preprocessed.get("expanded_tokens", [])
-    
+
     # Tambahkan variasi kueri lapangan (Augmentasi) ke dalam expanded_tokens
     # sesuai dengan model yang sedang dicari
     augmented_expanded = list(expanded_tokens)
@@ -174,7 +195,7 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
         # Jika model None, tambahkan keduanya demi Recall maksimal
         augmented_expanded.extend(preprocessed.get("kbli_variations", []))
         augmented_expanded.extend(preprocessed.get("kbji_variations", []))
-    
+
     # Deduplikasi
     augmented_expanded = sorted(list(set(augmented_expanded)))
 
@@ -201,48 +222,50 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
                 results.extend([{**r, "_source": "KBJI", "_boost": "original_phrase"} for r in rows])
 
             # Step 2: Coba AND groups + variations
-            if len(results) < limit:
-                existing_ids = {r.get("id") for r in results}
-                token_groups = preprocessed.get("expanded_groups", [])
-                
-                vars_list = []
-                if model in (None, "KBLI"):
-                    vars_list.extend(preprocessed.get("kbli_variations", []))
-                if model in (None, "KBJI"):
-                    vars_list.extend(preprocessed.get("kbji_variations", []))
-                vars_list = list(set(vars_list))
+            existing_ids = {r.get("id") for r in results}
+            token_groups = preprocessed.get("expanded_groups", [])
 
-                if model is None or model == "KBLI":
-                    rows = _run_query_and_token_groups(cur, Settings.TABLE_KBLI, token_groups, limit, vars_list)
-                    for r in rows:
-                        if r.get("id") not in existing_ids:
-                            results.append({**r, "_source": "KBLI", "_boost": "and_expanded_groups"})
-                            existing_ids.add(r.get("id"))
+            vars_list = []
+            if model in (None, "KBLI"):
+                vars_list.extend(preprocessed.get("kbli_variations", []))
+            if model in (None, "KBJI"):
+                vars_list.extend(preprocessed.get("kbji_variations", []))
+            vars_list = list(set(vars_list))
 
-                if model is None or model == "KBJI":
-                    rows = _run_query_and_token_groups(cur, Settings.TABLE_KBJI, token_groups, limit, vars_list)
-                    for r in rows:
-                        if r.get("id") not in existing_ids:
-                            results.append({**r, "_source": "KBJI", "_boost": "and_expanded_groups"})
-                            existing_ids.add(r.get("id"))
+            if model is None or model == "KBLI":
+                rows = _run_query_and_token_groups(cur, Settings.TABLE_KBLI, token_groups, limit, vars_list)
+                for r in rows:
+                    if r.get("id") not in existing_ids:
+                        results.append({**r, "_source": "KBLI", "_boost": "and_expanded_groups"})
+                        existing_ids.add(r.get("id"))
 
-            # Step 3: OR per expanded token (High Recall) jika masih kurang dari limit
-            if len(results) < limit and augmented_expanded:
-                existing_ids = {r.get("id") for r in results}
-                
+            if model is None or model == "KBJI":
+                rows = _run_query_and_token_groups(cur, Settings.TABLE_KBJI, token_groups, limit, vars_list)
+                for r in rows:
+                    if r.get("id") not in existing_ids:
+                        results.append({**r, "_source": "KBJI", "_boost": "and_expanded_groups"})
+                        existing_ids.add(r.get("id"))
+
+            # Step 3: OR per expanded token (High Recall)
+            # FIX: Jalankan HANYA jika Step 1 & 2 benar-benar kosong.
+            # Sebelumnya: berjalan jika len(results) < limit → mencemari hasil yang sudah ada.
+            # Sekarang: last resort saja — hanya jika sistem benar-benar tidak menemukan apapun.
+            if not results and augmented_expanded:
+                existing_ids_step3 = set()
+
                 if model is None or model == "KBLI":
                     rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, augmented_expanded, limit)
                     for r in rows:
-                        if r.get("id") not in existing_ids:
-                            results.append({**r, "_source": "KBLI", "_boost": "expanded_token"})
-                            existing_ids.add(r.get("id"))
+                        if r.get("id") not in existing_ids_step3:
+                            results.append({**r, "_source": "KBLI", "_boost": "or_expanded_fallback"})
+                            existing_ids_step3.add(r.get("id"))
 
                 if model is None or model == "KBJI":
                     rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, augmented_expanded, limit)
                     for r in rows:
-                        if r.get("id") not in existing_ids:
-                            results.append({**r, "_source": "KBJI", "_boost": "expanded_token"})
-                            existing_ids.add(r.get("id"))
+                        if r.get("id") not in existing_ids_step3:
+                            results.append({**r, "_source": "KBJI", "_boost": "or_expanded_fallback"})
+                            existing_ids_step3.add(r.get("id"))
     finally:
         release_connection(conn)
 

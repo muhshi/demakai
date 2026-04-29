@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMAKAI - Evaluasi Baseline (SQL LIKE + SQLite)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #0a0c14;
+      color: #e2e8f0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a78bfa, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .meta {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    /* ---- Methodology Tag ---- */
+    .method-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e2030;
+      border: 1px solid #2d3048;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      padding: 5px 14px;
+      border-radius: 8px;
+    }
+    .tag.active {
+      border-color: #4f46e5;
+      color: #a5b4fc;
+      background: #1e1b4b22;
+    }
+    .tag.disabled {
+      color: #475569;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    /* ---- Overall Summary Card ---- */
+    .summary-card {
+      background: linear-gradient(135deg, #1a1f35, #13192b);
+      border: 1px solid #2d3480;
+      border-radius: 16px;
+      padding: 28px 36px;
+      margin-bottom: 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 20px;
+    }
+    .sum-item {
+      text-align: center;
+    }
+    .sum-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .sum-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    /* ---- Section heading ---- */
+    .section-header {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #c4b5fd;
+      margin: 50px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-header::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 22px;
+      background: linear-gradient(180deg, #7c3aed, #4f46e5);
+      border-radius: 2px;
+    }
+
+    /* ---- Stats Bar ---- */
+    .stats-bar {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #141828;
+      border: 1px solid #222840;
+      border-radius: 10px;
+      padding: 12px 20px;
+      min-width: 100px;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-top: 2px;
+    }
+
+    /* ---- Table ---- */
+    .wrap {
+      overflow-x: auto;
+      background: #0f1320;
+      border: 1px solid #1e2438;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      margin-bottom: 40px;
+    }
+    table {
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid #1e2438;
+      white-space: nowrap;
+    }
+    th {
+      background: #141828;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      text-align: center;
+    }
+    tr:hover td { background: rgba(255,255,255,0.015) !important; }
+    code {
+      background: #1a2035;
+      color: #a5b4fc;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #2d3480;
+      font-size: 0.85em;
+    }
+
+    /* ---- Divider ---- */
+    hr {
+      border: 0;
+      border-top: 2px dashed #1e2438;
+      margin: 50px 0;
+    }
+
+    /* ---- Legend ---- */
+    .legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 30px 0;
+      font-size: 0.82rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    /* ---- Footer ---- */
+    .footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #1e2438;
+      color: #334155;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">Evaluasi Baseline</div>
+    <h1>DEMAKAI &mdash; SQL LIKE Baseline</h1>
+    <p class="meta">Generated: 20 April 2026, 08:26:01 &nbsp;&middot;&nbsp; 60 query</p>
+    <p class="meta">Database: SQLite &nbsp;&middot;&nbsp; Pencarian: SQL LIKE (tanpa preprocessing)</p>
+
+    <div class="method-tags">
+      <span class="tag active">&#10003; SQL LIKE</span>
+      <span class="tag active">&#10003; SQLite</span>
+      <span class="tag disabled">&#10007; Hybrid Search</span>
+      <span class="tag disabled">&#10007; Preprocessing</span>
+      <span class="tag disabled">&#10007; Contoh Lapangan</span>
+    </div>
+  </div>
+
+  <!-- Overall Summary -->
+  <div class="summary-card">
+    <div class="sum-item">
+      <div class="sum-label">Total Query</div>
+      <div class="sum-val" style="color:#c4b5fd">60</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Top@1</div>
+      <div class="sum-val" style="color:#86efac">0.0%</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Top@3</div>
+      <div class="sum-val" style="color:#7dd3fc">3.3%</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">Top@10</div>
+      <div class="sum-val" style="color:#d8b4fe">8.3%</div>
+    </div>
+    <div class="sum-item">
+      <div class="sum-label">MRR</div>
+      <div class="sum-val" style="color:#f87171">0.0217</div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#064e3b;border:1px solid #6ee7b7"></div>
+      <span style="color:#6ee7b7">Rank 1 (sangat baik)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#065f46;border:1px solid #a7f3d0"></div>
+      <span style="color:#a7f3d0">Rank 2&ndash;3</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1e3a2f;border:1px solid #d1fae5"></div>
+      <span style="color:#d1fae5">Rank 4&ndash;10</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a1f2e;border:1px solid #475569"></div>
+      <span style="color:#475569">Tidak ditemukan dalam top-10</span>
+    </div>
+  </div>
+
+  <!-- Section KBLI -->
+  
+        <div class="section-header">Dataset KBLI 2025</div>
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-label">Total Query</div>
+            <div class="stat-value">30</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@1</div>
+            <div class="stat-value" style="color:#86efac">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@3</div>
+            <div class="stat-value" style="color:#7dd3fc">6.7%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@10</div>
+            <div class="stat-value" style="color:#d8b4fe">16.7%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">MRR</div>
+            <div class="stat-value" style="color:#f87171">0.0433</div>
+          </div>
+        </div>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipe</th>
+                <th style='text-align:left;min-width:300px'>Query</th>
+                <th>Kode GT</th>
+                <th>Rank</th>
+                <th>Top@1</th>
+                <th>Top@3</th>
+                <th>Top@10</th>
+                <th>RR</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>1</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+              <td style='text-align:center'><code>01122</code></td>
+              <td style='background:#1e3a2f;color:#d1fae5'>10</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.1</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>3</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+              <td style='text-align:center'><code>31011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>5</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN</td>
+              <td style='text-align:center'><code>01122</code></td>
+              <td style='background:#1e3a2f;color:#d1fae5'>10</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.1</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>7</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+              <td style='text-align:center'><code>47249</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>9</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+              <td style='text-align:center'><code>85316</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>11</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+              <td style='text-align:center'><code>16211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>13</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN PADI</td>
+              <td style='text-align:center'><code>01122</code></td>
+              <td style='background:#065f46;color:#a7f3d0'>2</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>15</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>01134</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>17</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>KONTRUKSI RUMAH DI DESA</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>19</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+              <td style='text-align:center'><code>47749</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>21</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+              <td style='text-align:center'><code>47832</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>23</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA TRANSPORTASI</td>
+              <td style='text-align:center'><code>49231</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>25</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PENYEDIA BHAN BAKU MAKANAN</td>
+              <td style='text-align:center'><code>47213</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>27</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>TUKANG BATU</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>29</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>01134</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>31</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+              <td style='text-align:center'><code>01122</code></td>
+              <td style='background:#1e3a2f;color:#d1fae5'>10</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.1</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>33</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+              <td style='text-align:center'><code>47112</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>35</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCUCI MOTOR DAN MOBIL</td>
+              <td style='text-align:center'><code>81290</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>37</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENJUAL BOTOK PELAS DAN PECEL</td>
+              <td style='text-align:center'><code>56101</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>39</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PENYEDIAAN MAKANAN</td>
+              <td style='text-align:center'><code>56210</code></td>
+              <td style='background:#065f46;color:#a7f3d0'>2</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+              <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>41</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>43</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENJUAL ES TEH JUMBO</td>
+              <td style='text-align:center'><code>56303</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>45</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA ANTAR UNDANGAN ACARA</td>
+              <td style='text-align:center'><code>96909</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>47</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>49</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+              <td style='text-align:center'><code>56102</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>51</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>53</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+              <td style='text-align:center'><code>16101</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>55</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>01134</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>57</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>KONTRUSI RUMAH</td>
+              <td style='text-align:center'><code>41011</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>59</td>
+              <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+              <td style='color:#c4b5fd;text-align:left'>INDUSTRI AIR ISI ULANG</td>
+              <td style='text-align:center'><code>11052</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+              <td colspan='4' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>
+                MRR (Mean Reciprocal Rank)
+              </td>
+              <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.000</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.067</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.167</td>
+              <td style='text-align:center;font-weight:bold;color:#f87171'>0.0433</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+  <hr>
+
+  <!-- Section KBJI -->
+  
+        <div class="section-header">Dataset KBJI 2014</div>
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-label">Total Query</div>
+            <div class="stat-value">30</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@1</div>
+            <div class="stat-value" style="color:#86efac">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@3</div>
+            <div class="stat-value" style="color:#7dd3fc">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Top@10</div>
+            <div class="stat-value" style="color:#d8b4fe">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">MRR</div>
+            <div class="stat-value" style="color:#f87171">0.0000</div>
+          </div>
+        </div>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipe</th>
+                <th style='text-align:left;min-width:300px'>Query</th>
+                <th>Kode GT</th>
+                <th>Rank</th>
+                <th>Top@1</th>
+                <th>Top@3</th>
+                <th>Top@10</th>
+                <th>RR</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>2</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+              <td style='text-align:center'><code>9211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>4</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+              <td style='text-align:center'><code>7523</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>6</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN</td>
+              <td style='text-align:center'><code>9211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>8</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+              <td style='text-align:center'><code>5212</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>10</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+              <td style='text-align:center'><code>2330</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>12</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+              <td style='text-align:center'><code>9329</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>14</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN PADI</td>
+              <td style='text-align:center'><code>6111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>16</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>9211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>18</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>KONTRUKSI RUMAH DI DESA</td>
+              <td style='text-align:center'><code>7112</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>20</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+              <td style='text-align:center'><code>5249</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>22</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+              <td style='text-align:center'><code>5249</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>24</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA TRANSPORTASI</td>
+              <td style='text-align:center'><code>8322</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>26</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PENYEDIA BHAN BAKU MAKANAN</td>
+              <td style='text-align:center'><code>9520</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>28</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>TUKANG BATU</td>
+              <td style='text-align:center'><code>7111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>30</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>9211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>32</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+              <td style='text-align:center'><code>6111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>34</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+              <td style='text-align:center'><code>5223</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>36</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCUCI MOTOR DAN MOBIL</td>
+              <td style='text-align:center'><code>9122</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>38</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENJUAL BOTOK PELAS DAN PECEL</td>
+              <td style='text-align:center'><code>5212</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>40</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PENYEDIAAN MAKANAN</td>
+              <td style='text-align:center'><code>9412</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>42</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+              <td style='text-align:center'><code>7111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>44</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENJUAL ES TEH JUMBO</td>
+              <td style='text-align:center'><code>5223</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>46</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA ANTAR UNDANGAN ACARA</td>
+              <td style='text-align:center'><code>5169</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>48</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+              <td style='text-align:center'><code>7111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>50</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+              <td style='text-align:center'><code>5212</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>52</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+              <td style='text-align:center'><code>7111</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>54</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+              <td style='text-align:center'><code>3122</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>56</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+              <td style='text-align:center'><code>9211</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>58</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>KONTRUSI RUMAH</td>
+              <td style='text-align:center'><code>7112</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr>
+              <td style='text-align:center;color:#94a3b8'>60</td>
+              <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+              <td style='color:#c4b5fd;text-align:left'>INDUSTRI AIR ISI ULANG</td>
+              <td style='text-align:center'><code>8183</code></td>
+              <td style='background:#1a1f2e;color:#475569'>-</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569'>0</td>
+              <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+            </tr>
+            <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+              <td colspan='4' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>
+                MRR (Mean Reciprocal Rank)
+              </td>
+              <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.000</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.000</td>
+              <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.000</td>
+              <td style='text-align:center;font-weight:bold;color:#f87171'>0.0000</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+  <div class="footer">
+    DEMAKAI &mdash; Sistem Evaluasi Baseline &middot; Dibuat otomatis oleh evaluate_baseline.py
+  </div>
+
+</body>
+</html>

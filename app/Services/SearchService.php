@@ -198,33 +198,64 @@ class SearchService
         // PYTHON API MODE — aktifkan dengan PYTHON_SEARCH_ENABLED=true di .env
         // ============================================================
         if (config('services.python_search.enabled', false)) {
-            return $this->searchViaPython($query, $limit, $model);
+            $results = $this->searchViaPython($query, $limit, $model);
+            
+            // Jika hasil tidak null, berarti API sukses (meskipun results-nya kosong [])
+            if ($results !== null) {
+                return $results;
+            }
+            
+            // Jika hasil NULL, berarti ada error koneksi API -> Lanjut ke fallback SQL di bawah
+            Log::info("Falling back to local SQL search for query: {$query}");
         }
 
+        // ============================================================
+        // SQL LIKE MODE (Fallback / Legacy)
+        // ============================================================
+        
         // Step 0: Preprocess query — normalisasi, stopword removal, synonym expansion
         $preprocessed = $this->preprocessQuery($query);
+        $tokens = $preprocessed['tokens'];
+        $clean = $preprocessed['clean'];
 
-        // ============================================================
-        // SQL LIKE MODE (aktif untuk evaluasi perbandingan)
-        // ============================================================
-        $like = '%' . $query . '%';
         $results = collect();
+        
+        // Fungsi helper untuk membangun query per token
+        $applyQuery = function ($q) use ($tokens, $clean) {
+            // Coba exact phrase dulu (skor tertinggi)
+            $q->where(function($sub) use ($clean) {
+                $like = '%' . $clean . '%';
+                $sub->orWhere('judul', 'ILIKE', $like)
+                    ->orWhere('deskripsi', 'ILIKE', $like)
+                    ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
+            });
+
+            // Jika banyak kata, tambahkan AND logic per token agar lebih fleksibel
+            if (count($tokens) > 1) {
+                $q->orWhere(function($sub) use ($tokens) {
+                    foreach ($tokens as $token) {
+                        $like = '%' . $token . '%';
+                        $sub->where(function($tokenQuery) use ($like) {
+                            $tokenQuery->orWhere('judul', 'ILIKE', $like)
+                                ->orWhere('deskripsi', 'ILIKE', $like)
+                                ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
+                        });
+                    }
+                });
+            }
+        };
+
         if ($model === null || $model === 'KBLI') {
             $results = $results->merge(
-                PgKBLI2025::where('judul', 'ILIKE', $like)
-                    ->orWhere('deskripsi', 'ILIKE', $like)
-                    ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like])
-                    ->limit($limit)->get()
+                PgKBLI2025::where($applyQuery)->limit($limit)->get()
             );
         }
         if ($model === null || $model === 'KBJI') {
             $results = $results->merge(
-                PgKBJI2014::where('judul', 'ILIKE', $like)
-                    ->orWhere('deskripsi', 'ILIKE', $like)
-                    ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like])
-                    ->limit($limit)->get()
+                PgKBJI2014::where($applyQuery)->limit($limit)->get()
             );
         }
+
         $finalResults = $results->take($limit)->all();
         $this->logHistory($query, $finalResults);
         return $finalResults;
@@ -240,7 +271,7 @@ class SearchService
      *   PYTHON_SEARCH_METHOD=sql          (sql | hybrid)
      *   PYTHON_SEARCH_PROCESSING=none     (none | basic | advanced)
      */
-    public function searchViaPython(string $query, int $limit = 10, ?string $model = null): array
+    public function searchViaPython(string $query, int $limit = 10, ?string $model = null): ?array
     {
         $url = config('services.python_search.url', 'http://127.0.0.1:8000');
         $searchMethod = config('services.python_search.method', 'sql');
@@ -250,29 +281,39 @@ class SearchService
         if ($searchMethod === 'sql' && $processing === 'expansion') $mode = 'sql_expansion';
         if ($searchMethod === 'hybrid' && $processing === 'expansion') $mode = 'hybrid_expansion';
 
+        $payload = [
+            'query' => $query,
+            'search' => $searchMethod,
+            'processing' => $processing,
+            'mode' => $mode,
+            'limit' => $limit,
+            'model' => $model,
+        ];
+
         try {
-            $response = Http::timeout(15)->post("{$url}/search", [
-                'query' => $query,
-                'search' => $searchMethod,
-                'processing' => $processing,
-                'mode' => $mode,
-                'limit' => $limit,
-                'model' => $model,
-            ]);
+            // Gunakan timeout lebih pendek untuk fallback yang cepat
+            $response = Http::timeout(8)->post("{$url}/search", $payload);
 
             if ($response->failed()) {
-                Log::error('Python search API error: ' . $response->body());
-                return [];
+                Log::warning('Python search API error response: ' . $response->status() . ' - ' . $response->body());
+                return null; // Return null agar memicu fallback ke SQL
             }
 
             $data = $response->json();
             $results = collect($data['results'] ?? []);
+            
+            // Log sukses untuk debugging
+            Log::debug("Python search success: found " . $results->count() . " results.");
+            
             $this->logHistory($query, $results->all());
             return $results->all();
 
         } catch (Exception $e) {
-            Log::error('Python search API unreachable: ' . $e->getMessage());
-            return [];
+            Log::error('Python search API unreachable (Connection Error): ' . $e->getMessage(), [
+                'url' => $url,
+                'payload' => $payload
+            ]);
+            return null; // Return null agar memicu fallback ke SQL
         }
     }
 

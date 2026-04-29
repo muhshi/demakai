@@ -1,0 +1,61 @@
+no,tipe,query,preprocessed,kode_gt,rank,top1,top3,top10,rr
+1,KBLI,MENCABUT RUMPUT LIAR DI SAWAH(MATON),"liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani",01122,1,1,1,1,1.0
+2,KBJI,MENCABUT RUMPUT LIAR DI SAWAH(MATON),"liar maton mencabut pertanian rumput sawah tanaman pangan | +KBJI: buruh matun sawah, pekerja sawah, tukang cabut rumput",9211,2,0,1,1,0.5
+3,KBLI,"MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA","etalase kaca lemari membuat mengantar pesanan | +KBLI: bengkel kaca etalase, toko lemari kaca, usaha rak kaca",31011,1,1,1,1,1.0
+4,KBJI,"MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA","etalase kaca lemari membuat mengantar pesanan | +KBJI: pengrajin lemari kaca, sopir antar lemari, tukang bikin etalase",7523,1,1,1,1,1.0
+5,KBLI,PERTANIAN,"pertanian | +KBLI: lahan kebun, sektor pertanian, usaha tani",01122,0,0,0,0,0.0
+6,KBJI,PERTANIAN,"pertanian | +KBJI: buruh tani, pekerja ladang, petani",9211,0,0,0,0,0.0
+7,KBLI,MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG,"dijual dipasar kampung membuat resoles | +KBLI: katering gorengan, produksi risoles, usaha jajanan pasar",47249,1,1,1,1,1.0
+8,KBJI,MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG,"dijual dipasar kampung membuat resoles | +KBJI: pembuat gorengan, penjual snack, tukang masak risoles",5212,1,1,1,1,1.0
+9,KBLI,MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN,"alquran mata mengajar mts pelajaran pkn tahassus | +KBLI: instansi pendidikan, lembaga sekolah, sekolah mts",85316,1,1,1,1,1.0
+10,KBJI,MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN,"alquran mata mengajar mts pelajaran pkn tahassus | +KBJI: guru pkn, pendidik honorer, pengajar madrasah",2330,0,0,0,0,0.0
+11,KBLI,"KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI",akhir dipabrik karyawan kayu lai pemotongan produksi sesuai,16211,1,1,1,1,1.0
+12,KBJI,"KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI",akhir dipabrik karyawan kayu lai pemotongan produksi sesuai,9329,1,1,1,1,1.0
+13,KBLI,PERTANIAN PADI,"padi pertanian | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan",01122,2,0,1,1,0.5
+14,KBJI,PERTANIAN PADI,"padi pertanian | +KBJI: buruh tanam padi, buruh tani, pekerja ladang",6111,2,0,1,1,0.5
+15,KBLI,PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN,"bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun",01134,1,1,1,1,1.0
+16,KBJI,PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN,"bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani",9211,1,1,1,1,1.0
+17,KBLI,KONTRUKSI RUMAH DI DESA,"bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah",41011,1,1,1,1,1.0
+18,KBJI,KONTRUKSI RUMAH DI DESA,"bangunan desa hunian konstruksi kontruksi rumah | +KBJI: kepala tukang, kuli bangunan proyek, tukang bangunan rumah",7112,1,1,1,1,1.0
+19,KBLI,PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI,"barang bekas dijual lagi perdagangan | +KBLI: lapak loak, toko barang bekas, usaha jual beli second",47749,1,1,1,1,1.0
+20,KBJI,PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI,"barang bekas dijual lagi perdagangan | +KBJI: bakul loak, pedagang barang second, penjual barang bekas",5249,1,1,1,1,1.0
+21,KBLI,PEDAGANG MOTOR DI RUMAH SENDIRI,"bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan",47832,1,1,1,1,1.0
+22,KBJI,PEDAGANG MOTOR DI RUMAH SENDIRI,"bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor",5249,1,1,1,1,1.0
+23,KBLI,JASA TRANSPORTASI,"transportasi | +KBLI: armada transportasi, jasa pengiriman logistik, usaha angkutan barang",49231,1,1,1,1,1.0
+24,KBJI,JASA TRANSPORTASI,"transportasi | +KBJI: driver logistik, pengemudi antar barang, sopir truk angkutan",8322,3,0,1,1,0.3333
+25,KBLI,PENYEDIA BHAN BAKU MAKANAN,baku bhan makanan penyedia,47213,1,1,1,1,1.0
+26,KBJI,PENYEDIA BHAN BAKU MAKANAN,baku bhan makanan penyedia,9520,1,1,1,1,1.0
+27,KBLI,TUKANG BATU,"batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi",41011,1,1,1,1,1.0
+28,KBJI,TUKANG BATU,"batu | +KBJI: pekerja bangunan batu, tukang batu konstruksi, tukang plester",7111,2,0,1,1,0.5
+29,KBLI,PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN,"bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun",01134,1,1,1,1,1.0
+30,KBJI,PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN,"bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani",9211,1,1,1,1,1.0
+31,KBLI,PERTANIAN PADI DI SAWAH MILIK SENDIRI,"milik padi pertanian sawah sendiri tanaman pangan | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan",01122,1,1,1,1,1.0
+32,KBJI,PERTANIAN PADI DI SAWAH MILIK SENDIRI,"milik padi pertanian sawah sendiri tanaman pangan | +KBJI: buruh tanam padi, buruh tani, pekerja ladang",6111,1,1,1,1,1.0
+33,KBLI,BURUH (PELAYAN DI TOKO KLONTONG),"buruh eceran kelontong klontong manisan pelayan toko | +KBLI: retail kelontong, toko kebutuhan harian, warung kelontong sembako",47112,1,1,1,1,1.0
+34,KBJI,BURUH (PELAYAN DI TOKO KLONTONG),"buruh eceran kelontong klontong manisan pelayan toko | +KBJI: asisten penjualan, pelayan toko sembako, penjaga warung kelontong",5223,5,0,0,1,0.2
+35,KBLI,MENCUCI MOTOR DAN MOBIL,"angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan",81290,1,1,1,1,1.0
+36,KBJI,MENCUCI MOTOR DAN MOBIL,"angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor",9122,1,1,1,1,1.0
+37,KBLI,MENJUAL BOTOK PELAS DAN PECEL,"botok menjual pecel pelas | +KBLI: kedai nasi pecel, usaha kuliner tradisional, warung pecel botok",56101,1,1,1,1,1.0
+38,KBJI,MENJUAL BOTOK PELAS DAN PECEL,"botok menjual pecel pelas | +KBJI: pedagang botok keliling, penjual nasi pecel, penjual pecel pelas",5212,1,1,1,1,1.0
+39,KBLI,PENYEDIAAN MAKANAN,"makanan penyediaan | +KBLI: bisnis makanan siap saji, industri jasa boga, katering acara",56210,3,0,1,1,0.3333
+40,KBJI,PENYEDIAAN MAKANAN,"makanan penyediaan | +KBJI: juru masak katering, koki pelayanan, staf makanan katering",9412,1,1,1,1,1.0
+41,KBLI,"BURUH BANGUNAN, MENGADUK SEMEN","bangunan buruh mengaduk semen | +KBLI: bengkel konstruksi, jasa renovasi harian, layanan perbaikan rumah",41011,1,1,1,1,1.0
+42,KBJI,"BURUH BANGUNAN, MENGADUK SEMEN","bangunan buruh mengaduk semen | +KBJI: kuli aduk semen, pekerja bangunan harian, pekerja kasar",7111,5,0,0,1,0.2
+43,KBLI,MENJUAL ES TEH JUMBO,"es jumbo menjual teh | +KBLI: franchise es teh, kedai minuman es teh, stand es teh jumbo",56303,1,1,1,1,1.0
+44,KBJI,MENJUAL ES TEH JUMBO,"es jumbo menjual teh | +KBJI: pedagang es teh, penjaga stand minuman, penjual es teh jumbo",5223,1,1,1,1,1.0
+45,KBLI,JASA ANTAR UNDANGAN ACARA,"acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan, usaha jasa perorangan",96909,0,0,0,0,0.0
+46,KBJI,JASA ANTAR UNDANGAN ACARA,"acara antar undangan | +KBJI: kurir sebar undangan, pengirim undangan, tenaga antar undangan",5169,1,1,1,1,1.0
+47,KBLI,JASA KONTRUKSI TUKANG BANGUNAN HARIAN,"bangunan harian kontruksi | +KBLI: jasa renovasi harian, layanan perbaikan rumah, usaha tukang borongan",41011,1,1,1,1,1.0
+48,KBJI,JASA KONTRUKSI TUKANG BANGUNAN HARIAN,"bangunan harian kontruksi | +KBJI: pekerja bangunan harian, tenaga borongan, tukang bangunan lepas",7111,1,1,1,1,1.0
+49,KBLI,PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA,"keliling makanan peyedia sepeda siomay | +KBLI: jualan makanan tidak tetap, produksi siomay, usaha siomay keliling",56102,1,1,1,1,1.0
+50,KBJI,PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA,"keliling makanan peyedia sepeda siomay | +KBJI: pedagang siomay kayuh, penjual siomay sepeda, tukang siomay komplek",5212,1,1,1,1,1.0
+51,KBLI,"MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN","bata dinding material memasang men mencampur mengangkut plester | +KBLI: bengkel konstruksi, proyek konstruksi gedung, usaha renovasi rumah",41011,1,1,1,1,1.0
+52,KBJI,"MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN","bata dinding material memasang men mencampur mengangkut plester | +KBJI: kuli aduk semen, pekerja kasar, pembantu tukang bangunan",7111,5,0,0,1,0.2
+53,KBLI,MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA,"berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBLI: bengkel mesin pabrik, industri perlengkapan, usaha perbaikan alat",16101,1,1,1,1,1.0
+54,KBJI,MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA,"berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBJI: montir mesin industri, supervisor mekanik, teknisi mesin pabrik",3122,1,1,1,1,1.0
+55,KBLI,PERTANIAN BAWANG MERAH MILIK ORANG LAIN,"bawang merah milik pertanian | +KBLI: kebun bawang merah, lahan bawang, lahan kebun",01134,1,1,1,1,1.0
+56,KBJI,PERTANIAN BAWANG MERAH MILIK ORANG LAIN,"bawang merah milik pertanian | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani",9211,1,1,1,1,1.0
+57,KBLI,KONTRUSI RUMAH,bangunan hunian konstruksi kontrusi rumah,41011,1,1,1,1,1.0
+58,KBJI,KONTRUSI RUMAH,bangunan hunian konstruksi kontrusi rumah,7112,1,1,1,1,1.0
+59,KBLI,INDUSTRI AIR ISI ULANG,"air industri isi ulang | +KBLI: depot air galon, pabrik air minum, usaha air mineral",11052,1,1,1,1,1.0
+60,KBJI,INDUSTRI AIR ISI ULANG,"air industri isi ulang | +KBJI: operator isi ulang galon, pengantar air galon, penjaga depot air",8183,1,1,1,1,1.0

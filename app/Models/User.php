@@ -8,6 +8,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\SearchHistory;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -27,6 +28,11 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'sipetra_id',
+        'sipetra_token',
+        'sipetra_refresh_token',
+        'nip',
+        'jabatan',
     ];
 
     /**
@@ -50,5 +56,13 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the search histories for the user.
+     */
+    public function searchHistories()
+    {
+        return $this->hasMany(SearchHistory::class, 'user_id', 'id');
     }
 }

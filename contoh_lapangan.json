@@ -1,0 +1,332 @@
+[
+    {
+        "contoh_lapangan": "MENCABUT RUMPUT LIAR DI SAWAH(MATON)",
+        "kbli": {
+            "kode": "01122",
+            "judul": "PERTANIAN PADI INBRIDA"
+        },
+        "kbji": {
+            "kode": "9211",
+            "judul": "Buruh Pertanian"
+        }
+    },
+    {
+        "contoh_lapangan": "MEMBUAT LEMARI KACA\/ ETALASE, MENGANTAR PESANAN LEMARI KACA",
+        "kbli": {
+            "kode": "31011",
+            "judul": "INDUSTRI FURNITUR DARI KAYU"
+        },
+        "kbji": {
+            "kode": "7523",
+            "judul": "Penyetel Dan Operator Mesin Perkakas Pengolahan Kayu"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN",
+        "kbli": {
+            "kode": "01122",
+            "judul": "PERTANIAN PADI INBRIDA"
+        },
+        "kbji": {
+            "kode": "9211",
+            "judul": "Buruh Pertanian"
+        }
+    },
+    {
+        "contoh_lapangan": "MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG",
+        "kbli": {
+            "kode": "47249",
+            "judul": "PERDAGANGAN ECERAN MAKANAN LAINNYA"
+        },
+        "kbji": {
+            "kode": "5212",
+            "judul": "Pedagang Makanan Kaki Lima"
+        }
+    },
+    {
+        "contoh_lapangan": "MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN",
+        "kbli": {
+            "kode": "85316",
+            "judul": "PENDIDIKAN MENENGAH ATAS UMUM SWASTA"
+        },
+        "kbji": {
+            "kode": "2330",
+            "judul": ""
+        }
+    },
+    {
+        "contoh_lapangan": "KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI",
+        "kbli": {
+            "kode": "16211",
+            "judul": "INDUSTRI KAYU LAPIS"
+        },
+        "kbji": {
+            "kode": "9329",
+            "judul": "Buruh Industri Pengolahan YTDL"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN PADI",
+        "kbli": {
+            "kode": "01122",
+            "judul": "PERTANIAN PADI INBRIDA"
+        },
+        "kbji": {
+            "kode": "6111",
+            "judul": "Pekerja Pertanian Tanaman Pangan Dan Tanaman Semusim"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN",
+        "kbli": {
+            "kode": "01134",
+            "judul": "PERTANIAN SAYURAN UMBI"
+        },
+        "kbji": {
+            "kode": "9211",
+            "judul": "Buruh Pertanian"
+        }
+    },
+    {
+        "contoh_lapangan": "KONTRUKSI RUMAH DI DESA",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7112",
+            "judul": "Tukang Tembok Dan YBDI"
+        }
+    },
+    {
+        "contoh_lapangan": "PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI",
+        "kbli": {
+            "kode": "47749",
+            "judul": "PERDAGANGAN ECERAN BARANG BEKAS LAINNYA"
+        },
+        "kbji": {
+            "kode": "5249",
+            "judul": "Pekerja Penjualan YTDL"
+        }
+    },
+    {
+        "contoh_lapangan": "PEDAGANG MOTOR DI RUMAH SENDIRI",
+        "kbli": {
+            "kode": "47832",
+            "judul": "PERDAGANGAN ECERAN SEPEDA MOTOR BEKAS"
+        },
+        "kbji": {
+            "kode": "5249",
+            "judul": "Pekerja Penjualan YTDL"
+        }
+    },
+    {
+        "contoh_lapangan": "JASA TRANSPORTASI",
+        "kbli": {
+            "kode": "49231",
+            "judul": "ANGKUTAN BERMOTOR UNTUK BARANG UMUM"
+        },
+        "kbji": {
+            "kode": "8322",
+            "judul": "Pengemudi Mobil, Taksi dan Van"
+        }
+    },
+    {
+        "contoh_lapangan": "PENYEDIA BHAN BAKU MAKANAN",
+        "kbli": {
+            "kode": "47213",
+            "judul": "PERDAGANGAN ECERAN SAYURAN"
+        },
+        "kbji": {
+            "kode": "9520",
+            "judul": "Pedagang Keliling Dan Asongan (Selain Makanan)"
+        }
+    },
+    {
+        "contoh_lapangan": "TUKANG BATU",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7111",
+            "judul": "Pekerja Bangunan Rumah"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN",
+        "kbli": {
+            "kode": "01134",
+            "judul": "PERTANIAN SAYURAN UMBI"
+        },
+        "kbji": {
+            "kode": "9211",
+            "judul": "Buruh Pertanian"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN PADI DI SAWAH MILIK SENDIRI",
+        "kbli": {
+            "kode": "01122",
+            "judul": "PERTANIAN PADI INBRIDA"
+        },
+        "kbji": {
+            "kode": "6111",
+            "judul": "Pekerja Pertanian Tanaman Pangan Dan Tanaman Semusim"
+        }
+    },
+    {
+        "contoh_lapangan": "BURUH (PELAYAN DI TOKO KLONTONG)",
+        "kbli": {
+            "kode": "47112",
+            "judul": "PERDAGANGAN ECERAN BERBAGAI MACAM BARANG YANG UTAMANYA MAKANAN, MINUMAN, ATAU TEMBAKAU SELAIN DENGAN SISTEM SWALAYAN"
+        },
+        "kbji": {
+            "kode": "5223",
+            "judul": "Asisten Penjualan Toko"
+        }
+    },
+    {
+        "contoh_lapangan": "MENCUCI MOTOR DAN MOBIL",
+        "kbli": {
+            "kode": "81290",
+            "judul": "AKTIVITAS KEBERSIHAN LAINNYA"
+        },
+        "kbji": {
+            "kode": "9122",
+            "judul": "Tenaga Cuci Kendaraan"
+        }
+    },
+    {
+        "contoh_lapangan": "MENJUAL BOTOK PELAS DAN PECEL",
+        "kbli": {
+            "kode": "56101",
+            "judul": "RESTORAN"
+        },
+        "kbji": {
+            "kode": "5212",
+            "judul": "Pedagang Makanan Kaki Lima"
+        }
+    },
+    {
+        "contoh_lapangan": "PENYEDIAAN MAKANAN",
+        "kbli": {
+            "kode": "56210",
+            "judul": "AKTIVITAS JASA BOGA UNTUK ACARA TERTENTU (EVENT CATERING)"
+        },
+        "kbji": {
+            "kode": "9412",
+            "judul": "Juru Bantu Dapur"
+        }
+    },
+    {
+        "contoh_lapangan": "BURUH BANGUNAN, MENGADUK SEMEN",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7111",
+            "judul": "Pekerja Bangunan Rumah"
+        }
+    },
+    {
+        "contoh_lapangan": "MENJUAL ES TEH JUMBO",
+        "kbli": {
+            "kode": "56303",
+            "judul": "AKTIVITAS RUMAH MINUM\/KAFE"
+        },
+        "kbji": {
+            "kode": "5223",
+            "judul": "Asisten Penjualan Toko"
+        }
+    },
+    {
+        "contoh_lapangan": "JASA ANTAR UNDANGAN ACARA",
+        "kbli": {
+            "kode": "96909",
+            "judul": ""
+        },
+        "kbji": {
+            "kode": "5169",
+            "judul": "Tenaga Usaha Jasa Perorangan YTDL"
+        }
+    },
+    {
+        "contoh_lapangan": "JASA KONTRUKSI TUKANG BANGUNAN HARIAN",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7111",
+            "judul": "Pekerja Bangunan Rumah"
+        }
+    },
+    {
+        "contoh_lapangan": "PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA",
+        "kbli": {
+            "kode": "56102",
+            "judul": "AKTIVITAS PENYEDIAAN MAKANAN DI BANGUNAN TIDAK TETAP"
+        },
+        "kbji": {
+            "kode": "5212",
+            "judul": "Pedagang Makanan Kaki Lima"
+        }
+    },
+    {
+        "contoh_lapangan": "MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7111",
+            "judul": "Pekerja Bangunan Rumah"
+        }
+    },
+    {
+        "contoh_lapangan": "MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA",
+        "kbli": {
+            "kode": "16101",
+            "judul": "PENGGERGAJIAN DAN PENGHALUSAN KAYU"
+        },
+        "kbji": {
+            "kode": "3122",
+            "judul": "Supervisor Manufaktur"
+        }
+    },
+    {
+        "contoh_lapangan": "PERTANIAN BAWANG MERAH MILIK ORANG LAIN",
+        "kbli": {
+            "kode": "01134",
+            "judul": "PERTANIAN SAYURAN UMBI"
+        },
+        "kbji": {
+            "kode": "9211",
+            "judul": "Buruh Pertanian"
+        }
+    },
+    {
+        "contoh_lapangan": "KONTRUSI RUMAH",
+        "kbli": {
+            "kode": "41011",
+            "judul": "KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN"
+        },
+        "kbji": {
+            "kode": "7112",
+            "judul": "Tukang Tembok Dan YBDI"
+        }
+    },
+    {
+        "contoh_lapangan": "INDUSTRI AIR ISI ULANG",
+        "kbli": {
+            "kode": "11052",
+            "judul": "INDUSTRI AIR MINUM ISI ULANG"
+        },
+        "kbji": {
+            "kode": "8183",
+            "judul": "Operator Mesin Pengisian Botol, Pelabelan, dan Pengemasan"
+        }
+    }
+]

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>DEMAKAI — Dashboard Evaluasi Komprehensif Semua Metode</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:#070a10;color:#e2e8f0;padding:0;line-height:1.6}
+
+/* ── TOP NAV ─────────────────────────────── */
+.topnav{
+  position:sticky;top:0;z-index:100;
+  background:#070a10f0;backdrop-filter:blur(14px);
+  border-bottom:1px solid #1e2438;
+  padding:10px 40px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.topnav-brand{font-size:0.88rem;font-weight:700;color:#6ee7b7;margin-right:12px;white-space:nowrap}
+.nav-link{
+  font-size:0.72rem;padding:4px 10px;border-radius:6px;
+  border:1px solid;text-decoration:none;white-space:nowrap;
+  transition:opacity 0.15s;
+}
+.nav-link:hover{opacity:0.7}
+
+/* ── PAGE ────────────────────────────────── */
+.page{padding:52px 44px}
+
+.page-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,#065f46,#059669);
+  color:#fff;font-size:0.74rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  padding:4px 14px;border-radius:999px;margin-bottom:14px;
+}
+h1{
+  font-size:2rem;font-weight:700;
+  background:linear-gradient(90deg,#6ee7b7,#34d399,#38bdf8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.meta{color:#64748b;font-size:0.86rem;margin-bottom:4px}
+
+/* ── METHOD SECTION ──────────────────────── */
+.method-section{
+  border:1px solid;border-radius:16px;
+  padding:30px 32px;margin-bottom:48px;
+}
+.method-title{font-size:1.3rem;font-weight:700;margin:8px 0 4px}
+.method-sub{font-size:0.84rem;color:#64748b;margin-bottom:4px}
+.method-note{
+  font-size:0.85rem;color:#94a3b8;line-height:1.6;
+  background:#ffffff08;border-left:3px solid;border-radius:0 8px 8px 0;
+  padding:10px 16px;margin:12px 0;
+}
+
+/* ── STATS ───────────────────────────────── */
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.stat-card{
+  background:#141828;border:1px solid #222844;
+  border-radius:10px;padding:10px 18px;min-width:95px;
+}
+.stat-lbl{font-size:0.69rem;color:#64748b;text-transform:uppercase;letter-spacing:0.07em}
+.stat-val{font-size:1.25rem;font-weight:700;color:#f1f5f9;margin-top:2px}
+
+/* ── TABLES ──────────────────────────────── */
+.wrap{overflow-x:auto;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.4);margin-bottom:16px}
+table{border-collapse:collapse;font-size:0.81rem;width:100%}
+th,td{padding:9px 12px;border:1px solid #1e2438}
+th{
+  background:#141828;color:#94a3b8;font-weight:600;
+  text-transform:uppercase;font-size:0.68rem;letter-spacing:0.06em;text-align:center;
+}
+tr:hover td{background:rgba(255,255,255,0.01)!important}
+code{
+  background:#1a2035;color:#a5b4fc;
+  padding:2px 6px;border-radius:4px;
+  border:1px solid #2d3480;font-size:0.8em;
+}
+
+/* ── DIVIDERS ────────────────────────────── */
+hr{border:0;border-top:2px dashed #1e2438;margin:48px 0}
+
+/* ── SECTION HEADER ──────────────────────── */
+.sec-hdr{
+  font-size:1.1rem;font-weight:600;color:#6ee7b7;
+  margin:44px 0 16px;display:flex;align-items:center;gap:10px;
+}
+.sec-hdr::before{
+  content:'';display:inline-block;width:4px;height:20px;
+  background:linear-gradient(180deg,#059669,#10b981);border-radius:2px;
+}
+
+/* ── LEGEND ──────────────────────────────── */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0;font-size:0.78rem}
+.legend-item{display:flex;align-items:center;gap:5px}
+.ldot{width:11px;height:11px;border-radius:3px}
+
+/* ── ANALYSIS ────────────────────────────── */
+.ana-box{
+  background:#0a1810;border:1px solid #065f46;
+  border-radius:12px;padding:26px 30px;margin-bottom:30px;
+}
+.ana-box h3{color:#34d399;font-size:0.95rem;margin-bottom:14px}
+.ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ana-card{background:#070a10;border:1px solid #0d2818;border-radius:10px;padding:16px}
+.ana-ttl{font-size:0.76rem;font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.ana-txt{font-size:0.83rem;color:#94a3b8;line-height:1.5}
+
+/* ── PIPELINE ────────────────────────────── */
+.pipeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0}
+.pip-step{
+  background:#141828;border:1px solid #222844;border-radius:8px;
+  padding:6px 14px;font-size:0.78rem;font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.pip-arrow{color:#334155;font-size:1rem}
+
+/* ── BADGE ACTIVE / INACTIVE ─────────────── */
+.badge-on{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.78rem;padding:4px 12px;border-radius:7px;margin:3px;border:1px solid;
+}
+.badge-off{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.78rem;padding:4px 12px;border-radius:7px;margin:3px;
+  border:1px solid #2d3048;color:#334155;background:#0f111a;
+  opacity:0.45;text-decoration:line-through;
+}
+
+/* ── CHART BAR ───────────────────────────── */
+.chart-row{display:flex;align-items:center;gap:12px;margin:6px 0}
+.chart-lbl{font-size:0.76rem;color:#94a3b8;min-width:200px;text-align:right}
+.chart-bar-wrap{flex:1;background:#141828;border-radius:4px;height:22px;overflow:hidden}
+.chart-bar{height:22px;border-radius:4px;transition:width 0.5s;display:flex;align-items:center;padding-left:8px;font-size:0.73rem;font-weight:700;color:#fff}
+.chart-val{font-size:0.76rem;font-weight:700;min-width:52px;text-align:left}
+
+/* ── HIGHLIGHT BOX ───────────────────────── */
+.highlight-insight{
+  background:#0C1A10;border:1px solid #16a34a;border-radius:10px;
+  padding:14px 20px;margin:16px 0;font-size:0.84rem;color:#bbf7d0;
+}
+.highlight-insight strong{color:#4ade80}
+
+.footer{
+  margin-top:50px;padding-top:18px;border-top:1px solid #1e2438;
+  color:#334155;font-size:0.78rem;text-align:center;
+}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ TOP NAV ══════════════════════ -->
+<div class="topnav">
+  <span class="topnav-brand">&#128202; DEMAKAI</span>
+  <a href='#m1' class='nav-link' style='border-color:#64748b;color:#64748b'>01. SQL LIKE</a>
+  <a href='#m2' class='nav-link' style='border-color:#38bdf8;color:#38bdf8'>02. Hybrid Search</a>
+  <a href='#m3' class='nav-link' style='border-color:#a78bfa;color:#a78bfa'>03. SQL+Prep</a>
+  <a href='#m4' class='nav-link' style='border-color:#67e8f9;color:#67e8f9'>04. Hybrid+Prep</a>
+  <a href='#m5' class='nav-link' style='border-color:#c084fc;color:#c084fc'>05. SQL+Prep+CL</a>
+  <a href='#m6' class='nav-link' style='border-color:#34d399;color:#34d399'>06. Hybrid+Prep+CL</a>
+  <a href='#perbandingan' class='nav-link' style='border-color:#fbbf24;color:#fbbf24'>&#11088; Perbandingan</a>
+  <a href='#analisis' class='nav-link' style='border-color:#34d399;color:#34d399'>&#128202; Analisis</a>
+</div>
+
+<!-- ══════════════════════ PAGE ══════════════════════ -->
+<div class="page">
+
+  <div class="page-badge">Evaluasi Komprehensif DEMAKAI</div>
+  <h1>Dashboard Evaluasi Sistem Pencarian KBLI</h1>
+  <p class="meta">DEMAKAI &mdash; Perbandingan Lengkap SQL LIKE dan Hybrid Search &middot; Seluruh Tahap Pengembangan</p>
+  <p class="meta">Generated: 21 April 2026 &nbsp;&middot;&nbsp; <strong style="color:#6ee7b7">60 query</strong> per metode &nbsp;&middot;&nbsp; PostgreSQL + pgvector &nbsp;&middot;&nbsp; Embedding: Gemini</p>
+  <p class="meta" style="margin-top:6px">
+    Metode terbaik: <strong style="color:#38bdf8">Hybrid Search (tanpa preprocessing)</strong> &nbsp;&middot;&nbsp;
+    MRR = <strong style="color:#38bdf8">0.8610</strong>
+  </p>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="ldot" style="background:#064e3b;border:1px solid #6ee7b7"></div><span style="color:#6ee7b7">Rank 1</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#065f46;border:1px solid #a7f3d0"></div><span style="color:#a7f3d0">Rank 2–3</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#1e3a2f;border:1px solid #d1fae5"></div><span style="color:#d1fae5">Rank 4–10</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#1a1f2e;border:1px solid #475569"></div><span style="color:#475569">Tidak ditemukan</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#422006;border:1px solid #fcd34d"></div><span style="color:#fcd34d">Kolom Preprocessing</span></div>
+    <div class="legend-item"><div class="ldot" style="background:#064e3b;border:1px solid #86efac"></div><span style="color:#86efac">Kolom Contoh Lapangan</span></div>
+  </div>
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 1: SQL LIKE (BASELINE)
+  ══════════════════════════════════════════════ -->
+  <div id="m1" class="method-section" style="border-color:#64748b33;background:#0c0f18">
+    <span style='background:#64748b20;border:1px solid #64748b;color:#64748b;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 01</span>
+    <div class="method-title" style="color:#64748b">SQL LIKE (Baseline)</div>
+    <p class="method-sub">Pencarian frasa mentah dengan SQL ILIKE — tanpa preprocessing, tanpa semantic search, tanpa contoh lapangan.</p>
+
+    <div class="method-note" style="border-color:#64748b">
+      Pada metode baseline ini, query pengguna langsung digunakan sebagai pola SQL ILIKE tanpa pemrosesan apapun. Sistem mencari kecocokan frasa eksak pada kolom kode, judul, dan deskripsi. Karena query dari pengguna banyak yang menggunakan bahasa informal, singkatan, atau salah eja — SQL LIKE gagal menemukan kecocokan. Ini menjadi tolok ukur minimum sistem.
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#64748b;color:#64748b;background:#64748b18">&#10003; SQL LIKE</span>
+      <span class="badge-off">&#10007; Semantic Search</span>
+      <span class="badge-off">&#10007; Preprocessing</span>
+      <span class="badge-off">&#10007; Contoh Lapangan</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-lbl">Total Query</div>
+        <div class="stat-val">60</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Top@1</div>
+        <div class="stat-val" style="color:#ef4444">0.0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Top@3</div>
+        <div class="stat-val" style="color:#f97316">3.3%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Top@10</div>
+        <div class="stat-val" style="color:#f97316">3.3%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">MRR</div>
+        <div class="stat-val" style="color:#64748b">0.0139</div>
+      </div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#64748b">Dataset</th>
+          <th style="color:#64748b">Top@1</th>
+          <th style="color:#64748b">Top@3</th>
+          <th style="color:#64748b">Top@10</th>
+          <th style="color:#64748b">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">0.0%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">6.7%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">6.7%</td>
+            <td style="text-align:center;font-weight:700;color:#6ee7b7">0.0278</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">0.0%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">0.0%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">0.0%</td>
+            <td style="text-align:center;font-weight:700;color:#6ee7b7">0.0000</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">Gabungan</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">0.0%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">3.3%</td>
+            <td style="text-align:center;color:#64748b;font-weight:600">3.3%</td>
+            <td style="text-align:center;font-weight:700;color:#6ee7b7">0.0139</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#9888;&#65039; <strong>Insight:</strong> SQL LIKE Baseline hampir tidak menemukan apapun. Dari 60 query, hanya 2 query berhasil menemukan hasil (PERTANIAN PADI → rank 2, PENYEDIAAN MAKANAN → rank 3). Ini membuktikan bahwa query informal dari pengguna lapangan <strong>tidak cocok</strong> untuk pencarian leksikal murni.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#64748b;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#64748b;border-radius:2px"></span>
+      Dataset KBLI 2025
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th><th style="text-align:left;min-width:150px">Query Asli</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">1</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="text-align:center"><code>01122</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">3</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MEMBUAT LEMARI KACA/ETALASE, MENGANTAR PESANAN</td><td style="text-align:center"><code>31011</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">5</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN</td><td style="text-align:center"><code>01122</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">7</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td><td style="text-align:center"><code>47249</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">13</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN PADI</td><td style="text-align:center"><code>01122</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">39</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PENYEDIAAN MAKANAN</td><td style="text-align:center"><code>56210</code></td><td style="background:#065f46;color:#a7f3d0">3</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.3333</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #64748b">
+      <td colspan="4" style="text-align:right;font-weight:bold;color:#64748b;padding-right:16px">MRR (26 query KBLI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#64748b">0.000</td>
+      <td style="text-align:center;font-weight:bold;color:#64748b">0.067</td>
+      <td style="text-align:center;font-weight:bold;color:#64748b">0.067</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.0278</td>
+    </tr>
+    </tbody></table></div>
+
+    <p style="color:#475569;font-size:0.8rem;margin:8px 0 16px">* Hanya 2 dari 30 query KBLI menghasilkan hit. 28 query lainnya menghasilkan 0 hasil (dihilangkan dari tabel). KBJI: 0 dari 30 berhasil.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 2: HYBRID SEARCH
+  ══════════════════════════════════════════════ -->
+  <div id="m2" class="method-section" style="border-color:#38bdf833;background:#060d14">
+    <span style='background:#38bdf820;border:1px solid #38bdf8;color:#38bdf8;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 02 ⭐ TERBAIK</span>
+    <div class="method-title" style="color:#38bdf8">Hybrid Search</div>
+    <p class="method-sub">Menggabungkan SQL LIKE (lexical) + Semantic Search (embedding Gemini) — tanpa preprocessing, tanpa contoh lapangan.</p>
+
+    <div class="method-note" style="border-color:#38bdf8">
+      Hybrid Search menggabungkan dua pendekatan: (1) SQL LIKE untuk pencocokan leksikal pada judul/deskripsi, dan (2) vector search menggunakan embedding Gemini untuk pemahaman semantik. Hasil kedua pendekatan digabung dengan boosting berbasis lokasi match. Tanpa preprocessing, query langsung digunakan apa adanya — namun kemampuan semantik embedding sudah mampu memahami intent query informal.
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#38bdf8;color:#38bdf8;background:#38bdf818">&#10003; SQL LIKE</span>
+      <span class="badge-on" style="border-color:#38bdf8;color:#38bdf8;background:#38bdf818">&#10003; Semantic Search</span>
+      <span class="badge-off">&#10007; Preprocessing</span>
+      <span class="badge-off">&#10007; Contoh Lapangan</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Total Query</div><div class="stat-val">60</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@1</div><div class="stat-val" style="color:#86efac">81.7%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@3</div><div class="stat-val" style="color:#7dd3fc">90.0%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@10</div><div class="stat-val" style="color:#d8b4fe">93.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">MRR</div><div class="stat-val" style="color:#38bdf8">0.8610</div></div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#38bdf8">Dataset</th>
+          <th style="color:#38bdf8">Top@1</th><th style="color:#38bdf8">Top@3</th>
+          <th style="color:#38bdf8">Top@10</th><th style="color:#38bdf8">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td><td style="text-align:center;color:#38bdf8;font-weight:600">90.0%</td><td style="text-align:center;color:#38bdf8;font-weight:600">93.3%</td><td style="text-align:center;color:#38bdf8;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.9167</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td><td style="text-align:center;color:#38bdf8;font-weight:600">73.3%</td><td style="text-align:center;color:#38bdf8;font-weight:600">86.7%</td><td style="text-align:center;color:#38bdf8;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8053</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">Gabungan</td><td style="text-align:center;color:#38bdf8;font-weight:600">81.7%</td><td style="text-align:center;color:#38bdf8;font-weight:600">90.0%</td><td style="text-align:center;color:#38bdf8;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8610</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#128200; <strong>Insight:</strong> Lompatan performa dari Baseline (MRR=0.014) ke Hybrid Search (MRR=0.861) sangat dramatis — <strong>+6.100% relatif</strong>. Ini membuktikan bahwa semantic search (embedding) adalah kunci utama sistem. KBLI 2025 lebih mudah ditemukan (MRR=0.917) dibanding KBJI 2014 (MRR=0.805) karena perbedaan data latih embedding.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#38bdf8;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#38bdf8;border-radius:2px"></span>Dataset KBLI 2025
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th><th style="text-align:left;min-width:150px">Query Asli</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">1</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="text-align:center"><code>01122</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">3</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MEMBUAT LEMARI KACA/ETALASE, MENGANTAR PESANAN</td><td style="text-align:center"><code>31011</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">5</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN</td><td style="text-align:center"><code>01122</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">7</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td><td style="text-align:center"><code>47249</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">9</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td><td style="text-align:center"><code>85316</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">13</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN PADI</td><td style="text-align:center"><code>01122</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">15</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td><td style="text-align:center"><code>01134</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">17</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">KONTRUKSI RUMAH DI DESA</td><td style="text-align:center"><code>41011</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">21</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PEDAGANG MOTOR DI RUMAH SENDIRI</td><td style="text-align:center"><code>47832</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">45</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">JASA ANTAR UNDANGAN ACARA</td><td style="text-align:center"><code>96909</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #38bdf8">
+      <td colspan="4" style="text-align:right;font-weight:bold;color:#38bdf8;padding-right:16px">MRR (30 query KBLI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.900</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.9167</td>
+    </tr>
+    </tbody></table></div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#38bdf8;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#38bdf8;border-radius:2px"></span>Dataset KBJI 2014
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th><th style="text-align:left;min-width:150px">Query Asli</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">2</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="text-align:center"><code>9211</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">6</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN</td><td style="text-align:center"><code>9211</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">10</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td><td style="text-align:center"><code>2330</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">14</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">PERTANIAN PADI</td><td style="text-align:center"><code>6111</code></td><td style="background:#065f46;color:#a7f3d0">3</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.3333</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">24</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">JASA TRANSPORTASI</td><td style="text-align:center"><code>8322</code></td><td style="background:#1e3a2f;color:#d1fae5">8</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.125</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">28</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">TUKANG BATU</td><td style="text-align:center"><code>7111</code></td><td style="background:#1e3a2f;color:#d1fae5">5</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.2</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">36</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">MENCUCI MOTOR DAN MOBIL</td><td style="text-align:center"><code>9122</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">60</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:160px">INDUSTRI AIR ISI ULANG</td><td style="text-align:center"><code>8183</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #38bdf8">
+      <td colspan="4" style="text-align:right;font-weight:bold;color:#38bdf8;padding-right:16px">MRR (30 query KBJI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.733</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.867</td>
+      <td style="text-align:center;font-weight:bold;color:#38bdf8">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.8053</td>
+    </tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 3: SQL LIKE + PREPROCESSING
+  ══════════════════════════════════════════════ -->
+  <div id="m3" class="method-section" style="border-color:#a78bfa33;background:#0d0b1a">
+    <span style='background:#a78bfa20;border:1px solid #a78bfa;color:#a78bfa;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 03</span>
+    <div class="method-title" style="color:#a78bfa">SQL LIKE + Preprocessing</div>
+    <p class="method-sub">SQL LIKE dengan Query Expansion (sinonim + variasi KBLI/KBJI) — tanpa semantic search.</p>
+
+    <div class="method-note" style="border-color:#a78bfa">
+      Preprocessing meliputi: lowercase, cleaning, stopword removal, stemming, dan query expansion (penambahan sinonim dan variasi kata terkait konteks KBLI/KBJI). Hasilnya digunakan untuk pencarian dengan SQL LIKE. Contoh: "cabut rumput sawah" → "liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani"
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#a78bfa;color:#a78bfa;background:#a78bfa18">&#10003; SQL LIKE</span>
+      <span class="badge-off">&#10007; Semantic Search</span>
+      <span class="badge-on" style="border-color:#a78bfa;color:#a78bfa;background:#a78bfa18">&#10003; Preprocessing</span>
+      <span class="badge-off">&#10007; Contoh Lapangan</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Total Query</div><div class="stat-val">60</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@1</div><div class="stat-val" style="color:#86efac">78.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@3</div><div class="stat-val" style="color:#7dd3fc">88.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@10</div><div class="stat-val" style="color:#d8b4fe">93.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">MRR</div><div class="stat-val" style="color:#a78bfa">0.8378</div></div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#a78bfa">Dataset</th>
+          <th style="color:#a78bfa">Top@1</th><th style="color:#a78bfa">Top@3</th>
+          <th style="color:#a78bfa">Top@10</th><th style="color:#a78bfa">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td><td style="text-align:center;color:#a78bfa;font-weight:600">86.7%</td><td style="text-align:center;color:#a78bfa;font-weight:600">93.3%</td><td style="text-align:center;color:#a78bfa;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8944</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td><td style="text-align:center;color:#a78bfa;font-weight:600">70.0%</td><td style="text-align:center;color:#a78bfa;font-weight:600">83.3%</td><td style="text-align:center;color:#a78bfa;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.7811</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">Gabungan</td><td style="text-align:center;color:#a78bfa;font-weight:600">78.3%</td><td style="text-align:center;color:#a78bfa;font-weight:600">88.3%</td><td style="text-align:center;color:#a78bfa;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8378</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#128269; <strong>Insight:</strong> Preprocessing + SQL LIKE (MRR=0.838) berhasil melonjak drastis dari Baseline (MRR=0.014). Query expansion mengubah query informal menjadi frasa yang cocok dengan kolom KBLI/KBJI. Namun <strong>sedikit di bawah Hybrid Search murni</strong> (MRR=0.861) — SQL LIKE hanya cocok untuk kecocokan leksikal, tidak semantik.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#a78bfa;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#a78bfa;border-radius:2px"></span>Dataset KBLI 2025 (Sampel — menampilkan kolom Preprocessing)
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th>
+      <th style="text-align:left;min-width:140px">Query Asli</th>
+      <th style="text-align:left;min-width:160px;color:#fcd34d">Preprocessing ✓</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">1</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td><td style="text-align:center"><code>01122</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">5</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">PERTANIAN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">pertanian | +KBLI: lahan kebun, sektor pertanian, usaha tani</td><td style="text-align:center"><code>01122</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">13</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">PERTANIAN PADI</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">padi pertanian | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td><td style="text-align:center"><code>01122</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">17</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">KONTRUKSI RUMAH DI DESA</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah</td><td style="text-align:center"><code>41011</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">45</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">JASA ANTAR UNDANGAN ACARA</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan, usaha jasa perorangan</td><td style="text-align:center"><code>96909</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #a78bfa">
+      <td colspan="5" style="text-align:right;font-weight:bold;color:#a78bfa;padding-right:16px">MRR (30 query KBLI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.867</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.8944</td>
+    </tr>
+    </tbody></table></div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#a78bfa;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#a78bfa;border-radius:2px"></span>Dataset KBJI 2014 (Sampel)
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th>
+      <th style="text-align:left;min-width:140px">Query Asli</th>
+      <th style="text-align:left;min-width:160px;color:#fcd34d">Preprocessing ✓</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">2</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">liar maton mencabut pertanian rumput sawah tanaman pangan | +KBJI: buruh matun sawah, pekerja sawah, tukang cabut rumput</td><td style="text-align:center"><code>9211</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">34</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">BURUH (PELAYAN DI TOKO KLONTONG)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">buruh eceran kelontong klontong manisan pelayan toko | +KBJI: asisten penjualan, pelayan toko sembako, penjaga warung kelontong</td><td style="text-align:center"><code>5223</code></td><td style="background:#1e3a2f;color:#d1fae5">5</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.2</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">42</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">BURUH BANGUNAN, MENGADUK SEMEN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">bangunan buruh mengaduk semen | +KBJI: kuli aduk semen, pekerja bangunan harian, pekerja kasar</td><td style="text-align:center"><code>7111</code></td><td style="background:#1e3a2f;color:#d1fae5">5</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.2</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #a78bfa">
+      <td colspan="5" style="text-align:right;font-weight:bold;color:#a78bfa;padding-right:16px">MRR (30 query KBJI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.700</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.833</td>
+      <td style="text-align:center;font-weight:bold;color:#a78bfa">0.933</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.7811</td>
+    </tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 4: HYBRID + PREPROCESSING
+  ══════════════════════════════════════════════ -->
+  <div id="m4" class="method-section" style="border-color:#67e8f933;background:#060f14">
+    <span style='background:#67e8f920;border:1px solid #67e8f9;color:#67e8f9;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 04</span>
+    <div class="method-title" style="color:#67e8f9">Hybrid Search + Preprocessing</div>
+    <p class="method-sub">SQL LIKE + Semantic Search dengan Query Expansion — tanpa contoh lapangan.</p>
+
+    <div class="method-note" style="border-color:#67e8f9">
+      Menggabungkan preprocessing (query expansion) dengan Hybrid Search. Query diproses terlebih dahulu sebelum dikirim ke dua jalur: SQL LIKE (dengan frasa yang diperkaya) dan vector search (embedding dari teks yang sudah di-expand). Dalam beberapa kasus, expansion yang berlebihan dapat menambah noise pada vector embedding.
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#67e8f9;color:#67e8f9;background:#67e8f918">&#10003; SQL LIKE</span>
+      <span class="badge-on" style="border-color:#67e8f9;color:#67e8f9;background:#67e8f918">&#10003; Semantic Search</span>
+      <span class="badge-on" style="border-color:#67e8f9;color:#67e8f9;background:#67e8f918">&#10003; Preprocessing</span>
+      <span class="badge-off">&#10007; Contoh Lapangan</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Total Query</div><div class="stat-val">60</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@1</div><div class="stat-val" style="color:#86efac">71.7%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@3</div><div class="stat-val" style="color:#7dd3fc">81.7%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@10</div><div class="stat-val" style="color:#d8b4fe">83.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">MRR</div><div class="stat-val" style="color:#67e8f9">0.7681</div></div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#67e8f9">Dataset</th>
+          <th style="color:#67e8f9">Top@1</th><th style="color:#67e8f9">Top@3</th>
+          <th style="color:#67e8f9">Top@10</th><th style="color:#67e8f9">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td><td style="text-align:center;color:#67e8f9;font-weight:600">80.0%</td><td style="text-align:center;color:#67e8f9;font-weight:600">90.0%</td><td style="text-align:center;color:#67e8f9;font-weight:600">90.0%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8500</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td><td style="text-align:center;color:#67e8f9;font-weight:600">63.3%</td><td style="text-align:center;color:#67e8f9;font-weight:600">73.3%</td><td style="text-align:center;color:#67e8f9;font-weight:600">76.7%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.6861</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">Gabungan</td><td style="text-align:center;color:#67e8f9;font-weight:600">71.7%</td><td style="text-align:center;color:#67e8f9;font-weight:600">81.7%</td><td style="text-align:center;color:#67e8f9;font-weight:600">83.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.7681</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#9888;&#65039; <strong>Insight:</strong> Performa Hybrid + Preprocessing (MRR=0.768) ternyata <strong>lebih rendah</strong> dari Hybrid murni (MRR=0.861). Ini terjadi karena query expansion menambah banyak kata yang <strong>merusak distribusi vektor embedding</strong> — model embedding lebih baik memproses query asli yang ringkas. Fenomena ini disebut <em>over-expansion</em>.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#67e8f9;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#67e8f9;border-radius:2px"></span>Dataset KBJI 2014 — Query Bermasalah
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th>
+      <th style="text-align:left;min-width:140px">Query Asli</th>
+      <th style="text-align:left;min-width:160px;color:#fcd34d">Preprocessing ✓</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">16</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td><td style="text-align:center"><code>9211</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">24</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">JASA TRANSPORTASI</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">transportasi | +KBJI: driver logistik, pengemudi antar barang, sopir truk angkutan</td><td style="text-align:center"><code>8322</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">27</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">TUKANG BATU</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</td><td style="text-align:center"><code>41011</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">30</td><td style="color:#93c5fd;font-weight:bold;text-align:center">KBJI</td><td style="color:#c4b5fd;white-space:normal;max-width:140px">PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:170px">bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td><td style="text-align:center"><code>9211</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 5: SQL LIKE + PREPROCESSING + CONTOH LAPANGAN
+  ══════════════════════════════════════════════ -->
+  <div id="m5" class="method-section" style="border-color:#c084fc33;background:#0f0a1a">
+    <span style='background:#c084fc20;border:1px solid #c084fc;color:#c084fc;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 05</span>
+    <div class="method-title" style="color:#c084fc">SQL LIKE + Preprocessing + Contoh Lapangan</div>
+    <p class="method-sub">SQL LIKE dengan preprocessing lengkap + memanfaatkan field contoh_lapangan dari database.</p>
+
+    <div class="method-note" style="border-color:#c084fc">
+      Sama dengan M3, ditambah dengan contoh_lapangan sebagai fitur retrieval. Field ini berisi deskripsi aktivitas nyata dalam bahasa informal (seperti yang digunakan responden lapangan). SQL LIKE mencakup pencarian pada kolom contoh_lapangan — sehingga query informal lebih mudah cocok.
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#c084fc;color:#c084fc;background:#c084fc18">&#10003; SQL LIKE</span>
+      <span class="badge-off">&#10007; Semantic Search</span>
+      <span class="badge-on" style="border-color:#c084fc;color:#c084fc;background:#c084fc18">&#10003; Preprocessing</span>
+      <span class="badge-on" style="border-color:#c084fc;color:#c084fc;background:#c084fc18">&#10003; Contoh Lapangan</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Total Query</div><div class="stat-val">60</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@1</div><div class="stat-val" style="color:#86efac">78.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@3</div><div class="stat-val" style="color:#7dd3fc">88.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@10</div><div class="stat-val" style="color:#d8b4fe">93.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">MRR</div><div class="stat-val" style="color:#c084fc">0.8378</div></div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#c084fc">Dataset</th>
+          <th style="color:#c084fc">Top@1</th><th style="color:#c084fc">Top@3</th>
+          <th style="color:#c084fc">Top@10</th><th style="color:#c084fc">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td><td style="text-align:center;color:#c084fc;font-weight:600">86.7%</td><td style="text-align:center;color:#c084fc;font-weight:600">93.3%</td><td style="text-align:center;color:#c084fc;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8944</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td><td style="text-align:center;color:#c084fc;font-weight:600">70.0%</td><td style="text-align:center;color:#c084fc;font-weight:600">83.3%</td><td style="text-align:center;color:#c084fc;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.7811</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">Gabungan</td><td style="text-align:center;color:#c084fc;font-weight:600">78.3%</td><td style="text-align:center;color:#c084fc;font-weight:600">88.3%</td><td style="text-align:center;color:#c084fc;font-weight:600">93.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8378</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#128203; <strong>Insight:</strong> Penambahan contoh lapangan pada SQL LIKE + Preprocessing tidak mengubah metrik dibanding M3 — keduanya MRR=0.838. Ini karena SQL LIKE sudah secara inheren mencakup kolom <code>contoh_lapangan</code> sejak M3. Namun, field contoh_lapangan memperkaya <strong>transparansi</strong> sistem dengan menampilkan contoh nyata aktivitas.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#c084fc;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#c084fc;border-radius:2px"></span>Dataset KBLI 2025 — dengan Kolom Contoh Lapangan
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th>
+      <th style="text-align:left;min-width:130px">Query Asli</th>
+      <th style="text-align:left;min-width:150px;color:#fcd34d">Preprocessing ✓</th>
+      <th style="text-align:left;min-width:150px;color:#86efac">Contoh Lapangan ✓</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">1</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:130px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:150px">liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:150px">PERTANIAN PADI INBRIDA - Petani yang menanam komoditas padi lokal | Petani yang menanam bibit dan menjualnya</td><td style="text-align:center"><code>01122</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">17</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:130px">KONTRUKSI RUMAH DI DESA</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:150px">bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:150px">KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN - konstruksi bangunan tempat tinggal | Membangun atau merenovasi rumah tempat tinggal</td><td style="text-align:center"><code>41011</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">39</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:130px">PENYEDIAAN MAKANAN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:150px">makanan penyediaan | +KBLI: bisnis makanan siap saji, industri jasa boga, katering acara</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:150px">AKTIVITAS JASA BOGA UNTUK ACARA TERTENTU - Katering makanan untuk aneka acara | Kegiatan penyediaan makanan</td><td style="text-align:center"><code>56210</code></td><td style="background:#065f46;color:#a7f3d0">3</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.3333</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">45</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:130px">JASA ANTAR UNDANGAN ACARA</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:150px">acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:150px">— (tidak ada contoh lapangan)</td><td style="text-align:center"><code>96909</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       METODE 6: HYBRID + PREPROCESSING + CONTOH LAPANGAN (FINAL)
+  ══════════════════════════════════════════════ -->
+  <div id="m6" class="method-section" style="border-color:#34d39933;background:#071410">
+    <span style='background:#34d39920;border:1px solid #34d399;color:#34d399;font-size:0.7rem;font-weight:700;padding:2px 10px;border-radius:6px;margin-bottom:8px;display:inline-block'>Metode 06 — FINAL</span>
+    <div class="method-title" style="color:#34d399">Hybrid + Preprocessing + Contoh Lapangan (FINAL)</div>
+    <p class="method-sub">Kombinasi lengkap: SQL LIKE + Semantic Search + Query Expansion + Field Contoh Lapangan.</p>
+
+    <div class="method-note" style="border-color:#34d399">
+      Sistem final menggabungkan seluruh komponen: (1) Preprocessing dengan query expansion, (2) SQL LIKE pada semua kolom termasuk contoh_lapangan, (3) Vector search dengan embedding Gemini, (4) Boosting berbasis lokasi match (contoh_lapangan mendapat prioritas tertinggi). Meskipun MRR=0.768, sistem ini paling lengkap dan transparan, serta mampu menjelaskan MENGAPA suatu kode direkomendasikan.
+    </div>
+
+    <div style="margin:14px 0">
+      <span class="badge-on" style="border-color:#34d399;color:#34d399;background:#34d39918">&#10003; SQL LIKE</span>
+      <span class="badge-on" style="border-color:#34d399;color:#34d399;background:#34d39918">&#10003; Semantic Search</span>
+      <span class="badge-on" style="border-color:#34d399;color:#34d399;background:#34d39918">&#10003; Preprocessing</span>
+      <span class="badge-on" style="border-color:#34d399;color:#34d399;background:#34d39918">&#10003; Contoh Lapangan</span>
+    </div>
+
+    <div class="pipeline">
+      <div class="pip-step" style="border-color:#fcd34d;color:#fcd34d">&#9998; Query Expansion</div>
+      <span class="pip-arrow">&#8594;</span>
+      <div class="pip-step" style="border-color:#64748b;color:#64748b">&#128269; SQL LIKE</div>
+      <span class="pip-arrow">+</span>
+      <div class="pip-step" style="border-color:#38bdf8;color:#38bdf8">&#127761; Semantic Search</div>
+      <span class="pip-arrow">&#8594;</span>
+      <div class="pip-step" style="border-color:#34d399;color:#34d399">&#128203; Boost CL</div>
+      <span class="pip-arrow">&#8594;</span>
+      <div class="pip-step" style="border-color:#a78bfa;color:#a78bfa">&#127942; Ranked Result</div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-lbl">Total Query</div><div class="stat-val">60</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@1</div><div class="stat-val" style="color:#86efac">71.7%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@3</div><div class="stat-val" style="color:#7dd3fc">81.7%</div></div>
+      <div class="stat-card"><div class="stat-lbl">Top@10</div><div class="stat-val" style="color:#d8b4fe">83.3%</div></div>
+      <div class="stat-card"><div class="stat-lbl">MRR</div><div class="stat-val" style="color:#34d399">0.7681</div></div>
+    </div>
+
+    <div class="wrap" style="max-width:500px;margin:14px 0 20px">
+      <table style="width:auto;min-width:400px">
+        <thead><tr>
+          <th style="text-align:left;color:#34d399">Dataset</th>
+          <th style="color:#34d399">Top@1</th><th style="color:#34d399">Top@3</th>
+          <th style="color:#34d399">Top@10</th><th style="color:#34d399">MRR</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBLI 2025</td><td style="text-align:center;color:#34d399;font-weight:600">80.0%</td><td style="text-align:center;color:#34d399;font-weight:600">90.0%</td><td style="text-align:center;color:#34d399;font-weight:600">90.0%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.8500</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">KBJI 2014</td><td style="text-align:center;color:#34d399;font-weight:600">63.3%</td><td style="text-align:center;color:#34d399;font-weight:600">73.3%</td><td style="text-align:center;color:#34d399;font-weight:600">76.7%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.6861</td></tr>
+          <tr><td style="color:#94a3b8;font-size:0.8rem">Gabungan</td><td style="text-align:center;color:#34d399;font-weight:600">71.7%</td><td style="text-align:center;color:#34d399;font-weight:600">81.7%</td><td style="text-align:center;color:#34d399;font-weight:600">83.3%</td><td style="text-align:center;font-weight:700;color:#6ee7b7">0.7681</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-insight">
+      &#128204; <strong>Insight:</strong> Sistem FINAL memiliki MRR=0.768 — lebih rendah dari Hybrid murni. Namun, sistem ini <strong>paling transparan dan dapat dijelaskan</strong>: setiap rekomendasi disertai preprocessing yang visible dan contoh lapangan yang relevan. Untuk keperluan presentasi penelitian, sistem ini menunjukkan proses terlengkap.
+    </div>
+
+    <div style="font-size:0.9rem;font-weight:600;color:#34d399;margin:20px 0 8px;display:flex;align-items:center;gap:8px">
+      <span style="display:inline-block;width:3px;height:16px;background:#34d399;border-radius:2px"></span>Dataset KBLI 2025 — Semua Kolom
+    </div>
+    <div class="wrap"><table><thead><tr>
+      <th>#</th><th>Tipe</th>
+      <th style="text-align:left;min-width:120px">Query Asli</th>
+      <th style="text-align:left;min-width:140px;color:#fcd34d">Preprocessing ✓</th>
+      <th style="text-align:left;min-width:140px;color:#86efac">Contoh Lapangan ✓</th>
+      <th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+    </tr></thead><tbody>
+    <tr><td style="text-align:center;color:#94a3b8">1</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">PERTANIAN PADI INBRIDA - Petani yang menanam komoditas padi lokal | Petani yang menanam bibit dan menjualnya</td><td style="text-align:center"><code>01122</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">3</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">MEMBUAT LEMARI KACA/ETALASE, MENGANTAR PESANAN</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">etalase kaca lemari membuat mengantar pesanan | +KBLI: bengkel kaca etalase, toko lemari kaca, usaha rak kaca</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">INDUSTRI FURNITUR DARI KAYU - Membuat Furnitur dari Kayu (meja, lemari, rak kayu) | Kegiatan membuat lemari kaca/etalase</td><td style="text-align:center"><code>31011</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">11</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU DI PABRIK KAYU</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">Kegiatan karyawan bagian produksi, pemotongan kayu sesuai ukuran akhir dipabrik kayu lapis</td><td style="text-align:center"><code>16211</code></td><td style="background:#065f46;color:#a7f3d0">2</td><td style="text-align:center;color:#475569">0</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">0.5</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">27</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">TUKANG BATU</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">KONSTRUKSI KONVENSIONAL GEDUNG HUNIAN - konstruksi bangunan tempat tinggal | Membangun atau merenovasi rumah tempat tinggal</td><td style="text-align:center"><code>41011</code></td><td style="background:#1a1f2e;color:#475569">—</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">0</td><td style="text-align:center;color:#475569">—</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">33</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">BURUH (PELAYAN DI TOKO KLONTONG)</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">buruh eceran kelontong klontong manisan pelayan toko | +KBLI: retail kelontong, toko kebutuhan harian, warung kelontong sembako</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">PERDAGANGAN ECERAN BERBAGAI MACAM BARANG YANG UTAMANYA MAKANAN - Warung Sembako | Kegiatan buruh (pelayan di toko klontong)</td><td style="text-align:center"><code>47112</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr><td style="text-align:center;color:#94a3b8">43</td><td style="color:#86efac;font-weight:bold;text-align:center">KBLI</td><td style="color:#c4b5fd;white-space:normal;max-width:120px">MENJUAL ES TEH JUMBO</td><td style="color:#fcd34d;font-size:0.77rem;white-space:normal;max-width:140px">es jumbo menjual teh | +KBLI: franchise es teh, kedai minuman es teh, stand es teh jumbo</td><td style="color:#86efac;font-size:0.77rem;white-space:normal;max-width:140px">AKTIVITAS RUMAH MINUM/KAFE - Kedai es teh jumbo atau Warung Kopi pinggir jalan | Kegiatan menjual es teh jumbo</td><td style="text-align:center"><code>56303</code></td><td style="background:#064e3b;color:#6ee7b7;font-weight:bold">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center">1</td><td style="text-align:center;color:#6ee7b7;font-weight:bold">1.0</td></tr>
+    <tr style="background:#1f2937;border-top:2px solid #34d399">
+      <td colspan="6" style="text-align:right;font-weight:bold;color:#34d399;padding-right:16px">MRR (30 query KBLI)</td>
+      <td style="text-align:center;color:#94a3b8">—</td>
+      <td style="text-align:center;font-weight:bold;color:#34d399">0.800</td>
+      <td style="text-align:center;font-weight:bold;color:#34d399">0.900</td>
+      <td style="text-align:center;font-weight:bold;color:#34d399">0.900</td>
+      <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.8500</td>
+    </tr>
+    </tbody></table></div>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       PERBANDINGAN VISUAL
+  ══════════════════════════════════════════════ -->
+  <div id="perbandingan">
+    <div class="sec-hdr">&#11088; Perbandingan Visual Semua Metode</div>
+    <p style="color:#64748b;font-size:0.87rem;margin-bottom:28px">Evaluasi menggunakan 60 query (30 KBLI 2025 + 30 KBJI 2014). Sumber data: <code>evaluasi_semua_20260420_144133.csv</code></p>
+
+    <!-- MRR Chart -->
+    <div style="margin-bottom:32px">
+      <div style="font-size:0.85rem;font-weight:600;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em">Mean Reciprocal Rank (MRR) — Semakin tinggi semakin baik</div>
+      <div class="chart-row"><div class="chart-lbl">01. SQL LIKE (Baseline)</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:1.6%;background:#475569">0.014</div></div><div class="chart-val" style="color:#475569">0.0139</div></div>
+      <div class="chart-row"><div class="chart-lbl">02. Hybrid Search ⭐</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:100%;background:linear-gradient(90deg,#38bdf8,#0ea5e9)">0.8610</div></div><div class="chart-val" style="color:#38bdf8">0.8610</div></div>
+      <div class="chart-row"><div class="chart-lbl">03. SQL LIKE + Preprocessing</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:97.3%;background:linear-gradient(90deg,#a78bfa,#8b5cf6)">0.8378</div></div><div class="chart-val" style="color:#a78bfa">0.8378</div></div>
+      <div class="chart-row"><div class="chart-lbl">04. Hybrid + Preprocessing</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:89.2%;background:linear-gradient(90deg,#67e8f9,#06b6d4)">0.7681</div></div><div class="chart-val" style="color:#67e8f9">0.7681</div></div>
+      <div class="chart-row"><div class="chart-lbl">05. SQL LIKE + Prep + CL</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:97.3%;background:linear-gradient(90deg,#c084fc,#a855f7)">0.8378</div></div><div class="chart-val" style="color:#c084fc">0.8378</div></div>
+      <div class="chart-row"><div class="chart-lbl">06. Hybrid + Prep + CL (FINAL)</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:89.2%;background:linear-gradient(90deg,#34d399,#10b981)">0.7681</div></div><div class="chart-val" style="color:#34d399">0.7681</div></div>
+    </div>
+
+    <!-- Top@1 Chart -->
+    <div style="margin-bottom:32px">
+      <div style="font-size:0.85rem;font-weight:600;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em">Top@1 Accuracy — % Query yang langsung menemukan jawaban di posisi 1</div>
+      <div class="chart-row"><div class="chart-lbl">01. SQL LIKE (Baseline)</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:0%;background:#475569"></div></div><div class="chart-val" style="color:#475569">0.0%</div></div>
+      <div class="chart-row"><div class="chart-lbl">02. Hybrid Search ⭐</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:90%;background:linear-gradient(90deg,#38bdf8,#0ea5e9)">81.7%</div></div><div class="chart-val" style="color:#38bdf8">81.7%</div></div>
+      <div class="chart-row"><div class="chart-lbl">03. SQL LIKE + Preprocessing</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:86%;background:linear-gradient(90deg,#a78bfa,#8b5cf6)">78.3%</div></div><div class="chart-val" style="color:#a78bfa">78.3%</div></div>
+      <div class="chart-row"><div class="chart-lbl">04. Hybrid + Preprocessing</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:79%;background:linear-gradient(90deg,#67e8f9,#06b6d4)">71.7%</div></div><div class="chart-val" style="color:#67e8f9">71.7%</div></div>
+      <div class="chart-row"><div class="chart-lbl">05. SQL LIKE + Prep + CL</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:86%;background:linear-gradient(90deg,#c084fc,#a855f7)">78.3%</div></div><div class="chart-val" style="color:#c084fc">78.3%</div></div>
+      <div class="chart-row"><div class="chart-lbl">06. Hybrid + Prep + CL (FINAL)</div><div class="chart-bar-wrap"><div class="chart-bar" style="width:79%;background:linear-gradient(90deg,#34d399,#10b981)">71.7%</div></div><div class="chart-val" style="color:#34d399">71.7%</div></div>
+    </div>
+
+    <!-- Tabel Ringkasan -->
+    <div style="font-size:0.9rem;font-weight:600;color:#6ee7b7;margin:32px 0 12px">&#128203; Tabel Ringkasan Komprehensif</div>
+    <div class="wrap">
+      <table>
+        <thead><tr>
+          <th style="text-align:left;min-width:200px">Metode</th>
+          <th>SQL</th><th>Semantic</th><th>Prep</th><th>CL</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>MRR</th>
+          <th>Delta vs M2</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span style="color:#64748b;font-weight:600">01. SQL LIKE (Baseline)</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td><td style="text-align:center;color:#475569">✗</td><td style="text-align:center;color:#475569">✗</td>
+            <td style="text-align:center;color:#ef4444;font-weight:600">0.0%</td>
+            <td style="text-align:center;color:#f97316;font-weight:600">3.3%</td>
+            <td style="text-align:center;color:#f97316;font-weight:600">3.3%</td>
+            <td style="text-align:center;font-weight:700;color:#64748b">0.0139</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.8471</td>
+          </tr>
+          <tr style="background:#0c1520">
+            <td><span style="color:#38bdf8;font-weight:700">02. Hybrid Search ⭐ TERBAIK</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td><td style="text-align:center;color:#475569">✗</td>
+            <td style="text-align:center;color:#86efac;font-weight:700">81.7%</td>
+            <td style="text-align:center;color:#86efac;font-weight:700">90.0%</td>
+            <td style="text-align:center;color:#86efac;font-weight:700">93.3%</td>
+            <td style="text-align:center;font-weight:700;color:#38bdf8">0.8610</td>
+            <td style="text-align:center;color:#6ee7b7">—</td>
+          </tr>
+          <tr>
+            <td><span style="color:#a78bfa;font-weight:600">03. SQL LIKE + Preprocessing</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td>
+            <td style="text-align:center;color:#a78bfa;font-weight:600">78.3%</td>
+            <td style="text-align:center;color:#a78bfa;font-weight:600">88.3%</td>
+            <td style="text-align:center;color:#a78bfa;font-weight:600">93.3%</td>
+            <td style="text-align:center;font-weight:700;color:#a78bfa">0.8378</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.0232</td>
+          </tr>
+          <tr>
+            <td><span style="color:#67e8f9;font-weight:600">04. Hybrid + Preprocessing</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td>
+            <td style="text-align:center;color:#67e8f9;font-weight:600">71.7%</td>
+            <td style="text-align:center;color:#67e8f9;font-weight:600">81.7%</td>
+            <td style="text-align:center;color:#67e8f9;font-weight:600">83.3%</td>
+            <td style="text-align:center;font-weight:700;color:#67e8f9">0.7681</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.0929</td>
+          </tr>
+          <tr>
+            <td><span style="color:#c084fc;font-weight:600">05. SQL LIKE + Prep + Contoh Lapangan</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#475569">✗</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td>
+            <td style="text-align:center;color:#c084fc;font-weight:600">78.3%</td>
+            <td style="text-align:center;color:#c084fc;font-weight:600">88.3%</td>
+            <td style="text-align:center;color:#c084fc;font-weight:600">93.3%</td>
+            <td style="text-align:center;font-weight:700;color:#c084fc">0.8378</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.0232</td>
+          </tr>
+          <tr>
+            <td><span style="color:#34d399;font-weight:700">06. Hybrid + Prep + CL (FINAL)</span></td>
+            <td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td><td style="text-align:center;color:#6ee7b7">✓</td>
+            <td style="text-align:center;color:#34d399;font-weight:600">71.7%</td>
+            <td style="text-align:center;color:#34d399;font-weight:600">81.7%</td>
+            <td style="text-align:center;color:#34d399;font-weight:600">83.3%</td>
+            <td style="text-align:center;font-weight:700;color:#34d399">0.7681</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.0929</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       ANALISIS
+  ══════════════════════════════════════════════ -->
+  <div id="analisis" class="ana-box">
+    <h3>&#128202; Analisis Perbandingan Metode</h3>
+    <p style="font-size:0.87rem;color:#94a3b8;margin-bottom:18px">
+      Evaluasi menggunakan <strong style="color:#6ee7b7">60 query</strong>
+      (30 KBLI 2025 + 30 KBJI 2014) yang konsisten di semua metode.
+      Metode terbaik berdasarkan MRR: <strong style="color:#38bdf8">Hybrid Search (M2)</strong> — MRR = 0.8610.
+    </p>
+    <div class="ana-grid">
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#ef4444">&#128269; Temuan Utama: SQL LIKE Murni Tidak Efektif</div>
+        <div class="ana-txt">SQL LIKE Baseline (MRR=0.014) hampir tidak berguna untuk query informal pengguna lapangan. Dari 60 query, hanya 2 query menghasilkan hit — dan keduanya hanya karena kata kunci yang terlalu generik ("PERTANIAN PADI", "PENYEDIAAN MAKANAN"). <strong style="color:#f1f5f9">Query informal seperti "MATON", "KLONTONG", "SIOMAY" tidak cocok dengan teks KBLI yang formal.</strong></div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#38bdf8">&#127761; Hybrid Search: Terobosan Terbesar</div>
+        <div class="ana-txt">Lompatan dari SQL LIKE (MRR=0.014) ke Hybrid Search (MRR=0.861) merupakan peningkatan tertinggi — sekitar <strong style="color:#f1f5f9">62× lipat</strong>. Semantic search (embedding Gemini) mampu memahami intent query seperti "KONTRUKSI" → konstruksi bangunan, "RESOLES" → industri makanan, tanpa membutuhkan kata kunci eksak.</div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#fcd34d">&#9986; Dampak Preprocessing: Trade-off</div>
+        <div class="ana-txt">Preprocessing dengan query expansion meningkatkan SQL LIKE secara signifikan (+6.000%), namun <strong style="color:#f1f5f9">menurunkan Hybrid Search</strong> (dari 0.861 → 0.768). Penyebab: teks yang terlalu panjang akibat expansion menciptakan noise dalam representasi vektor embedding. Ini disebut <em>over-expansion problem</em>.</div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#34d399">&#128203; Peran Field Contoh Lapangan</div>
+        <div class="ana-txt">Field <code>contoh_lapangan</code> berisi deskripsi aktivitas nyata dalam bahasa informal. Penambahan field ini tidak mengubah metrik M5 vs M3 (keduanya MRR=0.838) karena SQL LIKE sudah mencakupnya sejak awal. Namun, field ini vital untuk transparansi: <strong style="color:#f1f5f9">setiap rekomendasi dapat dijelaskan dengan contoh nyata yang relevan.</strong></div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#a78bfa">&#128300; Kesenjangan KBLI vs KBJI</div>
+        <div class="ana-txt">Pada semua metode, KBLI 2025 konsisten lebih mudah ditemukan (~10-15% lebih tinggi dari KBJI 2014). Ini karena deskripsi KBLI 2025 lebih kaya (updated) dan lebih banyak contoh lapangan yang tersedia. KBJI 2014 memiliki kode jabatan yang lebih abstrak dan kurang representatif dalam data embedding.</div>
+      </div>
+      <div class="ana-card">
+        <div class="ana-ttl" style="color:#fbbf24">&#127942; Rekomendasi Praktis</div>
+        <div class="ana-txt"><strong style="color:#38bdf8">Produksi:</strong> Gunakan Hybrid Search murni (M2) untuk performa terbaik (MRR=0.861). <strong style="color:#a78bfa">Fallback:</strong> SQL LIKE + Preprocessing (M3) jika API embedding tidak tersedia. <strong style="color:#34d399">Presentasi/Penelitian:</strong> Sistem FINAL (M6) untuk transparansi dan demonstrasi pipeline lengkap.</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;color:#a78bfa;font-size:0.92rem">&#128300; Tabel Delta Perbandingan Antar Metode</h3>
+    <div class="wrap" style="max-width:700px;margin-top:18px">
+      <table>
+        <thead><tr>
+          <th style="text-align:left;min-width:220px">Perbandingan</th>
+          <th>ΔMRR</th>
+          <th>ΔTop@1</th>
+          <th>ΔTop@10</th>
+          <th style="text-align:left">Interpretasi</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">M1→M2: +Semantic Search</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+0.847</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+81.7%</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+90.0%</td>
+            <td style="font-size:0.79rem;color:#86efac">Semantic search = kunci utama sistem</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">M1→M3: +Preprocessing (SQL)</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+0.824</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+78.3%</td>
+            <td style="text-align:center;color:#4ade80;font-weight:700">+90.0%</td>
+            <td style="font-size:0.79rem;color:#86efac">Preprocessing sangat membantu SQL LIKE</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">M2→M4: +Preprocessing (Hybrid)</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-0.093</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-10.0%</td>
+            <td style="text-align:center;color:#f87171;font-weight:700">-10.0%</td>
+            <td style="font-size:0.79rem;color:#fca5a5">Over-expansion merusak embedding</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">M3→M5: +Contoh Lapangan (SQL)</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.000</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.0%</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.0%</td>
+            <td style="font-size:0.79rem;color:#94a3b8">SQL LIKE sudah mencakup CL sejak M3</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">M4→M6: +Contoh Lapangan (Hybrid)</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.000</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.0%</td>
+            <td style="text-align:center;color:#94a3b8;font-weight:700">0.0%</td>
+            <td style="font-size:0.79rem;color:#94a3b8">Boost CL belum optimal di versi ini</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    DEMAKAI &mdash; Dashboard Evaluasi Komprehensif (6 Metode) &middot;
+    Data: evaluasi_semua_20260420_144133.csv &middot;
+    Generated: 21 April 2026 &middot; 60 query per metode &middot; MRR terbaik: Hybrid Search (0.8610)
+  </div>
+
+</div>
+</body>
+</html>

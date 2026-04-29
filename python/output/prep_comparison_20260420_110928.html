@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMAKAI - SQL LIKE vs Hybrid + Preprocessing</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #0a0c14; color: #e2e8f0; padding: 40px; line-height: 1.6; }
+
+    .page-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #6d28d9, #4f46e5);
+      color: #fff; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 999px; margin-bottom: 14px;
+    }
+    h1 {
+      font-size: 2rem; font-weight: 700;
+      background: linear-gradient(90deg, #a78bfa, #818cf8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .meta { color: #64748b; font-size: 0.88rem; margin-bottom: 6px; }
+
+    /* Method badges */
+    .method-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; padding: 5px 14px; border-radius: 8px;
+      margin-right: 8px; margin-bottom: 8px;
+    }
+    .mb-sql  { background: #1e1b4b22; border: 1px solid #6d28d9; color: #a78bfa; }
+    .mb-hyb  { background: #082f4922; border: 1px solid #0e7490; color: #67e8f9; }
+    .mb-off  { background: #1e2030; border: 1px solid #2d3048; color: #475569; text-decoration: line-through; opacity: 0.5; }
+
+    /* Section */
+    .method-section {
+      border: 1px solid;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+    .ms-sql { border-color: #6d28d922; background: #0d0b1a; }
+    .ms-hyb { border-color: #0e749022; background: #060f14; }
+
+    .method-title {
+      font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .mt-sql { color: #a78bfa; }
+    .mt-hyb { color: #67e8f9; }
+
+    .method-desc {
+      background: #13111f;
+      border-left: 3px solid #6d28d9;
+      padding: 12px 18px;
+      border-radius: 0 8px 8px 0;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      margin: 14px 0 20px;
+      line-height: 1.6;
+    }
+    .md-hyb { background: #060f14; border-left-color: #0e7490; }
+
+    .section-sub {
+      font-size: 1.05rem; font-weight: 600;
+      margin: 28px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-sub::before {
+      content: ''; display: inline-block;
+      width: 3px; height: 18px; border-radius: 2px;
+    }
+    .ss-sql::before { background: #6d28d9; }
+    .ss-sql { color: #c4b5fd; }
+    .ss-hyb::before { background: #0e7490; }
+    .ss-hyb { color: #67e8f9; }
+
+    .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .stat-card {
+      background: #141828; border: 1px solid #222840;
+      border-radius: 10px; padding: 12px 20px; min-width: 100px;
+    }
+    .stat-label { font-size: 0.72rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.07em; }
+    .stat-value { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; margin-top: 2px; }
+
+    .wrap {
+      overflow-x: auto; border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+    }
+    table { border-collapse: collapse; font-size: 0.83rem; width: 100%; }
+    th, td { padding: 10px 14px; border: 1px solid #1e2438; white-space: nowrap; }
+    th {
+      background: #141828; color: #94a3b8; font-weight: 600;
+      text-transform: uppercase; font-size: 0.7rem;
+      letter-spacing: 0.07em; text-align: center;
+    }
+    tr:hover td { background: rgba(255,255,255,0.012) !important; }
+    code {
+      background: #1a2035; color: #a5b4fc;
+      padding: 2px 7px; border-radius: 4px;
+      border: 1px solid #2d3480; font-size: 0.82em;
+    }
+
+    hr { border: 0; border-top: 2px dashed #1e2438; margin: 40px 0; }
+
+    .section-header {
+      font-size: 1.2rem; font-weight: 600;
+      color: #c4b5fd; margin: 40px 0 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-header::before {
+      content: ''; display: inline-block; width: 4px; height: 20px;
+      background: linear-gradient(180deg, #7c3aed, #4f46e5); border-radius: 2px;
+    }
+
+    .legend { display: flex; gap: 18px; flex-wrap: wrap; margin: 20px 0; font-size: 0.8rem; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+    /* Comparison table */
+    .cmp-table-wrap {
+      overflow-x: auto;
+      background: #0f1320;
+      border: 1px solid #1e2438;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    /* Analysis */
+    .analysis-box {
+      background: #0f1320;
+      border: 1px solid #1e2438;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 30px;
+    }
+    .analysis-box h3 { color: #a78bfa; font-size: 1rem; margin-bottom: 16px; }
+    .ana-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .ana-card { background: #0a0c14; border: 1px solid #1e2438; border-radius: 10px; padding: 16px; }
+    .ana-title { font-size: 0.78rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
+    .ana-text { font-size: 0.84rem; color: #94a3b8; line-height: 1.5; }
+
+    .footer {
+      margin-top: 50px; padding-top: 18px;
+      border-top: 1px solid #1e2438;
+      color: #334155; font-size: 0.8rem; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="page-badge">Evaluasi Preprocessing</div>
+  <h1>DEMAKAI &mdash; SQL LIKE vs Hybrid + Preprocessing</h1>
+  <p class="meta">Generated: 20 April 2026, 11:09:28 &nbsp;&middot;&nbsp; 60 query per metode</p>
+  <p class="meta">Preprocessing: Query Expansion (sinonim + variasi KBLI/KBJI) &nbsp;&middot;&nbsp; DB: PostgreSQL + pgvector</p>
+
+  <div style="margin-top:16px;margin-bottom:24px">
+    <span class="method-badge mb-sql">&#10003; SQL LIKE</span>
+    <span class="method-badge mb-hyb">&#10003; Hybrid Search (Semantic + Keyword)</span>
+    <span class="method-badge mb-sql">&#10003; Preprocessing (Expansion)</span>
+    <span class="method-badge mb-off">&#10007; Contoh Lapangan (filter)</span>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#064e3b;border:1px solid #6ee7b7"></div>
+      <span style="color:#6ee7b7">Rank 1</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#065f46;border:1px solid #a7f3d0"></div>
+      <span style="color:#a7f3d0">Rank 2&ndash;3</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1e3a2f;border:1px solid #d1fae5"></div>
+      <span style="color:#d1fae5">Rank 4&ndash;10</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a1f2e;border:1px solid #475569"></div>
+      <span style="color:#475569">Tidak ditemukan</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#422006;border:1px solid #fcd34d"></div>
+      <span style="color:#fcd34d">Kolom kuning = hasil preprocessing</span>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- BAGIAN 1: SQL LIKE + PREPROCESSING                     -->
+  <!-- ====================================================== -->
+  <div class="method-section ms-sql">
+    <div class="method-title mt-sql">&#128269; Bagian 1 &mdash; SQL LIKE + Preprocessing</div>
+    <div class="method-desc">
+      Pada metode SQL LIKE + Preprocessing, query terlebih dahulu diproses menggunakan teknik
+      preprocessing (advanced dan expansion), kemudian hasilnya digunakan untuk pencarian
+      berbasis pencocokan teks (SQL LIKE).
+    </div>
+
+    <div class="section-sub ss-sql">Dataset KBLI 2025</div>
+    
+    <div class="stats-bar">
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Total Query</div>
+        <div class="stat-value">30</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@1</div>
+        <div class="stat-value" style="color:#86efac">86.7%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@3</div>
+        <div class="stat-value" style="color:#7dd3fc">93.3%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@10</div>
+        <div class="stat-value" style="color:#d8b4fe">93.3%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">MRR</div>
+        <div class="stat-value" style="color:#6ee7b7">0.8944</div>
+      </div>
+    </div>
+    <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Tipe</th>
+          <th style='text-align:left;min-width:180px'>Query Asli</th>
+          <th style='text-align:left;min-width:200px'>Preprocessing &#10003;</th>
+          <th>Kode GT</th><th>Rank</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>1</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>3</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>etalase kaca lemari membuat mengantar pesanan | +KBLI: bengkel kaca etalase, toko lemari kaca, usaha rak kaca</td>
+          <td style='text-align:center'><code>31011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>5</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>pertanian | +KBLI: lahan kebun, sektor pertanian, usaha tani</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>7</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>dijual dipasar kampung membuat resoles | +KBLI: katering gorengan, produksi risoles, usaha jajanan pasar</td>
+          <td style='text-align:center'><code>47249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>9</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>alquran mata mengajar mts pelajaran pkn tahassus | +KBLI: instansi pendidikan, lembaga sekolah, sekolah mts</td>
+          <td style='text-align:center'><code>85316</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>11</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td>
+          <td style='text-align:center'><code>16211</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>13</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>padi pertanian | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>15</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>17</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUKSI RUMAH DI DESA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>19</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>barang bekas dijual lagi perdagangan | +KBLI: lapak loak, toko barang bekas, usaha jual beli second</td>
+          <td style='text-align:center'><code>47749</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>21</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+          <td style='text-align:center'><code>47832</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>23</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA TRANSPORTASI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>transportasi | +KBLI: armada transportasi, jasa pengiriman logistik, usaha angkutan barang</td>
+          <td style='text-align:center'><code>49231</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>25</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIA BHAN BAKU MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>baku bhan makanan penyedia</td>
+          <td style='text-align:center'><code>47213</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>27</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>TUKANG BATU</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>29</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>31</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>milik padi pertanian sawah sendiri tanaman pangan | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>33</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>buruh eceran kelontong klontong manisan pelayan toko | +KBLI: retail kelontong, toko kebutuhan harian, warung kelontong sembako</td>
+          <td style='text-align:center'><code>47112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>35</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCUCI MOTOR DAN MOBIL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+          <td style='text-align:center'><code>81290</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>37</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL BOTOK PELAS DAN PECEL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>botok menjual pecel pelas | +KBLI: kedai nasi pecel, usaha kuliner tradisional, warung pecel botok</td>
+          <td style='text-align:center'><code>56101</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>39</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIAAN MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>makanan penyediaan | +KBLI: bisnis makanan siap saji, industri jasa boga, katering acara</td>
+          <td style='text-align:center'><code>56210</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>3</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.3333</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>41</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan buruh mengaduk semen | +KBLI: bengkel konstruksi, jasa renovasi harian, layanan perbaikan rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>43</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL ES TEH JUMBO</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>es jumbo menjual teh | +KBLI: franchise es teh, kedai minuman es teh, stand es teh jumbo</td>
+          <td style='text-align:center'><code>56303</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>45</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA ANTAR UNDANGAN ACARA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan, usaha jasa perorangan</td>
+          <td style='text-align:center'><code>96909</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>47</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan harian kontruksi | +KBLI: jasa renovasi harian, layanan perbaikan rumah, usaha tukang borongan</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>49</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>keliling makanan peyedia sepeda siomay | +KBLI: jualan makanan tidak tetap, produksi siomay, usaha siomay keliling</td>
+          <td style='text-align:center'><code>56102</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>51</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bata dinding material memasang men mencampur mengangkut plester | +KBLI: bengkel konstruksi, proyek konstruksi gedung, usaha renovasi rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>53</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBLI: bengkel mesin pabrik, industri perlengkapan, usaha perbaikan alat</td>
+          <td style='text-align:center'><code>16101</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>55</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang merah milik pertanian | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>57</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUSI RUMAH</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan hunian konstruksi kontrusi rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>59</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>INDUSTRI AIR ISI ULANG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>air industri isi ulang | +KBLI: depot air galon, pabrik air minum, usaha air mineral</td>
+          <td style='text-align:center'><code>11052</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+          <td colspan='5' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>MRR (Mean Reciprocal Rank)</td>
+          <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.867</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.933</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.933</td>
+          <td style='text-align:center;font-weight:bold;color:#6ee7b7'>0.8944</td>
+        </tr></tbody>
+    </table></div>
+
+    <div class="section-sub ss-sql">Dataset KBJI 2014</div>
+    
+    <div class="stats-bar">
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Total Query</div>
+        <div class="stat-value">30</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@1</div>
+        <div class="stat-value" style="color:#86efac">70.0%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@3</div>
+        <div class="stat-value" style="color:#7dd3fc">83.3%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">Top@10</div>
+        <div class="stat-value" style="color:#d8b4fe">93.3%</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed22">
+        <div class="stat-label">MRR</div>
+        <div class="stat-value" style="color:#6ee7b7">0.7811</div>
+      </div>
+    </div>
+    <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Tipe</th>
+          <th style='text-align:left;min-width:180px'>Query Asli</th>
+          <th style='text-align:left;min-width:200px'>Preprocessing &#10003;</th>
+          <th>Kode GT</th><th>Rank</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>2</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>liar maton mencabut pertanian rumput sawah tanaman pangan | +KBJI: buruh matun sawah, pekerja sawah, tukang cabut rumput</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>4</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>etalase kaca lemari membuat mengantar pesanan | +KBJI: pengrajin lemari kaca, sopir antar lemari, tukang bikin etalase</td>
+          <td style='text-align:center'><code>7523</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>6</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>pertanian | +KBJI: buruh tani, pekerja ladang, petani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>8</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>dijual dipasar kampung membuat resoles | +KBJI: pembuat gorengan, penjual snack, tukang masak risoles</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>10</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>alquran mata mengajar mts pelajaran pkn tahassus | +KBJI: guru pkn, pendidik honorer, pengajar madrasah</td>
+          <td style='text-align:center'><code>2330</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>12</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td>
+          <td style='text-align:center'><code>9329</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>14</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>padi pertanian | +KBJI: buruh tanam padi, buruh tani, pekerja ladang</td>
+          <td style='text-align:center'><code>6111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>16</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>18</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUKSI RUMAH DI DESA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan desa hunian konstruksi kontruksi rumah | +KBJI: kepala tukang, kuli bangunan proyek, tukang bangunan rumah</td>
+          <td style='text-align:center'><code>7112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>20</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>barang bekas dijual lagi perdagangan | +KBJI: bakul loak, pedagang barang second, penjual barang bekas</td>
+          <td style='text-align:center'><code>5249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>22</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor</td>
+          <td style='text-align:center'><code>5249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>24</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA TRANSPORTASI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>transportasi | +KBJI: driver logistik, pengemudi antar barang, sopir truk angkutan</td>
+          <td style='text-align:center'><code>8322</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>3</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.3333</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>26</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIA BHAN BAKU MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>baku bhan makanan penyedia</td>
+          <td style='text-align:center'><code>9520</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>28</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>TUKANG BATU</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>batu | +KBJI: pekerja bangunan batu, tukang batu konstruksi, tukang plester</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>30</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>32</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>milik padi pertanian sawah sendiri tanaman pangan | +KBJI: buruh tanam padi, buruh tani, pekerja ladang</td>
+          <td style='text-align:center'><code>6111</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>34</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>buruh eceran kelontong klontong manisan pelayan toko | +KBJI: asisten penjualan, pelayan toko sembako, penjaga warung kelontong</td>
+          <td style='text-align:center'><code>5223</code></td>
+          <td style='background:#1e3a2f;color:#d1fae5'>5</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.2</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>36</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCUCI MOTOR DAN MOBIL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor</td>
+          <td style='text-align:center'><code>9122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>38</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL BOTOK PELAS DAN PECEL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>botok menjual pecel pelas | +KBJI: pedagang botok keliling, penjual nasi pecel, penjual pecel pelas</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>40</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIAAN MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>makanan penyediaan | +KBJI: juru masak katering, koki pelayanan, staf makanan katering</td>
+          <td style='text-align:center'><code>9412</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>42</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan buruh mengaduk semen | +KBJI: kuli aduk semen, pekerja bangunan harian, pekerja kasar</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#1e3a2f;color:#d1fae5'>5</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.2</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>44</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL ES TEH JUMBO</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>es jumbo menjual teh | +KBJI: pedagang es teh, penjaga stand minuman, penjual es teh jumbo</td>
+          <td style='text-align:center'><code>5223</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>46</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA ANTAR UNDANGAN ACARA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>acara antar undangan | +KBJI: kurir sebar undangan, pengirim undangan, tenaga antar undangan</td>
+          <td style='text-align:center'><code>5169</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>48</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan harian kontruksi | +KBJI: pekerja bangunan harian, tenaga borongan, tukang bangunan lepas</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>50</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>keliling makanan peyedia sepeda siomay | +KBJI: pedagang siomay kayuh, penjual siomay sepeda, tukang siomay komplek</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>52</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bata dinding material memasang men mencampur mengangkut plester | +KBJI: kuli aduk semen, pekerja kasar, pembantu tukang bangunan</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#1e3a2f;color:#d1fae5'>5</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.2</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>54</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBJI: montir mesin industri, supervisor mekanik, teknisi mesin pabrik</td>
+          <td style='text-align:center'><code>3122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>56</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang merah milik pertanian | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>58</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUSI RUMAH</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan hunian konstruksi kontrusi rumah</td>
+          <td style='text-align:center'><code>7112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>60</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>INDUSTRI AIR ISI ULANG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>air industri isi ulang | +KBJI: operator isi ulang galon, pengantar air galon, penjaga depot air</td>
+          <td style='text-align:center'><code>8183</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+          <td colspan='5' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>MRR (Mean Reciprocal Rank)</td>
+          <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.700</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.833</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.933</td>
+          <td style='text-align:center;font-weight:bold;color:#6ee7b7'>0.7811</td>
+        </tr></tbody>
+    </table></div>
+
+    <div class="section-sub ss-sql">Ringkasan SQL LIKE + Preprocessing</div>
+    <div class="wrap" style="max-width:720px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;background:#1a1040;color:#a78bfa">Metrik</th>
+            <th style="background:#1a1040;color:#a78bfa">KBLI 2025</th>
+            <th style="background:#1a1040;color:#a78bfa">KBJI 2014</th>
+            <th style="background:#1a1040;color:#e2e8f0">Gabungan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-weight:bold">Top@1</td>
+              <td style="text-align:center;color:#94a3b8">86.7%</td>
+              <td style="text-align:center;color:#94a3b8">70.0%</td>
+              <td style="text-align:center;font-weight:bold">78.3%</td></tr>
+          <tr><td style="font-weight:bold">Top@3</td>
+              <td style="text-align:center;color:#94a3b8">93.3%</td>
+              <td style="text-align:center;color:#94a3b8">83.3%</td>
+              <td style="text-align:center;font-weight:bold">88.3%</td></tr>
+          <tr><td style="font-weight:bold">Top@10</td>
+              <td style="text-align:center;color:#94a3b8">93.3%</td>
+              <td style="text-align:center;color:#94a3b8">93.3%</td>
+              <td style="text-align:center;font-weight:bold">93.3%</td></tr>
+          <tr><td style="font-weight:bold">MRR</td>
+              <td style="text-align:center;color:#94a3b8">0.8944</td>
+              <td style="text-align:center;color:#94a3b8">0.7811</td>
+              <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.8378</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ====================================================== -->
+  <!-- BAGIAN 2: HYBRID + PREPROCESSING                       -->
+  <!-- ====================================================== -->
+  <div class="method-section ms-hyb">
+    <div class="method-title mt-hyb">&#129504; Bagian 2 &mdash; Hybrid Search + Preprocessing</div>
+    <div class="method-desc md-hyb">
+      Pada metode Hybrid Search + Preprocessing, query diproses terlebih dahulu menggunakan
+      preprocessing, kemudian hasilnya digunakan pada dua pendekatan sekaligus, yaitu SQL LIKE
+      (lexical) dan semantic search, sehingga mampu meningkatkan relevansi hasil pencarian.
+    </div>
+
+    <div class="section-sub ss-hyb">Dataset KBLI 2025</div>
+    
+    <div class="stats-bar">
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Total Query</div>
+        <div class="stat-value">30</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@1</div>
+        <div class="stat-value" style="color:#86efac">80.0%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@3</div>
+        <div class="stat-value" style="color:#7dd3fc">90.0%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@10</div>
+        <div class="stat-value" style="color:#d8b4fe">90.0%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">MRR</div>
+        <div class="stat-value" style="color:#6ee7b7">0.8500</div>
+      </div>
+    </div>
+    <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Tipe</th>
+          <th style='text-align:left;min-width:180px'>Query Asli</th>
+          <th style='text-align:left;min-width:200px'>Preprocessing &#10003;</th>
+          <th>Kode GT</th><th>Rank</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>1</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>3</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>etalase kaca lemari membuat mengantar pesanan | +KBLI: bengkel kaca etalase, toko lemari kaca, usaha rak kaca</td>
+          <td style='text-align:center'><code>31011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>5</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>pertanian | +KBLI: lahan kebun, sektor pertanian, usaha tani</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>7</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>dijual dipasar kampung membuat resoles | +KBLI: katering gorengan, produksi risoles, usaha jajanan pasar</td>
+          <td style='text-align:center'><code>47249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>9</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>alquran mata mengajar mts pelajaran pkn tahassus | +KBLI: instansi pendidikan, lembaga sekolah, sekolah mts</td>
+          <td style='text-align:center'><code>85316</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>11</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td>
+          <td style='text-align:center'><code>16211</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>13</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>padi pertanian | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>15</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>17</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUKSI RUMAH DI DESA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>19</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>barang bekas dijual lagi perdagangan | +KBLI: lapak loak, toko barang bekas, usaha jual beli second</td>
+          <td style='text-align:center'><code>47749</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>21</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+          <td style='text-align:center'><code>47832</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>23</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA TRANSPORTASI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>transportasi | +KBLI: armada transportasi, jasa pengiriman logistik, usaha angkutan barang</td>
+          <td style='text-align:center'><code>49231</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>25</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIA BHAN BAKU MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>baku bhan makanan penyedia</td>
+          <td style='text-align:center'><code>47213</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>27</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>TUKANG BATU</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>29</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>31</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>milik padi pertanian sawah sendiri tanaman pangan | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+          <td style='text-align:center'><code>01122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>33</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>buruh eceran kelontong klontong manisan pelayan toko | +KBLI: retail kelontong, toko kebutuhan harian, warung kelontong sembako</td>
+          <td style='text-align:center'><code>47112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>35</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCUCI MOTOR DAN MOBIL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+          <td style='text-align:center'><code>81290</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>37</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL BOTOK PELAS DAN PECEL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>botok menjual pecel pelas | +KBLI: kedai nasi pecel, usaha kuliner tradisional, warung pecel botok</td>
+          <td style='text-align:center'><code>56101</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>39</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIAAN MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>makanan penyediaan | +KBLI: bisnis makanan siap saji, industri jasa boga, katering acara</td>
+          <td style='text-align:center'><code>56210</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>41</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan buruh mengaduk semen | +KBLI: bengkel konstruksi, jasa renovasi harian, layanan perbaikan rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>43</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL ES TEH JUMBO</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>es jumbo menjual teh | +KBLI: franchise es teh, kedai minuman es teh, stand es teh jumbo</td>
+          <td style='text-align:center'><code>56303</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>45</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA ANTAR UNDANGAN ACARA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan, usaha jasa perorangan</td>
+          <td style='text-align:center'><code>96909</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>47</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan harian kontruksi | +KBLI: jasa renovasi harian, layanan perbaikan rumah, usaha tukang borongan</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>49</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>keliling makanan peyedia sepeda siomay | +KBLI: jualan makanan tidak tetap, produksi siomay, usaha siomay keliling</td>
+          <td style='text-align:center'><code>56102</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>51</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bata dinding material memasang men mencampur mengangkut plester | +KBLI: bengkel konstruksi, proyek konstruksi gedung, usaha renovasi rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>53</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBLI: bengkel mesin pabrik, industri perlengkapan, usaha perbaikan alat</td>
+          <td style='text-align:center'><code>16101</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>55</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang merah milik pertanian | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+          <td style='text-align:center'><code>01134</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>57</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUSI RUMAH</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan hunian konstruksi kontrusi rumah</td>
+          <td style='text-align:center'><code>41011</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>59</td>
+          <td style='color:#86efac;font-weight:bold;text-align:center'>KBLI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>INDUSTRI AIR ISI ULANG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>air industri isi ulang | +KBLI: depot air galon, pabrik air minum, usaha air mineral</td>
+          <td style='text-align:center'><code>11052</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+          <td colspan='5' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>MRR (Mean Reciprocal Rank)</td>
+          <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.800</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.900</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.900</td>
+          <td style='text-align:center;font-weight:bold;color:#6ee7b7'>0.8500</td>
+        </tr></tbody>
+    </table></div>
+
+    <div class="section-sub ss-hyb">Dataset KBJI 2014</div>
+    
+    <div class="stats-bar">
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Total Query</div>
+        <div class="stat-value">30</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@1</div>
+        <div class="stat-value" style="color:#86efac">63.3%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@3</div>
+        <div class="stat-value" style="color:#7dd3fc">76.7%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">Top@10</div>
+        <div class="stat-value" style="color:#d8b4fe">76.7%</div>
+      </div>
+      <div class="stat-card" style="border-color:#0e749022">
+        <div class="stat-label">MRR</div>
+        <div class="stat-value" style="color:#6ee7b7">0.6944</div>
+      </div>
+    </div>
+    <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Tipe</th>
+          <th style='text-align:left;min-width:180px'>Query Asli</th>
+          <th style='text-align:left;min-width:200px'>Preprocessing &#10003;</th>
+          <th>Kode GT</th><th>Rank</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>2</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>liar maton mencabut pertanian rumput sawah tanaman pangan | +KBJI: buruh matun sawah, pekerja sawah, tukang cabut rumput</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>4</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>etalase kaca lemari membuat mengantar pesanan | +KBJI: pengrajin lemari kaca, sopir antar lemari, tukang bikin etalase</td>
+          <td style='text-align:center'><code>7523</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>6</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>pertanian | +KBJI: buruh tani, pekerja ladang, petani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>8</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>dijual dipasar kampung membuat resoles | +KBJI: pembuat gorengan, penjual snack, tukang masak risoles</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>10</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>alquran mata mengajar mts pelajaran pkn tahassus | +KBJI: guru pkn, pendidik honorer, pengajar madrasah</td>
+          <td style='text-align:center'><code>2330</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>12</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td>
+          <td style='text-align:center'><code>9329</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>14</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>padi pertanian | +KBJI: buruh tanam padi, buruh tani, pekerja ladang</td>
+          <td style='text-align:center'><code>6111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>3</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.3333</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>16</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>18</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUKSI RUMAH DI DESA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan desa hunian konstruksi kontruksi rumah | +KBJI: kepala tukang, kuli bangunan proyek, tukang bangunan rumah</td>
+          <td style='text-align:center'><code>7112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>20</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>barang bekas dijual lagi perdagangan | +KBJI: bakul loak, pedagang barang second, penjual barang bekas</td>
+          <td style='text-align:center'><code>5249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>22</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor</td>
+          <td style='text-align:center'><code>5249</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>24</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA TRANSPORTASI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>transportasi | +KBJI: driver logistik, pengemudi antar barang, sopir truk angkutan</td>
+          <td style='text-align:center'><code>8322</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>26</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIA BHAN BAKU MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>baku bhan makanan penyedia</td>
+          <td style='text-align:center'><code>9520</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>28</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>TUKANG BATU</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>batu | +KBJI: pekerja bangunan batu, tukang batu konstruksi, tukang plester</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>30</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>32</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>milik padi pertanian sawah sendiri tanaman pangan | +KBJI: buruh tanam padi, buruh tani, pekerja ladang</td>
+          <td style='text-align:center'><code>6111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>34</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>buruh eceran kelontong klontong manisan pelayan toko | +KBJI: asisten penjualan, pelayan toko sembako, penjaga warung kelontong</td>
+          <td style='text-align:center'><code>5223</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>36</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCUCI MOTOR DAN MOBIL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBJI: makelar motor bekas, pedagang motor rumah, penjual sepeda motor</td>
+          <td style='text-align:center'><code>9122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>38</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL BOTOK PELAS DAN PECEL</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>botok menjual pecel pelas | +KBJI: pedagang botok keliling, penjual nasi pecel, penjual pecel pelas</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>40</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PENYEDIAAN MAKANAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>makanan penyediaan | +KBJI: juru masak katering, koki pelayanan, staf makanan katering</td>
+          <td style='text-align:center'><code>9412</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>42</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan buruh mengaduk semen | +KBJI: kuli aduk semen, pekerja bangunan harian, pekerja kasar</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>44</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENJUAL ES TEH JUMBO</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>es jumbo menjual teh | +KBJI: pedagang es teh, penjaga stand minuman, penjual es teh jumbo</td>
+          <td style='text-align:center'><code>5223</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>46</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA ANTAR UNDANGAN ACARA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>acara antar undangan | +KBJI: kurir sebar undangan, pengirim undangan, tenaga antar undangan</td>
+          <td style='text-align:center'><code>5169</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>48</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan harian kontruksi | +KBJI: pekerja bangunan harian, tenaga borongan, tukang bangunan lepas</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>50</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>keliling makanan peyedia sepeda siomay | +KBJI: pedagang siomay kayuh, penjual siomay sepeda, tukang siomay komplek</td>
+          <td style='text-align:center'><code>5212</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>52</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bata dinding material memasang men mencampur mengangkut plester | +KBJI: kuli aduk semen, pekerja kasar, pembantu tukang bangunan</td>
+          <td style='text-align:center'><code>7111</code></td>
+          <td style='background:#065f46;color:#a7f3d0'>2</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>0.5</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>54</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBJI: montir mesin industri, supervisor mekanik, teknisi mesin pabrik</td>
+          <td style='text-align:center'><code>3122</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>56</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bawang merah milik pertanian | +KBJI: buruh harian bawang, buruh petik bawang, buruh tani</td>
+          <td style='text-align:center'><code>9211</code></td>
+          <td style='background:#1a1f2e;color:#475569'>-</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569'>0</td>
+          <td style='text-align:center;color:#475569;font-weight:normal'>-</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>58</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>KONTRUSI RUMAH</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>bangunan hunian konstruksi kontrusi rumah</td>
+          <td style='text-align:center'><code>7112</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr>
+          <td style='text-align:center;color:#94a3b8'>60</td>
+          <td style='color:#93c5fd;font-weight:bold;text-align:center'>KBJI</td>
+          <td style='color:#c4b5fd;text-align:left;white-space:normal;max-width:200px'>INDUSTRI AIR ISI ULANG</td>
+          <td style='color:#fcd34d;font-size:0.78rem;text-align:left;white-space:normal;max-width:220px'>air industri isi ulang | +KBJI: operator isi ulang galon, pengantar air galon, penjaga depot air</td>
+          <td style='text-align:center'><code>8183</code></td>
+          <td style='background:#064e3b;color:#6ee7b7;font-weight:bold'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='background:#1e3a5f;color:#93c5fd;font-weight:bold;text-align:center'>1</td>
+          <td style='text-align:center;color:#6ee7b7;font-weight:bold'>1.0</td>
+        </tr>
+        <tr style='background:#1f2937;border-top:2px solid #4f46e5'>
+          <td colspan='5' style='text-align:right;font-weight:bold;color:#a78bfa;padding-right:20px'>MRR (Mean Reciprocal Rank)</td>
+          <td style='text-align:center;color:#94a3b8'>&mdash;</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.633</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.767</td>
+          <td style='text-align:center;font-weight:bold;color:#a78bfa'>0.767</td>
+          <td style='text-align:center;font-weight:bold;color:#6ee7b7'>0.6944</td>
+        </tr></tbody>
+    </table></div>
+
+    <div class="section-sub ss-hyb">Ringkasan Hybrid + Preprocessing</div>
+    <div class="wrap" style="max-width:720px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;background:#060f14;color:#67e8f9">Metrik</th>
+            <th style="background:#060f14;color:#67e8f9">KBLI 2025</th>
+            <th style="background:#060f14;color:#67e8f9">KBJI 2014</th>
+            <th style="background:#060f14;color:#e2e8f0">Gabungan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-weight:bold">Top@1</td>
+              <td style="text-align:center;color:#94a3b8">80.0%</td>
+              <td style="text-align:center;color:#94a3b8">63.3%</td>
+              <td style="text-align:center;font-weight:bold">71.7%</td></tr>
+          <tr><td style="font-weight:bold">Top@3</td>
+              <td style="text-align:center;color:#94a3b8">90.0%</td>
+              <td style="text-align:center;color:#94a3b8">76.7%</td>
+              <td style="text-align:center;font-weight:bold">83.3%</td></tr>
+          <tr><td style="font-weight:bold">Top@10</td>
+              <td style="text-align:center;color:#94a3b8">90.0%</td>
+              <td style="text-align:center;color:#94a3b8">76.7%</td>
+              <td style="text-align:center;font-weight:bold">83.3%</td></tr>
+          <tr><td style="font-weight:bold">MRR</td>
+              <td style="text-align:center;color:#94a3b8">0.8500</td>
+              <td style="text-align:center;color:#94a3b8">0.6944</td>
+              <td style="text-align:center;font-weight:bold;color:#6ee7b7">0.7722</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ====================================================== -->
+  <!-- PERBANDINGAN LENGKAP                                   -->
+  <!-- ====================================================== -->
+  <div class="section-header">Perbandingan Kedua Metode</div>
+  <div class="cmp-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left;min-width:120px;vertical-align:middle">Metode</th>
+          <th colspan="4" style="background:#1a1040;color:#a78bfa;border-bottom:2px solid #6d28d9">KBLI 2025</th>
+          <th colspan="4" style="background:#060f14;color:#67e8f9;border-bottom:2px solid #0e7490">KBJI 2014</th>
+          <th colspan="4" style="background:#141828;color:#e2e8f0;border-bottom:2px solid #334155">Gabungan</th>
+        </tr>
+        <tr>
+          <th style="background:#1a1040;color:#a78bfa">Top@1</th><th style="background:#1a1040;color:#a78bfa">Top@3</th>
+          <th style="background:#1a1040;color:#a78bfa">Top@10</th><th style="background:#1a1040;color:#a78bfa">MRR</th>
+          <th style="background:#060f14;color:#67e8f9">Top@1</th><th style="background:#060f14;color:#67e8f9">Top@3</th>
+          <th style="background:#060f14;color:#67e8f9">Top@10</th><th style="background:#060f14;color:#67e8f9">MRR</th>
+          <th>Top@1</th><th>Top@3</th><th>Top@10</th><th>MRR</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td style='font-weight:600;color:#e2e8f0'>SQL LIKE + Preprocessing</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>86.7%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>93.3%</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>93.3%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>0.8944</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>70.0%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>83.3%</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>93.3%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>0.7811</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>78.3%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>88.3%</td>
+          <td style='text-align:center;color:#a78bfa;font-weight:bold'>93.3%</td><td style='text-align:center;color:#a78bfa;font-weight:bold'>0.8378</td>
+        </tr>
+        
+        <tr>
+          <td style='font-weight:600;color:#e2e8f0'>Hybrid + Preprocessing</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>80.0%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>90.0%</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>90.0%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>0.8500</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>63.3%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>76.7%</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>76.7%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>0.6944</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>71.7%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>83.3%</td>
+          <td style='text-align:center;color:#67e8f9;font-weight:bold'>83.3%</td><td style='text-align:center;color:#67e8f9;font-weight:bold'>0.7722</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  
+    <div class="analysis-box">
+      <h3>&#128202; Perbandingan & Analisis</h3>
+      <div class="ana-grid">
+        <div class="ana-card">
+          <div class="ana-title" style="color:#7dd3fc">&#128269; Dampak Preprocessing pada SQL LIKE</div>
+          <div class="ana-text">
+            Preprocessing (expansion + sinonim) memperluas cakupan token yang dicari.
+            Query seperti <em>"TUKANG BATU"</em> akan diperluas menjadi
+            <em>"tukang, batu, teknisi, pekerja, operator"</em> sehingga lebih banyak
+            entri KBLI/KBJI yang relevan dapat ditemukan meski kosakata formal berbeda.
+            Namun SQL LIKE tetap terbatas pada pencocokan teks harfiah.
+          </div>
+        </div>
+        <div class="ana-card">
+          <div class="ana-title" style="color:#34d399">&#129504; Dampak Preprocessing pada Hybrid</div>
+          <div class="ana-text">
+            Preprocessing memberikan dua keuntungan sekaligus untuk Hybrid:
+            (1) token yang sudah diperluas digunakan oleh SQL LIKE sehingga recall meningkat;
+            (2) teks yang sudah di-clean digunakan sebagai input embedding Gemini,
+            menghasilkan vektor yang lebih terfokus dan representasi semantik yang lebih akurat.
+          </div>
+        </div>
+        <div class="ana-card">
+          <div class="ana-title" style="color:#fcd34d">&#127942; Metode Paling Optimal</div>
+          <div class="ana-text">
+            <strong style="color:#fcd34d">SQL LIKE + Preprocessing</strong> memberikan performa terbaik
+            berdasarkan MRR gabungan. Hybrid unggul karena dimensi ganda (lexical + semantic)
+            mampu menjembatani gap antara bahasa informal query lapangan dan terminologi
+            formal KBLI/KBJI yang tidak dapat dijangkau SQL LIKE saja.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <hr>
+
+  <!-- Data Query Evaluasi -->
+  <div class="section-header">Data Query Evaluasi</div>
+  <div class="wrap" style="max-width:960px;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36px">#</th>
+          <th style="text-align:left">Query Asli</th>
+          <th style="text-align:left;color:#fcd34d">Hasil Preprocessing (Expansion) &#10003;</th>
+        </tr>
+      </thead>
+      <tbody>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>1</td>
+      <td style='color:#c4b5fd'>MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>liar maton mencabut pertanian rumput sawah tanaman pangan | +KBLI: lahan tani padi, sawah padi, usaha tani</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>2</td>
+      <td style='color:#c4b5fd'>MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>etalase kaca lemari membuat mengantar pesanan | +KBLI: bengkel kaca etalase, toko lemari kaca, usaha rak kaca</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>3</td>
+      <td style='color:#c4b5fd'>PERTANIAN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>pertanian | +KBLI: lahan kebun, sektor pertanian, usaha tani</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>4</td>
+      <td style='color:#c4b5fd'>MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>dijual dipasar kampung membuat resoles | +KBLI: katering gorengan, produksi risoles, usaha jajanan pasar</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>5</td>
+      <td style='color:#c4b5fd'>MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>alquran mata mengajar mts pelajaran pkn tahassus | +KBLI: instansi pendidikan, lembaga sekolah, sekolah mts</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>6</td>
+      <td style='color:#c4b5fd'>KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>akhir dipabrik karyawan kayu lai pemotongan produksi sesuai</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>7</td>
+      <td style='color:#c4b5fd'>PERTANIAN PADI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>padi pertanian | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>8</td>
+      <td style='color:#c4b5fd'>PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>9</td>
+      <td style='color:#c4b5fd'>KONTRUKSI RUMAH DI DESA</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bangunan desa hunian konstruksi kontruksi rumah | +KBLI: jasa bangun rumah, kontraktor kampung, proyek bangun rumah</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>10</td>
+      <td style='color:#c4b5fd'>PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>barang bekas dijual lagi perdagangan | +KBLI: lapak loak, toko barang bekas, usaha jual beli second</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>11</td>
+      <td style='color:#c4b5fd'>PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bangunan bermotor hunian kendaraan konstruksi motor roda dua rumah | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>12</td>
+      <td style='color:#c4b5fd'>JASA TRANSPORTASI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>transportasi | +KBLI: armada transportasi, jasa pengiriman logistik, usaha angkutan barang</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>13</td>
+      <td style='color:#c4b5fd'>PENYEDIA BHAN BAKU MAKANAN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>baku bhan makanan penyedia</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>14</td>
+      <td style='color:#c4b5fd'>TUKANG BATU</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>batu | +KBLI: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>15</td>
+      <td style='color:#c4b5fd'>PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bawang hortikultural merah milik pertanian sawah tanaman pangan | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>16</td>
+      <td style='color:#c4b5fd'>PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>milik padi pertanian sawah sendiri tanaman pangan | +KBLI: lahan kebun, lahan sawah padi, pertanian pangan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>17</td>
+      <td style='color:#c4b5fd'>BURUH (PELAYAN DI TOKO KLONTONG)</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>buruh eceran kelontong klontong manisan pelayan toko | +KBLI: retail kelontong, toko kebutuhan harian, warung kelontong sembako</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>18</td>
+      <td style='color:#c4b5fd'>MENCUCI MOTOR DAN MOBIL</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>angkutan bermotor kendaraan mencuci mobil motor roda dua | +KBLI: bisnis motor second, jual beli motor bekas, showroom motor rumahan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>19</td>
+      <td style='color:#c4b5fd'>MENJUAL BOTOK PELAS DAN PECEL</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>botok menjual pecel pelas | +KBLI: kedai nasi pecel, usaha kuliner tradisional, warung pecel botok</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>20</td>
+      <td style='color:#c4b5fd'>PENYEDIAAN MAKANAN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>makanan penyediaan | +KBLI: bisnis makanan siap saji, industri jasa boga, katering acara</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>21</td>
+      <td style='color:#c4b5fd'>BURUH BANGUNAN, MENGADUK SEMEN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bangunan buruh mengaduk semen | +KBLI: bengkel konstruksi, jasa renovasi harian, layanan perbaikan rumah</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>22</td>
+      <td style='color:#c4b5fd'>MENJUAL ES TEH JUMBO</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>es jumbo menjual teh | +KBLI: franchise es teh, kedai minuman es teh, stand es teh jumbo</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>23</td>
+      <td style='color:#c4b5fd'>JASA ANTAR UNDANGAN ACARA</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>acara antar undangan | +KBLI: biro antar undangan, jasa kurir undangan, usaha jasa perorangan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>24</td>
+      <td style='color:#c4b5fd'>JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bangunan harian kontruksi | +KBLI: jasa renovasi harian, layanan perbaikan rumah, usaha tukang borongan</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>25</td>
+      <td style='color:#c4b5fd'>PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>keliling makanan peyedia sepeda siomay | +KBLI: jualan makanan tidak tetap, produksi siomay, usaha siomay keliling</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>26</td>
+      <td style='color:#c4b5fd'>MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING, DAN MEN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bata dinding material memasang men mencampur mengangkut plester | +KBLI: bengkel konstruksi, proyek konstruksi gedung, usaha renovasi rumah</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>27</td>
+      <td style='color:#c4b5fd'>MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>berkala memperbaiki mengoperasikan mesin perawatan produksi | +KBLI: bengkel mesin pabrik, industri perlengkapan, usaha perbaikan alat</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>28</td>
+      <td style='color:#c4b5fd'>PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bawang merah milik pertanian | +KBLI: kebun bawang merah, lahan bawang, lahan kebun</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>29</td>
+      <td style='color:#c4b5fd'>KONTRUSI RUMAH</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>bangunan hunian konstruksi kontrusi rumah</td>
+    </tr>
+    <tr>
+      <td style='text-align:center;color:#64748b;width:36px'>30</td>
+      <td style='color:#c4b5fd'>INDUSTRI AIR ISI ULANG</td>
+      <td style='color:#fcd34d;font-size:0.8rem;white-space:normal'>air industri isi ulang | +KBLI: depot air galon, pabrik air minum, usaha air mineral</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    DEMAKAI &mdash; Evaluasi SQL LIKE vs Hybrid + Preprocessing &middot;
+    Dibuat otomatis oleh evaluate_preprocessing_comparison.py
+  </div>
+
+</body>
+</html>
