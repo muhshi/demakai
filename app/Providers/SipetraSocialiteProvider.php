@@ -40,10 +40,11 @@ class SipetraSocialiteProvider extends AbstractProvider implements ProviderInter
 
     protected function mapUserToObject(array $user)
     {
+        // Pastikan field minimal ada untuk mencegah 500 TypeError
         return (new User)->setRaw($user)->map([
-            'id'     => $user['id'],
-            'name'   => $user['name'],
-            'email'  => $user['email'],
+            'id'     => $user['id'] ?? null,
+            'name'   => $user['name'] ?? ($user['email'] ?? 'User SIPETRA'),
+            'email'  => $user['email'] ?? null,
             'avatar' => $user['avatar'] ?? null,
         ]);
     }

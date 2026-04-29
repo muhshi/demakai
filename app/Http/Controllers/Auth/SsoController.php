@@ -23,9 +23,13 @@ class SsoController extends Controller
         }
 
         try {
-            $ssoUser = Socialite::driver('sipetra')->user();
+            $ssoUser = Socialite::driver('sipetra')->stateless()->user();
         } catch (\Exception $e) {
-            return redirect('/admin/login')->withErrors(['email' => 'Gagal mengambil data dari SIPETRA SSO.']);
+            return redirect('/admin/login')->withErrors(['email' => 'Gagal mengambil data dari SIPETRA SSO: ' . $e->getMessage()]);
+        }
+
+        if (!$ssoUser->getId() || !$ssoUser->getEmail()) {
+            return redirect('/admin/login')->withErrors(['email' => 'Data User SIPETRA tidak lengkap. Pastikan Scope diizinkan.']);
         }
 
         $rawData = $ssoUser->getRaw();
