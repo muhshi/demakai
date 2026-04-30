@@ -17,6 +17,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <script>
+        // Cek preferensi sistem & localStorage sebelum render untuk menghindari flash
+        const currentTheme = localStorage.getItem("theme");
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+        if (currentTheme === "light" || (!currentTheme && !prefersDarkScheme.matches)) {
+            document.documentElement.classList.add("light-mode");
+        }
+    </script>
+
     <!-- Styles -->
     <style>
         :root {
@@ -29,6 +38,54 @@
             --text-muted: #94a3b8;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.05);
+            --panel-bg: rgba(255, 255, 255, 0.04);
+            --badge-color: #a5b4fc;
+            --gradient-start: var(--primary);
+            --gradient-end: var(--secondary);
+            --input-placeholder: #94a3b8;
+            --btn-bg: rgba(255, 255, 255, 0.04);
+            --active-bg: rgba(99, 102, 241, 0.15);
+            --active-text: #ffffff;
+            
+            /* Background effect variables */
+            --bg-anim-style: 
+                radial-gradient(circle at 15% 20%, var(--primary-glow) 0%, transparent 80%),
+                radial-gradient(circle at 85% 80%, var(--secondary-glow) 0%, transparent 80%);
+            --bg-anim-filter: blur(100px);
+            --bg-anim-opacity: 0.8;
+        }
+
+        :root.light-mode {
+            --bg-dark: #f8f9fc;
+            --text-light: #111111;
+            --text-muted: #555555;
+            
+            /* Solid colors instead of transparency for light mode */
+            --glass: #ffffff;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-hover: #f1f5f9;
+            --panel-bg: #ffffff;
+            --badge-color: #4f46e5;
+
+            /* Sharper primary/secondary for contrast */
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.18);
+            --secondary: #7e22ce;
+            --secondary-glow: rgba(126, 34, 206, 0.18);
+
+            /* Sharper gradient for text */
+            --gradient-start: #3730a3;
+            --gradient-end: #6b21a8;
+            --input-placeholder: #666666;
+            --btn-bg: #f1f5f9;
+            --active-bg: rgba(79, 70, 229, 0.1);
+            --active-text: #3730a3;
+
+            /* Elegant dark blue & white linear gradient for light mode */
+            --bg-anim-style: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #1e3a8a 100%);
+            --bg-anim-filter: none;
+            --bg-anim-opacity: 1;
         }
 
         * {
@@ -45,6 +102,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         /* --- Background Animations --- */
@@ -55,11 +113,9 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background:
-                radial-gradient(circle at 20% 20%, var(--primary-glow) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, var(--secondary-glow) 0%, transparent 40%);
-            filter: blur(80px);
-            opacity: 0.6;
+            background: var(--bg-anim-style);
+            filter: var(--bg-anim-filter);
+            opacity: var(--bg-anim-opacity);
             animation: move-bg 20s infinite alternate ease-in-out;
         }
 
@@ -89,7 +145,7 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
@@ -130,13 +186,13 @@
             line-height: 1.1;
             margin-bottom: 1.5rem;
             letter-spacing: -2px;
-            background: linear-gradient(to bottom, #fff 30%, #94a3b8);
+            background: linear-gradient(to bottom, var(--text-light) 30%, var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         h1 span {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -154,7 +210,7 @@
             width: 100%;
             max-width: 700px;
             position: relative;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass);
             backdrop-filter: blur(20px);
             padding: 0.5rem;
             border-radius: 1.5rem;
@@ -174,7 +230,7 @@
             flex: 1;
             border: none;
             background: transparent;
-            color: white;
+            color: var(--text-light);
             padding: 1rem 1.5rem;
             font-size: 1.125rem;
             outline: none;
@@ -182,7 +238,7 @@
         }
 
         .search-container input::placeholder {
-            color: #64748b;
+            color: var(--input-placeholder);
         }
 
         .search-btn {
@@ -233,9 +289,9 @@
         }
 
         .filter-btn.active {
-            background: rgba(99, 102, 241, 0.15);
+            background: var(--active-bg);
             border-color: var(--primary);
-            color: white;
+            color: var(--active-text);
             box-shadow: 0 0 15px -5px var(--primary-glow);
         }
 
@@ -287,9 +343,9 @@
         }
 
         .card:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-hover);
             transform: translateY(-10px);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
         }
 
         .card::before {
@@ -311,7 +367,7 @@
         .card-icon {
             width: 48px;
             height: 48px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-hover);
             border-radius: 1rem;
             display: flex;
             align-items: center;
@@ -381,7 +437,7 @@
         }
 
         .result-item {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--glass);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             padding: 1.5rem;
@@ -389,6 +445,14 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             animation: slideUp 0.4s ease-out forwards;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background: var(--glass-hover);
+            border-color: var(--primary);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 15px 30px -10px var(--primary-glow);
         }
 
         @keyframes slideUp {
@@ -404,7 +468,7 @@
         }
 
         .result-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-hover);
             border-color: var(--primary);
             transform: scale(1.01);
         }
@@ -422,7 +486,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-hover);
             padding: 0.2rem 0.5rem;
             border-radius: 0.4rem;
         }
@@ -437,7 +501,7 @@
             font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: white;
+            color: var(--text-light);
         }
 
         .result-kode {
@@ -512,10 +576,27 @@
             border: 1px solid rgba(99, 102, 241, 0.2);
         }
 
+        .more-examples-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .more-examples-toggle:hover {
+            background: rgba(99, 102, 241, 0.1);
+            text-decoration: underline;
+        }
+
         .loading-spinner {
             width: 30px;
             height: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            border: 3px solid var(--glass-border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -535,7 +616,7 @@
             color: var(--text-muted);
             font-size: 0.875rem;
             border-top: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--glass-hover);
         }
 
         /* --- Responsive --- */
@@ -560,7 +641,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
@@ -580,15 +661,199 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
+        /* --- Detail Modal --- */
+        .detail-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            padding: 1rem;
+        }
+
+        .detail-modal-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform: scale(0.95);
+            animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            overflow: hidden;
+        }
+
+        @keyframes scaleUp {
+            to { transform: scale(1); }
+        }
+
+        .detail-modal-header {
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-hover);
+        }
+
+        .detail-modal-body {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-areas: 
+                "kode ."
+                "judul ."
+                "desc examples";
+            gap: 1.5rem 2.5rem;
+            padding: 2.5rem;
+            overflow-y: auto;
+            flex: 1;
+            align-items: start;
+        }
+
+        @media (max-width: 850px) {
+            .detail-modal-body {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "kode"
+                    "judul"
+                    "desc"
+                    "examples";
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+        }
+
+        .section-kode { grid-area: kode; }
+        .section-judul { grid-area: judul; }
+        .section-desc { grid-area: desc; }
+        .section-examples { grid-area: examples; }
+
+        .detail-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: right;
+            background: var(--glass-hover);
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .detail-kode {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .detail-desc-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-light);
+            white-space: pre-wrap;
+            background: var(--active-bg);
+            padding: 1.25rem;
+            border-radius: 1.25rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .copy-mini-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            width: 28px;
+            height: 28px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-mini-btn:hover {
+            color: var(--text-light);
+            border-color: var(--primary);
+            background: var(--glass-hover);
+        }
+
+        .copy-mini-btn.copied {
+            color: #10b981;
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .example-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: var(--active-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.88rem;
+            color: var(--text-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.4;
+            width: 100%;
+        }
+
+        .example-pill:hover {
+            border-color: var(--primary);
+            background: var(--glass-hover);
+            transform: translateX(4px);
+        }
+
+        .item-with-copy {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
         .modal-close {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
             font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-light);
         }
 
         .modal-title {
@@ -623,7 +888,7 @@
             width: 100%;
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            color: white;
+            color: var(--text-light);
             padding: 1rem;
             border-radius: 1rem;
             outline: none;
@@ -684,11 +949,123 @@
             to { opacity: 1; }
         }
 
+        /* --- Theme Toggle Pill --- */
+        .theme-toggle-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 9999px;
+            padding: 4px;
+            width: 140px;
+            height: 40px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .theme-toggle-pill:hover {
+            border-color: var(--primary);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        :root.light-mode .toggle-thumb {
+            transform: translateX(100px);
+            background: #ffffff;
+        }
+
+        :root:not(.light-mode) .toggle-thumb {
+            background: #1e293b;
+        }
+
+        .toggle-icon {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-text {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            z-index: 2;
+            user-select: none;
+        }
+
+        :root.light-mode .toggle-icon {
+            color: #475569;
+        }
+        :root.light-mode .sun-wrapper {
+            color: #0f172a;
+        }
+        :root:not(.light-mode) .toggle-icon {
+            color: #94a3b8;
+        }
+        :root:not(.light-mode) .moon-wrapper {
+            color: #f8fafc;
+        }
+
+        .theme-toggle:hover {
+            background: var(--glass-hover);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            transition: all 0.3s ease;
+        }
+
+        :root.light-mode .theme-toggle .moon-icon {
+            display: block;
+        }
+
+        :root.light-mode .theme-toggle .sun-icon {
+            display: none;
+        }
+
+        :root:not(.light-mode) .theme-toggle .moon-icon {
+            display: none;
+        }
+
+        :root:not(.light-mode) .theme-toggle .sun-icon {
+            display: block;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+
         /* --- Method Selector Buttons --- */
         .method-btn {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #94a3b8;
+            background: var(--btn-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
             padding: 0.4rem 0.9rem;
             border-radius: 0.75rem;
             font-size: 0.78rem;
@@ -699,13 +1076,13 @@
         }
         .method-btn:hover {
             border-color: #6366f1;
-            color: #c7d2fe;
+            color: var(--badge-color);
         }
         .method-btn.active {
-            background: rgba(99,102,241,0.2);
-            border-color: #6366f1;
-            color: #a5b4fc;
-            box-shadow: 0 0 12px -4px rgba(99,102,241,0.5);
+            background: var(--active-bg);
+            border-color: var(--primary);
+            color: var(--active-text);
+            box-shadow: 0 0 12px -4px var(--primary-glow);
         }
     </style>
 </head>
@@ -715,14 +1092,26 @@
 
     <nav>
         <div class="logo">DEMAKAI.</div>
-        <div class="nav-links">
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/admin') }}">Dashboard Admin</a>
-                @else
-                    <a href="{{ route('login') }}">Masuk</a>
-                @endauth
-            @endif
+        <div class="nav-actions">
+            <div class="nav-links">
+                @if (Route::has('login'))
+                    @auth
+                        <a href="{{ url('/admin') }}">Dashboard Admin</a>
+                    @else
+                        <a href="{{ route('login') }}">Masuk</a>
+                    @endauth
+                @endif
+            </div>
+            <button class="theme-toggle-pill" id="theme-toggle" aria-label="Toggle Dark/Light Mode">
+                <div class="toggle-thumb"></div>
+                <div class="toggle-icon moon-wrapper">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </div>
+                <span class="toggle-text" id="toggle-text">Mode Gelap</span>
+                <div class="toggle-icon sun-wrapper">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </div>
+            </button>
         </div>
     </nav>
 
@@ -752,7 +1141,7 @@
         {{-- ── Panel Selector Metode (untuk penelitian) ── --}}
         <div id="method-panel" style="
             width:100%; max-width:700px; margin-top:1rem;
-            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+            background:var(--panel-bg); border:1px solid var(--glass-border);
             border-radius:1.25rem; padding:1rem 1.25rem;
             backdrop-filter:blur(10px);
         ">
@@ -761,7 +1150,7 @@
                     style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#6366f1;">🔬
                     Metode Pencarian</span>
                 <span id="active-method-badge"
-                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
+                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:var(--badge-color); padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
                     + None</span>
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
@@ -831,6 +1220,50 @@
 
                 <button type="submit" class="submit-btn" id="submit-btn-text">Kirim Pengajuan</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Universal Detail Modal -->
+    <div id="detail-modal" class="detail-modal-overlay" onclick="closeDetailModal(event)">
+        <div class="detail-modal-content" onclick="event.stopPropagation()">
+            <div class="detail-modal-header">
+                <span id="detail-type-badge" class="badge"></span>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="detail-modal-body">
+                <div class="detail-section section-kode">
+                    <h4>Kode</h4>
+                    <div class="item-with-copy">
+                        <p id="detail-kode" class="detail-kode"></p>
+                        <button id="copy-kode-btn" class="copy-mini-btn" title="Salin Kode" onclick="copyText(document.getElementById('detail-kode').textContent, this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="detail-section section-judul">
+                    <h4>Judul</h4>
+                    <div class="item-with-copy" style="align-items: flex-start;">
+                        <h3 id="detail-judul-full" style="font-size: 1.1rem; color: var(--text-light); margin: 0; line-height: 1.4;"></h3>
+                        <button id="copy-judul-btn" class="copy-mini-btn" title="Salin Judul" onclick="copyText(document.getElementById('detail-judul-full').textContent, this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="detail-section section-desc">
+                    <h4>Deskripsi Lengkap</h4>
+                    <p id="detail-desc" class="detail-desc-text"></p>
+                </div>
+
+                <div class="detail-section section-examples" id="detail-examples-section" style="display: none;">
+                    <h4>Contoh Lapangan</h4>
+                    <div id="detail-examples" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+                </div>
+            </div>
+            <div class="detail-modal-footer">
+                <button class="search-btn" style="padding: 0.5rem 1.5rem; border-radius: 0.75rem;" onclick="closeDetailModal()">Tutup</button>
+            </div>
         </div>
     </div>
 
@@ -908,7 +1341,8 @@
             try {
                 const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&search_method=${activeSearch}&processing=${activeProcessing}`);
                 const data = await response.json();
-
+                
+                window.lastSearchResults = data; // Simpan ke global state
                 renderResults(data);
             } catch (error) {
                 console.error('Search error:', error);
@@ -996,9 +1430,12 @@
         };
 
         const renderItem = (res, index) => {
-            const hasLongDesc = res.deskripsi && res.deskripsi.length > 150;
+            const hasExamples = res.contoh && res.contoh.length > 0;
+            const moreCount = hasExamples ? res.contoh.length - 2 : 0;
+            const safeKode = res.kode.replace(/\./g, '-');
+
             return `
-                <div class="result-item" style="animation-delay: ${index * 0.05}s; margin-bottom: 1rem;">
+                <div class="result-item" role="button" tabindex="0" onclick="openDetailModal('${res.type}', '${res.kode}')" style="animation-delay: ${index * 0.05}s; margin-bottom: 1rem;">
                     <div class="result-header">
                         <span class="result-type">${res.type}</span>
                         <span class="result-score">${res.score}% Match</span>
@@ -1007,30 +1444,35 @@
                         <span class="result-kode">${res.kode}</span>
                         ${res.judul}
                     </div>
-                    <div class="result-desc ${hasLongDesc ? 'clamped' : ''}" id="desc-${res.type}-${res.kode}">
+                    <div class="result-desc clamped" id="desc-${res.type}-${safeKode}">
                         ${res.deskripsi || 'Tidak ada deskripsi tersedia.'}
                     </div>
-                    ${hasLongDesc ? `
-                        <button class="read-more-btn" onclick="toggleReadMore('${res.type}-${res.kode}', this)">Read More</button>
-                    ` : ''}
-                    ${res.contoh && res.contoh.length > 0 ? `
-                        <div class="result-examples">
-                            ${res.contoh.map(ex => `<span class="example-tag">${ex}</span>`).join('')}
+                    ${hasExamples ? `
+                        <div class="result-examples" style="margin-top: 0.5rem;">
+                            ${res.contoh.slice(0, 2).map(ex => `<span class="example-tag">${ex}</span>`).join('')}
+                            <span id="more-tags-${res.type}-${safeKode}" style="display: none;">
+                                ${res.contoh.slice(2).map(ex => `<span class="example-tag">${ex}</span>`).join('')}
+                            </span>
                         </div>
+                        ${moreCount > 0 ? `
+                            <button class="more-examples-toggle" style="margin-top: 0.5rem;" onclick="event.stopPropagation(); toggleResultExamples('${res.type}', '${safeKode}', this, ${moreCount})">
+                                +${moreCount} lainnya
+                            </button>
+                        ` : ''}
                     ` : ''}
-                    <button class="add-example-btn" title="Ajukan Contoh Lapangan" onclick="openSubmissionModal('${res.type}', '${res.kode}', '${res.judul}')">+</button>
+                    <button class="add-example-btn" title="Ajukan Contoh Lapangan" onclick="event.stopPropagation(); openSubmissionModal('${res.type}', '${res.kode}', '${res.judul}')">+</button>
                 </div>
             `;
         };
 
-        window.toggleReadMore = (id, btn) => {
-            const desc = document.getElementById(`desc-${id}`);
-            if (desc.classList.contains('clamped')) {
-                desc.classList.remove('clamped');
-                btn.textContent = 'Show Less';
+        window.toggleResultExamples = (type, safeKode, btn, count) => {
+            const moreTags = document.getElementById(`more-tags-${type}-${safeKode}`);
+            if (moreTags.style.display === 'none') {
+                moreTags.style.display = 'contents';
+                btn.textContent = 'Sembunyikan';
             } else {
-                desc.classList.add('clamped');
-                btn.textContent = 'Read More';
+                moreTags.style.display = 'none';
+                btn.textContent = `+${count} lainnya`;
             }
         };
 
@@ -1043,6 +1485,28 @@
 
         searchButton.addEventListener('click', () => {
             performSearch(searchInput.value);
+        });
+
+        // --- Theme Toggle Logic ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const toggleText = document.getElementById('toggle-text');
+        
+        const updateToggleText = () => {
+            if (document.documentElement.classList.contains('light-mode')) {
+                toggleText.textContent = "Mode Gelap";
+            } else {
+                toggleText.textContent = "Mode Terang";
+            }
+        };
+        // Setup initial state
+        updateToggleText();
+
+        themeToggle.addEventListener('click', () => {
+            const root = document.documentElement;
+            root.classList.toggle('light-mode');
+            const theme = root.classList.contains('light-mode') ? 'light' : 'dark';
+            localStorage.setItem('theme', theme);
+            updateToggleText();
         });
 
         // --- Submission Logic ---
@@ -1099,12 +1563,99 @@
             }
         };
 
-        // Close modal on click outside
+        // Close modals on click outside
         window.onclick = (event) => {
             if (event.target == modal) {
                 closeSubmissionModal();
             }
+            if (event.target == document.getElementById('detail-modal')) {
+                closeDetailModal();
+            }
         };
+
+        // --- Detail Modal Logic ---
+        const detailModal = document.getElementById('detail-modal');
+        
+        window.getDetailData = (type, kode) => {
+            if (!window.lastSearchResults) return null;
+            const keyMap = {
+                'KBLI 2025': 'kbli2025',
+                'KBLI 2020': 'kbli2020',
+                'KBJI 2014': 'kbji'
+            };
+            const key = keyMap[type];
+            if (key && window.lastSearchResults[key]) {
+                return window.lastSearchResults[key].find(r => r.kode === kode);
+            }
+            return null;
+        };
+
+        window.openDetailModal = (type, kode) => {
+            const data = getDetailData(type, kode);
+            if (!data) return;
+
+            document.getElementById('detail-type-badge').textContent = data.type;
+            document.getElementById('detail-judul-full').textContent = data.judul;
+            document.getElementById('detail-kode').textContent = data.kode;
+            document.getElementById('detail-desc').textContent = data.deskripsi || 'Tidak ada deskripsi tersedia.';
+
+            const examplesSection = document.getElementById('detail-examples-section');
+            const examplesContainer = document.getElementById('detail-examples');
+            
+            if (data.contoh && data.contoh.length > 0) {
+                examplesContainer.innerHTML = data.contoh.map(ex => `
+                    <div class="example-pill">
+                        <span>${ex}</span>
+                        <button class="copy-mini-btn" title="Salin" onclick="copyText('${ex.replace(/'/g, "\\'")}', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                `).join('');
+                examplesSection.style.display = 'flex';
+            } else {
+                examplesSection.style.display = 'none';
+            }
+
+            detailModal.style.display = 'flex';
+        };
+
+        window.closeDetailModal = () => {
+            detailModal.style.display = 'none';
+        };
+
+        window.copyText = (text, btn) => {
+            if (!text || text === 'Tidak ada deskripsi tersedia.') return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalIcon = btn.innerHTML;
+                
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                btn.classList.add('copied');
+                
+                const originalTitle = btn.title;
+                btn.title = "Tersalin!";
+
+                setTimeout(() => {
+                    btn.innerHTML = originalIcon;
+                    btn.classList.remove('copied');
+                    btn.title = originalTitle;
+                }, 1500);
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+            });
+        };
+
+        // Global Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDetailModal();
+                closeSubmissionModal();
+            }
+            // Enable Enter key on clickable cards
+            if (e.key === 'Enter' && document.activeElement.classList.contains('result-item')) {
+                document.activeElement.click();
+            }
+        });
     </script>
 </body>
 

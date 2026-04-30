@@ -144,12 +144,16 @@ def prep_desc_adv(preprocessed: dict) -> str:
 
 
 def prep_desc_exp(preprocessed: dict, tipe: str) -> str:
-    """Deskripsi ringkas dari expansion preprocessing."""
-    exp = preprocessed.get("expanded_tokens", [])
+    """Deskripsi ringkas dari expansion preprocessing (hanya yang ditambahkan)."""
+    adv_tokens = set(preprocessed.get("stemmed_clean", "").split())
+    exp_tokens = preprocessed.get("expanded_tokens", [])
+    added = [t for t in exp_tokens if t not in adv_tokens]
+    
     kv  = preprocessed.get("kbli_variations",[]) if tipe=="KBLI" else preprocessed.get("kbji_variations",[])
-    base = " ".join(exp[:8])
+    base = " ".join(added[:8])
     extra = f" | +{tipe}: {', '.join(kv[:3])}" if kv else ""
-    return base + extra
+    res = (base + extra).strip()
+    return res if res else "-"
 
 
 # ─────────────────────────────────────────────────────────────
@@ -211,7 +215,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M1 ERR: {e}"); m = metrics(0)
         METHODS["m1_sql_baseline"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":"","contoh":"", **m})
+            "prep_adv":"","prep_exp":"","contoh":"", **m})
 
         # ── M2: SQL LIKE + Advanced Preprocessing (NO CL) ─────────────────
         search.sql_like.USE_CL = False
@@ -222,7 +226,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M2 ERR: {e}"); m = metrics(0)
         METHODS["m2_sql_advanced"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_adv,"contoh":"", **m})
+            "prep_adv":pd_adv,"prep_exp":"","contoh":"", **m})
 
         # ── M3: SQL LIKE + Advanced Preprocessing + Contoh Lapangan ──────
         search.sql_like.USE_CL = True
@@ -233,7 +237,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M3 ERR: {e}"); m = metrics(0)
         METHODS["m3_sql_adv_cl"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_adv,"contoh":contoh, **m})
+            "prep_adv":pd_adv,"prep_exp":"","contoh":contoh, **m})
 
         # ── M4: SQL LIKE + Preprocessing + Expansion (NO CL) ──────────────
         search.sql_like.USE_CL = False
@@ -244,7 +248,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M4 ERR: {e}"); m = metrics(0)
         METHODS["m4_sql_adv_exp"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_exp,"contoh":"", **m})
+            "prep_adv":pd_adv,"prep_exp":pd_exp,"contoh":"", **m})
 
         # ── M5: SQL LIKE + Preprocessing + Expansion + Contoh Lapangan ───
         search.sql_like.USE_CL = True
@@ -255,7 +259,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M5 ERR: {e}"); m = metrics(0)
         METHODS["m5_sql_adv_exp_cl"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_exp,"contoh":contoh, **m})
+            "prep_adv":pd_adv,"prep_exp":pd_exp,"contoh":contoh, **m})
 
         # ── M6: Hybrid Search Baseline (NO CL) ────────────────────────────
         search.hybrid.USE_CL = False
@@ -266,7 +270,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M6 ERR: {e}"); m = metrics(0)
         METHODS["m6_hybrid_baseline"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":"","contoh":"", **m})
+            "prep_adv":"","prep_exp":"","contoh":"", **m})
 
         # ── M7: Hybrid + Advanced Preprocessing (NO CL) ──────────────────
         search.hybrid.USE_CL = False
@@ -277,7 +281,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M7 ERR: {e}"); m = metrics(0)
         METHODS["m7_hybrid_advanced"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_adv,"contoh":"", **m})
+            "prep_adv":pd_adv,"prep_exp":"","contoh":"", **m})
 
         # ── M8: Hybrid + Advanced Preprocessing + Contoh Lapangan ──────
         search.hybrid.USE_CL = True
@@ -288,7 +292,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M8 ERR: {e}"); m = metrics(0)
         METHODS["m8_hybrid_adv_cl"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_adv,"contoh":contoh, **m})
+            "prep_adv":pd_adv,"prep_exp":"","contoh":contoh, **m})
 
         # ── M9: Hybrid + Preprocessing + Expansion (NO CL) ───────────────
         search.hybrid.USE_CL = False
@@ -299,7 +303,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M9 ERR: {e}"); m = metrics(0)
         METHODS["m9_hybrid_adv_exp"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_exp,"contoh":"", **m})
+            "prep_adv":pd_adv,"prep_exp":pd_exp,"contoh":"", **m})
 
         # ── M10: Hybrid + Preprocessing + Expansion + Contoh Lapangan ────
         search.hybrid.USE_CL = True
@@ -310,7 +314,7 @@ def evaluate_all(queries: list) -> dict:
             print(f"         M10 ERR: {e}"); m = metrics(0)
         METHODS["m10_hybrid_adv_exp_cl"].append({
             "no":no,"query":query,"kode_gt":kode_gt,"tipe":tipe,
-            "preprocessed":pd_exp,"contoh":contoh, **m})
+            "prep_adv":pd_adv,"prep_exp":pd_exp,"contoh":contoh, **m})
 
         # Status ringkas
         ranks = [METHODS[k][-1]["rank"] for k in sorted(METHODS.keys(), key=lambda x: int(x.split('_')[0][1:]))]
@@ -384,16 +388,18 @@ def _stat_cards(sm: dict) -> str:
 </div>"""
 
 
-def _table_block(rows: list, tipe_filter: str, show_prep: bool, show_contoh: bool, accent: str) -> str:
+def _table_block(rows: list, tipe_filter: str, show_adv: bool, show_exp: bool, show_contoh: bool, accent: str) -> str:
     filt = [r for r in rows if r["tipe"]==tipe_filter]
     if not filt: return ""
     sm = summary(filt)
 
     header_cols = "<th>#</th><th>Tipe</th><th style='text-align:left;min-width:160px'>Query</th>"
-    if show_prep:
-        header_cols += "<th style='text-align:left;min-width:150px;color:#fcd34d'>Preprocessing</th>"
+    if show_adv:
+        header_cols += "<th style='text-align:left;min-width:130px;color:#fbbf24'>Advanced Prep</th>"
+    if show_exp:
+        header_cols += "<th style='text-align:left;min-width:130px;color:#a78bfa'>Expansion Prep</th>"
     if show_contoh:
-        header_cols += "<th style='text-align:left;min-width:170px;color:#86efac'>Contoh Lapangan</th>"
+        header_cols += "<th style='text-align:left;min-width:150px;color:#86efac'>Contoh Lapangan</th>"
     header_cols += "<th>Kode GT</th><th>Rank</th><th>Top@1</th><th>Top@3</th><th>Top@10</th><th>RR</th>"
 
     body = ""
@@ -404,8 +410,10 @@ def _table_block(rows: list, tipe_filter: str, show_prep: bool, show_contoh: boo
         row  = f"<td style='text-align:center;color:#94a3b8'>{r['no']}</td>"
         row += f"<td style='color:{tc};font-weight:bold;text-align:center'>{r['tipe']}</td>"
         row += f"<td style='color:#c4b5fd;white-space:normal;max-width:160px'>{r['query']}</td>"
-        if show_prep:
-            row += f"<td style='color:#fcd34d;font-size:0.76rem;white-space:normal;max-width:150px'>{r['preprocessed'] or '—'}</td>"
+        if show_adv:
+            row += f"<td style='color:#fbbf24;font-size:0.76rem;white-space:normal;max-width:150px'>{r['prep_adv'] or '—'}</td>"
+        if show_exp:
+            row += f"<td style='color:#a78bfa;font-size:0.76rem;white-space:normal;max-width:150px'>{r['prep_exp'] or '—'}</td>"
         if show_contoh:
             contoh_disp = r['contoh'] if r['contoh'] and r['contoh']!='-' else '<span style="color:#475569">—</span>'
             row += f"<td style='color:#86efac;font-size:0.76rem;white-space:normal;max-width:170px'>{contoh_disp}</td>"
@@ -417,7 +425,7 @@ def _table_block(rows: list, tipe_filter: str, show_prep: bool, show_contoh: boo
         row += f"<td style='text-align:center;color:{rr_c};font-weight:{rr_w}'>{r['rr'] if r['rr']>0 else '—'}</td>"
         body += f"<tr>{row}</tr>"
 
-    extra_cols = (1 if show_prep else 0) + (1 if show_contoh else 0)
+    extra_cols = (1 if show_adv else 0) + (1 if show_exp else 0) + (1 if show_contoh else 0)
     body += f"""
     <tr style='background:#1f2937;border-top:2px solid {accent}'>
       <td colspan='{4+extra_cols}' style='text-align:right;font-weight:bold;color:{accent};padding-right:16px'>MRR</td>
@@ -477,8 +485,12 @@ def _method_section(key, rows, title, subtitle, tags, accent, accent_bg,
       </tbody>
     </table>"""
 
-    tbl_kbli = _table_block(rows, "KBLI", show_prep, show_contoh, accent)
-    tbl_kbji = _table_block(rows, "KBJI", show_prep, show_contoh, accent)
+    show_adv = indicators[0]
+    show_exp = indicators[1]
+    show_contoh = indicators[2]
+    
+    tbl_kbli = _table_block(rows, "KBLI", show_adv, show_exp, show_contoh, accent)
+    tbl_kbji = _table_block(rows, "KBJI", show_adv, show_exp, show_contoh, accent)
 
     return f"""
 <div id="{key}" class="method-section" style="border-color:{accent}22;background:{accent_bg}">

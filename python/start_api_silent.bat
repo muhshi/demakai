@@ -20,4 +20,4 @@ echo [%DATE% %TIME%] DEMAKAI API starting... >> %LOG%
 REM Gunakan PowerShell Start-Process untuk detach proses sepenuhnya
 REM -WindowStyle Hidden = tidak ada jendela CMD yang muncul
 REM -WorkingDirectory   = pastikan path Python modules ditemukan
-powershell -Command "Start-Process -FilePath 'python' -ArgumentList '-m uvicorn api:app --host 127.0.0.1 --port 8000' -WorkingDirectory '%APIDIR%' -WindowStyle Hidden"
+powershell -Command "Start-Process -FilePath 'C:\Users\LENOVO\AppData\Local\Programs\Python\Python314\python.exe' -ArgumentList '-m uvicorn api:app --host 127.0.0.1 --port 8000' -WorkingDirectory '%APIDIR%' -WindowStyle Hidden"

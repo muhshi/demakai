@@ -4,6 +4,32 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-04-30] - Redesain Universal Detail Modal & Integrasi Data KUWI
+
+### Added
+- **Data Integration — Direktori KUWI KBLI**:
+  - Ekstraksi otomatis data dari PDF **Direktori KUWI KBLI** menggunakan `pdfplumber`.
+  - Pemetaan kolom *Penjelasan Kegiatan Utama* dan *Rekomendasi Penulisan Kegiatan Utama* ke dalam field `contoh_lapangan`.
+  - Update massal pada database PostgreSQL untuk **112 kode KBLI 2020** dan **159 kode KBLI 2025**.
+- **Universal Detail Modal V2**:
+  - Implementasi layout **dua kolom** (Grid Layout) yang responsif untuk menampung informasi lebih banyak.
+  - Fitur **Copy-to-Clipboard** pada Kode KBLI/KBJI, Judul, dan setiap item Contoh Lapangan dengan *feedback* visual (centang hijau).
+  - Penyelarasan vertikal kolom Contoh Lapangan dengan Deskripsi Lengkap untuk estetika UI yang simetris.
+- **Interactive Search Cards**:
+  - Fitur **Inline Expansion** pada kartu hasil pencarian di landing page.
+  - Limitasi tampilan 2 contoh lapangan pertama dengan tombol **"+X lainnya"** untuk menjaga kerapian landing page.
+  - Mekanisme **"Sembunyikan"** untuk merapatkan kembali daftar contoh tanpa perlu me-refresh halaman.
+
+### Changed
+- **UX Optimization**: Seluruh area kartu hasil pencarian kini *full clickable* untuk membuka modal detail (dengan pengecualian tombol kontrol internal menggunakan `stopPropagation`).
+- **Layout Management**: Penggunaan `display: contents` pada CSS untuk menjaga konsistensi *flex-gap* dan *wrapping* pada daftar tag yang diekspansi.
+- **Accessibility**: Penambahan dukungan navigasi keyboard (Enter/Space) dan penutupan modal via tombol `ESC` atau klik luar area.
+
+### Fixed
+- Perbaikan masalah tumpang tindih (*overlapping*) pada daftar tag contoh lapangan saat dalam mode ekspansi di kartu hasil pencarian.
+
+---
+
 ## [2026-04-27] - Perluasan Framework Evaluasi 10 Metode & Pemisahan Preprocessing
 
 ### Added
