@@ -709,74 +709,216 @@
             box-shadow: 0 4px 12px -4px rgba(249,115,22,0.3);
         }
 
-        /* --- Hierarchy Tree --- */
-        .hierarchy-node {
-            margin-bottom: 0.5rem;
+        /* --- Hierarchy Explorer --- */
+        .hierarchy-section {
+            width: 100%;
+            max-width: 1300px;
+            margin: 3rem auto 0;
+            text-align: left;
         }
-        .hierarchy-header {
+        .hierarchy-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+        .hierarchy-section-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.3);
+        }
+        .hierarchy-section-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+        .hierarchy-section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+        /* Categories grid (A-U level) */
+        .kategori-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .kategori-card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.95);
+            border-radius: 1.1rem;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .kategori-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(249,115,22,0.12);
+            border-color: rgba(249,115,22,0.3);
+        }
+        .kategori-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .kategori-letter {
+            width: 44px;
+            height: 44px;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(245,158,11,0.1));
+            border: 1.5px solid rgba(249,115,22,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--primary);
+            flex-shrink: 0;
+            transition: all 0.25s;
+        }
+        .kategori-card.open .kategori-letter {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(249,115,22,0.35);
+        }
+        .kategori-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .kategori-card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .kategori-chevron {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+            flex-shrink: 0;
+        }
+        .kategori-card.open .kategori-chevron {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+        /* Accordion body */
+        .kategori-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.38s cubic-bezier(0.4,0,0.2,1);
+        }
+        .kategori-body.open {
+            grid-template-rows: 1fr;
+        }
+        .kategori-body-inner {
+            overflow: hidden;
+        }
+        .kategori-body-content {
+            padding: 0 1rem 1rem 1rem;
+            border-top: 1px solid rgba(249,115,22,0.1);
+            padding-top: 0.75rem;
+        }
+        /* Sub-level nodes */
+        .h-node {
+            margin-bottom: 0.4rem;
+        }
+        .h-node-header {
             display: flex;
             align-items: flex-start;
-            padding: 0.75rem 1rem;
-            background: rgba(255,255,255,0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 0.75rem;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            background: rgba(249,115,22,0.04);
+            border: 1px solid rgba(249,115,22,0.1);
+            border-radius: 0.65rem;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
-            gap: 1rem;
         }
-        .hierarchy-header:hover {
-            background: rgba(255,255,255,0.9);
-            border-color: var(--primary);
-            transform: translateX(5px);
+        .h-node-header:hover {
+            background: rgba(249,115,22,0.09);
+            border-color: rgba(249,115,22,0.3);
         }
-        .hierarchy-kode {
+        .h-node-header.is-leaf {
+            cursor: default;
+            background: rgba(249,115,22,0.02);
+        }
+        .h-node-header.is-leaf:hover {
+            background: rgba(249,115,22,0.04);
+            border-color: rgba(249,115,22,0.12);
+        }
+        .h-kode {
             font-weight: 800;
             color: var(--primary);
-            min-width: 45px;
+            font-size: 0.82rem;
+            min-width: 36px;
+            flex-shrink: 0;
+            padding-top: 1px;
         }
-        .hierarchy-title {
+        .h-info {
             flex: 1;
-            font-size: 0.9rem;
+            min-width: 0;
+        }
+        .h-judul {
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-color);
+            line-height: 1.4;
         }
-        .hierarchy-icon {
+        .h-desc {
+            font-size: 0.78rem;
             color: var(--text-muted);
-            transition: transform 0.3s;
+            line-height: 1.45;
+            margin-top: 0.3rem;
         }
-        .hierarchy-children {
+        .h-contoh {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            background: rgba(249,115,22,0.06);
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.45rem;
+            border: 1px solid rgba(249,115,22,0.12);
+        }
+        .h-icon {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding-top: 3px;
+        }
+        .h-children {
             display: grid;
             grid-template-rows: 0fr;
-            transition: grid-template-rows 0.3s ease-out;
-            padding-left: 1.5rem;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4,0,0.2,1);
+            padding-left: 1.1rem;
+            margin-top: 0.3rem;
         }
-        .hierarchy-children.open {
+        .h-children.open {
             grid-template-rows: 1fr;
         }
-        .hierarchy-children-inner {
+        .h-children-inner {
             overflow: hidden;
-            border-left: 2px dashed rgba(249,115,22,0.3);
-            margin-left: 0.5rem;
-            padding-left: 1rem;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-        }
-        .hierarchy-main-children {
-            display: grid;
-            grid-template-rows: 0fr;
-            transition: grid-template-rows 0.4s ease-out, opacity 0.4s ease-out, margin-top 0.4s ease-out;
-            opacity: 0;
-            overflow: hidden;
-            margin-top: 0;
-        }
-        .hierarchy-main-children.open {
-            grid-template-rows: 1fr;
-            opacity: 1;
-            margin-top: 1rem;
-        }
-        .hierarchy-main-children-inner {
-            overflow: hidden;
+            border-left: 2px solid rgba(249,115,22,0.2);
+            padding-left: 0.75rem;
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
         }
     </style>
 </head>
@@ -854,18 +996,16 @@
         </div>
 
         {{-- ── Panel Eksplorasi Manual ── --}}
-        <div style="width:100%; max-width:1200px; margin: 2.5rem auto; position: relative; z-index: 20;">
-            <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
-                <span style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span style="font-size: 1.2rem; background: rgba(249,115,22,0.1); padding: 0.4rem; border-radius: 0.5rem;">📂</span> Eksplorasi Manual KBLI 2025
-                </span>
-                <span id="hierarchy-chevron" style="transition: transform 0.3s;">▼</span>
-            </button>
-            
-            <div id="hierarchy-container" class="hierarchy-main-children" style="background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); border-radius: 1.25rem; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-                <div class="hierarchy-main-children-inner" id="hierarchy-container-inner" style="padding: 1.5rem;">
-                    <!-- Hierarchy Tree Will Be Injected Here -->
+        <div class="hierarchy-section" id="hierarchy-section">
+            <div class="hierarchy-section-header">
+                <div class="hierarchy-section-icon">📂</div>
+                <div>
+                    <div class="hierarchy-section-title">Eksplorasi Manual KBLI 2025</div>
+                    <div class="hierarchy-section-subtitle">Klik kategori untuk melihat sub-klasifikasi lebih detail</div>
                 </div>
+            </div>
+            <div class="kategori-grid" id="kategori-grid">
+                <div class="loading-spinner" style="width:30px;height:30px;border-width:3px;margin:3rem auto;grid-column:1/-1;"></div>
             </div>
         </div>
 
@@ -1192,103 +1332,152 @@
             }
         };
 
-        // --- Hierarchy Drill-down Logic ---
-        const hierarchyBtn = document.getElementById('toggle-hierarchy-btn');
-        const hierarchyContainer = document.getElementById('hierarchy-container');
-        const hierarchyChevron = document.getElementById('hierarchy-chevron');
+        // --- Hierarchy Drill-down Logic (new card grid design) ---
 
-        if (hierarchyBtn) {
-            hierarchyBtn.addEventListener('click', async () => {
-                const inner = document.getElementById('hierarchy-container-inner');
-                if (!hierarchyContainer.classList.contains('open')) {
-                    hierarchyContainer.classList.add('open');
-                    hierarchyChevron.style.transform = 'rotate(180deg)';
-                    if (inner.innerHTML.trim() === '' || inner.innerHTML.includes('Hierarchy Tree Will Be Injected Here')) {
-                        inner.innerHTML = '<div class="loading-spinner" style="width:30px;height:30px;border-width:3px;margin:2rem auto;"></div>';
-                        await loadHierarchy(null, inner);
-                    }
-                } else {
-                    hierarchyContainer.classList.remove('open');
-                    hierarchyChevron.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-
-        async function loadHierarchy(parentKode, containerElement) {
+        // Load top-level categories (A-U) immediately on page load
+        (async function initKategoriGrid() {
+            const grid = document.getElementById('kategori-grid');
             try {
-                const response = await fetch(`/api/kbli/hierarchy?parent=${parentKode || 'null'}`);
-                const nodes = await response.json();
-                
-                containerElement.innerHTML = ''; // clear loading
-                
-                if (nodes.length === 0) {
-                    containerElement.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Tidak ada sub-data.</p>';
+                const resp = await fetch('/api/kbli/hierarchy?parent=null');
+                const categories = await resp.json();
+
+                grid.innerHTML = '';
+
+                if (!categories || categories.length === 0) {
+                    grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">Tidak ada data kategori.</p>';
                     return;
                 }
-                
-                
-        for (const node of nodes) {
-            const nodeDiv = document.createElement('div');
-            nodeDiv.className = 'hierarchy-node';
-            
-            const isLeaf = node.is_leaf;
-            const chevronHtml = isLeaf ? '' : `<span class="hierarchy-icon" id="icon-${node.kode}">▼</span>`;
-            
-            const onClickAttr = isLeaf ? '' : `onclick="toggleHierarchyNode('${node.kode}')"`;
-            const leafStyle = isLeaf ? 'background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.2); cursor: default;' : '';
-            
-            nodeDiv.innerHTML = `
-                <div class="hierarchy-header" ${onClickAttr} style="${leafStyle}"
-                    >
-                    <div class="hierarchy-kode">${node.kode}</div>
-                    <div class="hierarchy-title">
-                        <div style="font-size:1.05rem; font-weight:700; margin-bottom:0.25rem;">${node.judul}</div>
-                        ${node.deskripsi ? `<div style="font-size:0.85rem; color:var(--text-muted); font-weight:normal; line-height:1.4; margin-bottom:0.25rem;">${node.deskripsi}</div>` : ''}
-                        ${isLeaf && node.contoh_lapangan ? `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal; background: rgba(249,115,22,0.05); padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(249,115,22,0.1);"><strong>Contoh Lapangan:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>` : ''}
+
+                for (const cat of categories) {
+                    const card = buildKategoriCard(cat);
+                    grid.appendChild(card);
+                }
+            } catch (e) {
+                grid.innerHTML = '<p style="color:red;grid-column:1/-1;text-align:center;">Gagal memuat data kategori.</p>';
+            }
+        })();
+
+
+        function buildKategoriCard(cat) {
+            const card = document.createElement('div');
+            card.className = 'kategori-card';
+            card.id = `card-${cat.kode}`;
+
+            card.innerHTML = `
+                <div class="kategori-card-header" onclick="toggleKategori('${cat.kode}')">
+                    <div class="kategori-letter">${cat.kode}</div>
+                    <div class="kategori-card-info">
+                        <div class="kategori-card-title">${cat.judul}</div>
                     </div>
-                    ${chevronHtml}
+                    <div class="kategori-chevron" id="chevron-${cat.kode}">▼</div>
                 </div>
-                ${isLeaf ? '' : `<div class="hierarchy-children" id="children-${node.kode}"><div class="hierarchy-children-inner" id="children-inner-${node.kode}"></div></div>`}
+                <div class="kategori-body" id="body-${cat.kode}">
+                    <div class="kategori-body-inner">
+                        <div class="kategori-body-content" id="body-content-${cat.kode}">
+                            <div class="loading-spinner" style="width:22px;height:22px;border-width:2px;margin:1rem auto;"></div>
+                        </div>
+                    </div>
+                </div>
             `;
-            
-            containerElement.appendChild(nodeDiv);
-            
-            // Auto‑expand top‑level categories (level "kategori")
-            if (node.level === 'kategori') {
-                const childrenContainer = document.getElementById(`children-${node.kode}`);
-                const childrenInner = document.getElementById(`children-inner-${node.kode}`);
-                if (childrenContainer && childrenInner) {
-                    childrenContainer.classList.add('open');
-                    childrenInner.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:1rem;"></div>';
-                    await loadHierarchy(node.kode, childrenInner);
+            return card;
+        }
+
+        window.toggleKategori = async (kode) => {
+            const card = document.getElementById(`card-${kode}`);
+            const body = document.getElementById(`body-${kode}`);
+            const content = document.getElementById(`body-content-${kode}`);
+
+            const isOpen = card.classList.contains('open');
+            if (isOpen) {
+                card.classList.remove('open');
+                body.classList.remove('open');
+                return;
+            }
+
+            card.classList.add('open');
+            body.classList.add('open');
+
+            // Load children only if not yet loaded
+            if (content.dataset.loaded) return;
+            content.dataset.loaded = '1';
+            content.innerHTML = '<div class="loading-spinner" style="width:22px;height:22px;border-width:2px;margin:1rem auto;"></div>';
+            await loadSubNodes(kode, content);
+        };
+
+        async function loadSubNodes(parentKode, containerEl) {
+            try {
+                const resp = await fetch(`/api/kbli/hierarchy?parent=${parentKode}`);
+                const nodes = await resp.json();
+
+                containerEl.innerHTML = '';
+
+                if (!nodes || nodes.length === 0) {
+                    containerEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:0.5rem;">Tidak ada sub-data.</p>';
+                    return;
                 }
+
+                for (const node of nodes) {
+                    containerEl.appendChild(buildSubNode(node));
+                }
+            } catch (e) {
+                containerEl.innerHTML = '<p style="color:red;font-size:0.8rem;text-align:center;">Gagal memuat.</p>';
             }
         }
 
-            } catch (error) {
-                containerElement.innerHTML = '<div style="color:red; text-align:center; padding: 1rem;">Gagal memuat data.</div>';
-            }
+        function buildSubNode(node) {
+            const wrap = document.createElement('div');
+            wrap.className = 'h-node';
+
+            const isLeaf = node.is_leaf;
+            const contohHtml = isLeaf && node.contoh_lapangan
+                ? `<div class="h-contoh"><strong>Contoh:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>`
+                : '';
+            const descHtml = node.deskripsi
+                ? `<div class="h-desc">${node.deskripsi.length > 200 ? node.deskripsi.substring(0, 200) + '…' : node.deskripsi}</div>`
+                : '';
+            const iconHtml = isLeaf ? '' : `<div class="h-icon" id="h-icon-${node.kode}">▼</div>`;
+            const clickAttr = isLeaf ? '' : `onclick="toggleSubNode('${node.kode}')"`;
+
+            wrap.innerHTML = `
+                <div class="h-node-header ${isLeaf ? 'is-leaf' : ''}" ${clickAttr}>
+                    <div class="h-kode">${node.kode}</div>
+                    <div class="h-info">
+                        <div class="h-judul">${node.judul}</div>
+                        ${descHtml}
+                        ${contohHtml}
+                    </div>
+                    ${iconHtml}
+                </div>
+                ${isLeaf ? '' : `
+                    <div class="h-children" id="h-children-${node.kode}">
+                        <div class="h-children-inner" id="h-children-inner-${node.kode}"></div>
+                    </div>
+                `}
+            `;
+            return wrap;
         }
 
-        window.toggleHierarchyNode = async (kode) => {
-            const childrenContainer = document.getElementById(`children-${kode}`);
-            const childrenInner = document.getElementById(`children-inner-${kode}`);
-            const icon = document.getElementById(`icon-${kode}`);
-            
-            if (!childrenContainer) return;
+        window.toggleSubNode = async (kode) => {
+            const children = document.getElementById(`h-children-${kode}`);
+            const inner    = document.getElementById(`h-children-inner-${kode}`);
+            const icon     = document.getElementById(`h-icon-${kode}`);
 
-            if (childrenContainer.classList.contains('open')) {
-                childrenContainer.classList.remove('open');
+            if (!children) return;
+
+            const isOpen = children.classList.contains('open');
+            if (isOpen) {
+                children.classList.remove('open');
                 if (icon) icon.style.transform = 'rotate(0deg)';
-            } else {
-                childrenContainer.classList.add('open');
-                if (icon) icon.style.transform = 'rotate(180deg)';
-                
-                if (childrenInner.innerHTML.trim() === '') {
-                    childrenInner.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:1rem;"></div>';
-                    await loadHierarchy(kode, childrenInner);
-                }
+                return;
             }
+
+            children.classList.add('open');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+
+            if (inner.dataset.loaded) return;
+            inner.dataset.loaded = '1';
+            inner.innerHTML = '<div class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0.75rem auto;"></div>';
+            await loadSubNodes(kode, inner);
         };
     </script>
 </body>
