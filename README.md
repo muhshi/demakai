@@ -60,6 +60,10 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Changed] - 2026-06-03
+- Updated the landing page design (`welcome.blade.php`) from dark mode to an elegant light mode for better readability.
+- Simplified search method selection to only display the best 3 methods: Standar (SQL), Pintar (Hybrid), and Ekspansi AI (Hybrid+).
+
 ### [Added] - 2026-04-29
 - Implemented SIPETRA SSO (OAuth2) integration using Laravel Socialite.
 - Created custom `SipetraSocialiteProvider` for SSO authentication.

@@ -20,15 +20,16 @@
     <!-- Styles -->
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.5);
-            --secondary: #a855f7;
-            --secondary-glow: rgba(168, 85, 247, 0.5);
-            --bg-dark: #0f172a;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.2);
+            --secondary: #9333ea;
+            --secondary-glow: rgba(147, 51, 234, 0.2);
+            --bg-color: #f1f5f9;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 1);
+            --glass-shadow: rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -39,8 +40,8 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             overflow-x: hidden;
             min-height: 100vh;
             display: flex;
@@ -96,7 +97,7 @@
         }
 
         .nav-links a {
-            color: var(--text-light);
+            color: var(--text-color);
             text-decoration: none;
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -130,7 +131,7 @@
             line-height: 1.1;
             margin-bottom: 1.5rem;
             letter-spacing: -2px;
-            background: linear-gradient(to bottom, #fff 30%, #94a3b8);
+            background: linear-gradient(to bottom, #0f172a 30%, #475569);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -154,7 +155,7 @@
             width: 100%;
             max-width: 700px;
             position: relative;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
             padding: 0.5rem;
             border-radius: 1.5rem;
@@ -174,7 +175,7 @@
             flex: 1;
             border: none;
             background: transparent;
-            color: white;
+            color: var(--text-color);
             padding: 1rem 1.5rem;
             font-size: 1.125rem;
             outline: none;
@@ -182,13 +183,13 @@
         }
 
         .search-container input::placeholder {
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         .search-btn {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
-            color: white;
+            color: var(--text-color);
             padding: 0 2rem;
             border-radius: 1rem;
             font-weight: 700;
@@ -229,13 +230,13 @@
 
         .filter-btn:hover {
             border-color: var(--primary);
-            color: white;
+            color: var(--text-color);
         }
 
         .filter-btn.active {
             background: rgba(99, 102, 241, 0.15);
             border-color: var(--primary);
-            color: white;
+            color: var(--text-color);
             box-shadow: 0 0 15px -5px var(--primary-glow);
         }
 
@@ -287,7 +288,7 @@
         }
 
         .card:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             transform: translateY(-10px);
             border-color: rgba(255, 255, 255, 0.2);
         }
@@ -311,7 +312,7 @@
         .card-icon {
             width: 48px;
             height: 48px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 1rem;
             display: flex;
             align-items: center;
@@ -381,7 +382,7 @@
         }
 
         .result-item {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             padding: 1.5rem;
@@ -404,7 +405,7 @@
         }
 
         .result-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             border-color: var(--primary);
             transform: scale(1.01);
         }
@@ -422,7 +423,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             padding: 0.2rem 0.5rem;
             border-radius: 0.4rem;
         }
@@ -437,7 +438,7 @@
             font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: white;
+            color: var(--text-color);
         }
 
         .result-kode {
@@ -535,7 +536,7 @@
             color: var(--text-muted);
             font-size: 0.875rem;
             border-top: 1px solid var(--glass-border);
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.02);
         }
 
         /* --- Responsive --- */
@@ -560,7 +561,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
@@ -570,7 +571,7 @@
         }
 
         .modal-content {
-            background: var(--bg-dark);
+            background: var(--bg-color);
             border: 1px solid var(--glass-border);
             padding: 2.5rem;
             border-radius: 2rem;
@@ -623,7 +624,7 @@
             width: 100%;
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            color: white;
+            color: var(--text-color);
             padding: 1rem;
             border-radius: 1rem;
             outline: none;
@@ -639,7 +640,7 @@
             width: 100%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
-            color: white;
+            color: var(--text-color);
             padding: 1rem;
             border-radius: 1rem;
             font-weight: 700;
@@ -674,7 +675,7 @@
 
         .add-example-btn:hover {
             background: var(--primary);
-            color: white;
+            color: var(--text-color);
             border-color: transparent;
             box-shadow: 0 0 15px var(--primary-glow);
         }
@@ -686,9 +687,9 @@
 
         /* --- Method Selector Buttons --- */
         .method-btn {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #94a3b8;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+            color: var(--text-muted);
             padding: 0.4rem 0.9rem;
             border-radius: 0.75rem;
             font-size: 0.78rem;
@@ -698,14 +699,14 @@
             font-family: inherit;
         }
         .method-btn:hover {
-            border-color: #6366f1;
-            color: #c7d2fe;
+            border-color: var(--primary);
+            color: var(--primary);
         }
         .method-btn.active {
-            background: rgba(99,102,241,0.2);
-            border-color: #6366f1;
-            color: #a5b4fc;
-            box-shadow: 0 0 12px -4px rgba(99,102,241,0.5);
+            background: rgba(79,70,229,0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 4px 12px -4px rgba(79,70,229,0.3);
         }
     </style>
 </head>
@@ -752,25 +753,22 @@
         {{-- ── Panel Selector Metode (untuk penelitian) ── --}}
         <div id="method-panel" style="
             width:100%; max-width:700px; margin-top:1rem;
-            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+            background:var(--glass); border:1px solid var(--glass-border); box-shadow: 0 10px 30px var(--glass-shadow);
             border-radius:1.25rem; padding:1rem 1.25rem;
             backdrop-filter:blur(10px);
         ">
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
                 <span
-                    style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:#6366f1;">🔬
+                    style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:var(--primary);">🔬
                     Metode Pencarian</span>
                 <span id="active-method-badge"
-                    style="font-size:0.7rem; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
+                    style="font-size:0.7rem; background:rgba(79,70,229,0.15); color:var(--primary); padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
                     + None</span>
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-                <button class="method-btn" data-search="sql" data-proc="none" onclick="setMethod(this)">SQL · None</button>
-                <button class="method-btn" data-search="sql" data-proc="advanced" onclick="setMethod(this)">SQL · Advanced</button>
-                <button class="method-btn" data-search="sql" data-proc="expansion" onclick="setMethod(this)">SQL · Expansion</button>
-                <button class="method-btn active" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Hybrid · None</button>
-                <button class="method-btn" data-search="hybrid" data-proc="advanced" onclick="setMethod(this)">Hybrid · Advanced</button>
-                <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Hybrid · Expansion</button>
+                <button class="method-btn" data-search="sql" data-proc="none" onclick="setMethod(this)">Standar (SQL)</button>
+                <button class="method-btn active" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Pintar (Hybrid)</button>
+                <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Ekspansi AI (Hybrid+)</button>
             </div>
         </div>
 
@@ -820,7 +818,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Kode & Judul</label>
-                    <div id="display-info" style="font-size: 0.9rem; font-weight: 600; color: var(--text-light);"></div>
+                    <div id="display-info" style="font-size: 0.9rem; font-weight: 600; color: var(--text-color);"></div>
                 </div>
 
                 <div class="form-group">
