@@ -60,6 +60,12 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-06-03
+- Added KBLI Hierarchical Drill-down feature.
+- Created `kbli2025_hierarchies` table to separate hierarchy records (Kategori to Subgolongan) from the main 5-digit KBLI data, ensuring no impact on existing AI Search Embeddings.
+- Processed 2.442 raw KBLI records from spreadsheet into JSON and seeded them into the database.
+- Implemented an elegant, smooth accordion-style Manual Exploration UI on the landing page for hierarchical KBLI browsing.
+
 ### [Changed] - 2026-06-03
 - Changed theme to orange to suit the "sensus ekonomi" aesthetic.
 - Centered the layout for the search method selection panel.

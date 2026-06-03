@@ -22,6 +22,7 @@ Route::get('/auth/sipetra/redirect', [SsoController::class, 'redirect'])->name('
 Route::get('/auth/sipetra/callback', [SsoController::class, 'callback']);
 
 Route::get('/api/search', [SearchController::class, 'search'])->name('search.api');
+Route::get('/api/kbli/hierarchy', [\App\Http\Controllers\Api\KbliHierarchyController::class, 'getChildren'])->name('hierarchy.api');
 Route::post('/api/submissions', [FieldExampleSubmissionController::class, 'store'])->name('submissions.store');
 
 Route::get('/cekhasilmethod', function () {
