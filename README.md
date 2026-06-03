@@ -71,6 +71,10 @@ All notable changes to this project will be documented in this section.
 - Centered the layout for the search method selection panel.
 - Updated the landing page design (`welcome.blade.php`) from dark mode to an elegant light mode for better readability.
 - Simplified search method selection to only display the best 3 methods: Standar (SQL), Pintar (Hybrid), and Ekspansi AI (Hybrid+).
+- Redesigned Manual Exploration UI to a vertical list layout showing all categories A-U by default on page load with smooth height transitions using CSS Grid.
+
+### [Removed] - 2026-06-03
+- Removed unused scratch files and raw conversion scripts to clean up the codebase.
 
 ### [Added] - 2026-04-29
 - Implemented SIPETRA SSO (OAuth2) integration using Laravel Socialite.
