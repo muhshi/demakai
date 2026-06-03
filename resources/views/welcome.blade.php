@@ -745,72 +745,58 @@
             color: var(--text-muted);
             margin-top: 0.15rem;
         }
-        /* Categories grid (A-U level) */
+        /* Categories list (A-U level) */
         .kategori-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         .kategori-card {
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(12px);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.95);
-            border-radius: 1.1rem;
+            border-left: 3px solid rgba(249,115,22,0.25);
+            border-radius: 0.85rem;
             overflow: hidden;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
         }
         .kategori-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(249,115,22,0.12);
-            border-color: rgba(249,115,22,0.3);
+            border-left-color: var(--primary);
+            box-shadow: 0 4px 18px rgba(249,115,22,0.1);
+        }
+        .kategori-card.open {
+            border-left-color: var(--primary);
+            box-shadow: 0 4px 18px rgba(249,115,22,0.1);
         }
         .kategori-card-header {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 1.25rem;
+            padding: 0.85rem 1.25rem;
             cursor: pointer;
             user-select: none;
         }
         .kategori-letter {
-            width: 44px;
-            height: 44px;
-            border-radius: 0.75rem;
-            background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(245,158,11,0.1));
-            border: 1.5px solid rgba(249,115,22,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
+            font-size: 0.95rem;
             font-weight: 900;
             color: var(--primary);
+            min-width: 28px;
             flex-shrink: 0;
-            transition: all 0.25s;
-        }
-        .kategori-card.open .kategori-letter {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(249,115,22,0.35);
         }
         .kategori-card-info {
             flex: 1;
             min-width: 0;
         }
         .kategori-card-title {
-            font-size: 0.88rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 600;
             color: var(--text-color);
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            line-height: 1.4;
         }
         .kategori-chevron {
             color: var(--text-muted);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
             flex-shrink: 0;
         }
