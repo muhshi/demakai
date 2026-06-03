@@ -746,26 +746,37 @@
             transition: transform 0.3s;
         }
         .hierarchy-children {
-            padding-left: 2rem;
-            margin-top: 0.5rem;
-            display: none;
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+            padding-left: 1.5rem;
+        }
+        .hierarchy-children.open {
+            grid-template-rows: 1fr;
+        }
+        .hierarchy-children-inner {
+            overflow: hidden;
             border-left: 2px dashed rgba(249,115,22,0.3);
-            margin-left: 1rem;
+            margin-left: 0.5rem;
+            padding-left: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
-        /* Custom scrollbar for hierarchy container */
-        #hierarchy-container::-webkit-scrollbar {
-            width: 8px;
+        .hierarchy-main-children {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s ease-out, opacity 0.4s ease-out, margin-top 0.4s ease-out;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
         }
-        #hierarchy-container::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.02);
-            border-radius: 4px;
+        .hierarchy-main-children.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            margin-top: 1rem;
         }
-        #hierarchy-container::-webkit-scrollbar-thumb {
-            background: rgba(249,115,22,0.2);
-            border-radius: 4px;
-        }
-        #hierarchy-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(249,115,22,0.5);
+        .hierarchy-main-children-inner {
+            overflow: hidden;
         }
     </style>
 </head>
@@ -843,16 +854,18 @@
         </div>
 
         {{-- ── Panel Eksplorasi Manual ── --}}
-        <div style="width:100%; max-width:1400px; margin-top:1.5rem; margin-bottom: 2rem; position: relative; z-index: 20;">
-            <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1rem 1.5rem; border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
+        <div style="width:100%; max-width:1000px; margin: 2rem auto; position: relative; z-index: 20;">
+            <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
                 <span style="display: flex; align-items: center; gap: 0.75rem;">
                     <span style="font-size: 1.2rem; background: rgba(249,115,22,0.1); padding: 0.4rem; border-radius: 0.5rem;">📂</span> Eksplorasi Manual KBLI 2025
                 </span>
                 <span id="hierarchy-chevron" style="transition: transform 0.3s;">▼</span>
             </button>
             
-            <div id="hierarchy-container" style="display: none; margin-top: 0.5rem; background: var(--glass); border-radius: 1.25rem; border: 1px solid var(--glass-border); padding: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-height: 60vh; overflow-y: auto; backdrop-filter: blur(10px);">
-                <!-- Hierarchy Tree Will Be Injected Here -->
+            <div id="hierarchy-container" class="hierarchy-main-children" style="background: var(--glass); border-radius: 1.25rem; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+                <div class="hierarchy-main-children-inner" id="hierarchy-container-inner" style="padding: 1.5rem;">
+                    <!-- Hierarchy Tree Will Be Injected Here -->
+                </div>
             </div>
         </div>
 
@@ -1186,15 +1199,16 @@
 
         if (hierarchyBtn) {
             hierarchyBtn.addEventListener('click', async () => {
-                if (hierarchyContainer.style.display === 'none') {
-                    hierarchyContainer.style.display = 'block';
+                const inner = document.getElementById('hierarchy-container-inner');
+                if (!hierarchyContainer.classList.contains('open')) {
+                    hierarchyContainer.classList.add('open');
                     hierarchyChevron.style.transform = 'rotate(180deg)';
-                    if (hierarchyContainer.innerHTML.trim() === '' || hierarchyContainer.innerHTML.includes('Hierarchy Tree Will Be Injected Here')) {
-                        hierarchyContainer.innerHTML = '<div class="loading-spinner" style="width:30px;height:30px;border-width:3px;margin:2rem auto;"></div>';
-                        await loadHierarchy(null, hierarchyContainer);
+                    if (inner.innerHTML.trim() === '' || inner.innerHTML.includes('Hierarchy Tree Will Be Injected Here')) {
+                        inner.innerHTML = '<div class="loading-spinner" style="width:30px;height:30px;border-width:3px;margin:2rem auto;"></div>';
+                        await loadHierarchy(null, inner);
                     }
                 } else {
-                    hierarchyContainer.style.display = 'none';
+                    hierarchyContainer.classList.remove('open');
                     hierarchyChevron.style.transform = 'rotate(0deg)';
                 }
             });
@@ -1232,7 +1246,7 @@
                             </div>
                             ${chevronHtml}
                         </div>
-                        ${isLeaf ? '' : `<div class="hierarchy-children" id="children-${node.kode}"></div>`}
+                        ${isLeaf ? '' : `<div class="hierarchy-children" id="children-${node.kode}"><div class="hierarchy-children-inner" id="children-inner-${node.kode}"></div></div>`}
                     `;
                     
                     containerElement.appendChild(nodeDiv);
@@ -1244,20 +1258,21 @@
 
         window.toggleHierarchyNode = async (kode) => {
             const childrenContainer = document.getElementById(`children-${kode}`);
+            const childrenInner = document.getElementById(`children-inner-${kode}`);
             const icon = document.getElementById(`icon-${kode}`);
             
             if (!childrenContainer) return;
 
-            if (childrenContainer.style.display === 'block') {
-                childrenContainer.style.display = 'none';
+            if (childrenContainer.classList.contains('open')) {
+                childrenContainer.classList.remove('open');
                 if (icon) icon.style.transform = 'rotate(0deg)';
             } else {
-                childrenContainer.style.display = 'block';
+                childrenContainer.classList.add('open');
                 if (icon) icon.style.transform = 'rotate(180deg)';
                 
-                if (childrenContainer.innerHTML.trim() === '') {
-                    childrenContainer.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:1rem;"></div>';
-                    await loadHierarchy(kode, childrenContainer);
+                if (childrenInner.innerHTML.trim() === '') {
+                    childrenInner.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:1rem;"></div>';
+                    await loadHierarchy(kode, childrenInner);
                 }
             }
         };
