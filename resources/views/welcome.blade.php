@@ -20,10 +20,10 @@
     <!-- Styles -->
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-glow: rgba(79, 70, 229, 0.2);
-            --secondary: #9333ea;
-            --secondary-glow: rgba(147, 51, 234, 0.2);
+            --primary: #f97316;
+            --primary-glow: rgba(249, 115, 22, 0.2);
+            --secondary: #f59e0b;
+            --secondary-glow: rgba(245, 158, 11, 0.2);
             --bg-color: #f1f5f9;
             --text-color: #0f172a;
             --text-muted: #64748b;
@@ -234,7 +234,7 @@
         }
 
         .filter-btn.active {
-            background: rgba(99, 102, 241, 0.15);
+            background: rgba(249, 115, 22, 0.15);
             border-color: var(--primary);
             color: var(--text-color);
             box-shadow: 0 0 15px -5px var(--primary-glow);
@@ -334,7 +334,7 @@
         .badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(249, 115, 22, 0.1);
             color: var(--primary);
             border-radius: 2rem;
             font-size: 0.75rem;
@@ -494,7 +494,7 @@
         }
 
         .see-more-btn:hover {
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(249, 115, 22, 0.1);
             border-color: var(--primary);
         }
 
@@ -506,11 +506,11 @@
 
         .example-tag {
             font-size: 0.7rem;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(249, 115, 22, 0.1);
             color: var(--primary);
             padding: 0.2rem 0.6rem;
             border-radius: 0.5rem;
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(249, 115, 22, 0.2);
         }
 
         .loading-spinner {
@@ -703,10 +703,10 @@
             color: var(--primary);
         }
         .method-btn.active {
-            background: rgba(79,70,229,0.1);
+            background: rgba(249,115,22,0.1);
             border-color: var(--primary);
             color: var(--primary);
-            box-shadow: 0 4px 12px -4px rgba(79,70,229,0.3);
+            box-shadow: 0 4px 12px -4px rgba(249,115,22,0.3);
         }
     </style>
 </head>
@@ -757,15 +757,15 @@
             border-radius:1.25rem; padding:1rem 1.25rem;
             backdrop-filter:blur(10px);
         ">
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+            <div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
                 <span
                     style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; color:var(--primary);">🔬
                     Metode Pencarian</span>
                 <span id="active-method-badge"
-                    style="font-size:0.7rem; background:rgba(79,70,229,0.15); color:var(--primary); padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
+                    style="font-size:0.7rem; background:rgba(249,115,22,0.15); color:var(--primary); padding:0.2rem 0.6rem; border-radius:0.4rem; font-weight:700;">HYBRID
                     + None</span>
             </div>
-            <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.5rem;">
                 <button class="method-btn" data-search="sql" data-proc="none" onclick="setMethod(this)">Standar (SQL)</button>
                 <button class="method-btn active" data-search="hybrid" data-proc="none" onclick="setMethod(this)">Pintar (Hybrid)</button>
                 <button class="method-btn" data-search="hybrid" data-proc="expansion" onclick="setMethod(this)">Ekspansi AI (Hybrid+)</button>
@@ -787,7 +787,7 @@
                 <div class="card-icon">🏢</div>
                 <h3>KBLI 2025</h3>
                 <p>Update terbaru Klasifikasi Baku Lapangan Usaha Indonesia untuk kesesuaian izin usaha terkini.</p>
-                <div class="badge" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary);">Terbaru</div>
+                <div class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--secondary);">Terbaru</div>
             </div>
             <div class="card">
                 <div class="card-icon">💼</div>
