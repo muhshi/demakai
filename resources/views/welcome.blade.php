@@ -103,7 +103,7 @@
             padding: 0.5rem 1rem;
             border-radius: 0.75rem;
             transition: all 0.3s ease;
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             border: 1px solid var(--glass-border);
         }
 
@@ -214,7 +214,7 @@
         }
 
         .filter-btn {
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             border: 1px solid var(--glass-border);
             color: var(--text-muted);
             padding: 0.6rem 1.25rem;
@@ -273,7 +273,7 @@
         }
 
         .card {
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             padding: 2rem;
@@ -481,7 +481,7 @@
 
         .see-more-btn {
             width: 100%;
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             border: 1px solid var(--glass-border);
             color: var(--primary);
             font-size: 0.85rem;
@@ -520,7 +520,7 @@
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 2rem auto;
+            margin: 2.5rem auto;
         }
 
         @keyframes spin {
@@ -622,7 +622,7 @@
 
         .form-input {
             width: 100%;
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             border: 1px solid var(--glass-border);
             color: var(--text-color);
             padding: 1rem;
@@ -660,7 +660,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--glass);
+            background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
             border: 1.5px solid var(--primary);
             color: var(--primary);
             display: flex;
@@ -854,15 +854,15 @@
         </div>
 
         {{-- ── Panel Eksplorasi Manual ── --}}
-        <div style="width:100%; max-width:1000px; margin: 2rem auto; position: relative; z-index: 20;">
-            <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
+        <div style="width:100%; max-width:1200px; margin: 2.5rem auto; position: relative; z-index: 20;">
+            <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1.25rem 1.5rem; border-radius: 1.25rem; background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
                 <span style="display: flex; align-items: center; gap: 0.75rem;">
                     <span style="font-size: 1.2rem; background: rgba(249,115,22,0.1); padding: 0.4rem; border-radius: 0.5rem;">📂</span> Eksplorasi Manual KBLI 2025
                 </span>
                 <span id="hierarchy-chevron" style="transition: transform 0.3s;">▼</span>
             </button>
             
-            <div id="hierarchy-container" class="hierarchy-main-children" style="background: var(--glass); border-radius: 1.25rem; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+            <div id="hierarchy-container" class="hierarchy-main-children" style="background: var(--glass); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); border-radius: 1.25rem; border: 1px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
                 <div class="hierarchy-main-children-inner" id="hierarchy-container-inner" style="padding: 1.5rem;">
                     <!-- Hierarchy Tree Will Be Injected Here -->
                 </div>
@@ -1226,31 +1226,45 @@
                     return;
                 }
                 
-                nodes.forEach(node => {
-                    const nodeDiv = document.createElement('div');
-                    nodeDiv.className = 'hierarchy-node';
-                    
-                    const isLeaf = node.is_leaf;
-                    const chevronHtml = isLeaf ? '' : `<span class="hierarchy-icon" id="icon-${node.kode}">▼</span>`;
-                    
-                    const onClickAttr = isLeaf ? '' : `onclick="toggleHierarchyNode('${node.kode}')"`;
-                    const leafStyle = isLeaf ? 'background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.2); cursor: default;' : '';
-                    
-                    nodeDiv.innerHTML = `
-                        <div class="hierarchy-header" ${onClickAttr} style="${leafStyle}">
-                            <div class="hierarchy-kode">${node.kode}</div>
-                            <div class="hierarchy-title">
-                                <div style="font-size:1.05rem; font-weight:700; margin-bottom:0.25rem;">${node.judul}</div>
-                                ${node.deskripsi ? `<div style="font-size:0.85rem; color:var(--text-muted); font-weight:normal; line-height:1.4; margin-bottom:0.25rem;">${node.deskripsi}</div>` : ''}
-                                ${isLeaf && node.contoh_lapangan ? `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal; background: rgba(249,115,22,0.05); padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(249,115,22,0.1);"><strong>Contoh Lapangan:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>` : ''}
-                            </div>
-                            ${chevronHtml}
-                        </div>
-                        ${isLeaf ? '' : `<div class="hierarchy-children" id="children-${node.kode}"><div class="hierarchy-children-inner" id="children-inner-${node.kode}"></div></div>`}
-                    `;
-                    
-                    containerElement.appendChild(nodeDiv);
-                });
+                
+        for (const node of nodes) {
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = 'hierarchy-node';
+            
+            const isLeaf = node.is_leaf;
+            const chevronHtml = isLeaf ? '' : `<span class="hierarchy-icon" id="icon-${node.kode}">▼</span>`;
+            
+            const onClickAttr = isLeaf ? '' : `onclick="toggleHierarchyNode('${node.kode}')"`;
+            const leafStyle = isLeaf ? 'background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.2); cursor: default;' : '';
+            
+            nodeDiv.innerHTML = `
+                <div class="hierarchy-header" ${onClickAttr} style="${leafStyle}"
+                    >
+                    <div class="hierarchy-kode">${node.kode}</div>
+                    <div class="hierarchy-title">
+                        <div style="font-size:1.05rem; font-weight:700; margin-bottom:0.25rem;">${node.judul}</div>
+                        ${node.deskripsi ? `<div style="font-size:0.85rem; color:var(--text-muted); font-weight:normal; line-height:1.4; margin-bottom:0.25rem;">${node.deskripsi}</div>` : ''}
+                        ${isLeaf && node.contoh_lapangan ? `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal; background: rgba(249,115,22,0.05); padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(249,115,22,0.1);"><strong>Contoh Lapangan:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>` : ''}
+                    </div>
+                    ${chevronHtml}
+                </div>
+                ${isLeaf ? '' : `<div class="hierarchy-children" id="children-${node.kode}"><div class="hierarchy-children-inner" id="children-inner-${node.kode}"></div></div>`}
+            `;
+            
+            containerElement.appendChild(nodeDiv);
+            
+            // Auto‑expand top‑level categories (level "kategori")
+            if (node.level === 'kategori') {
+                const childrenContainer = document.getElementById(`children-${node.kode}`);
+                const childrenInner = document.getElementById(`children-inner-${node.kode}`);
+                if (childrenContainer && childrenInner) {
+                    childrenContainer.classList.add('open');
+                    childrenInner.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:2px;margin:1rem;"></div>';
+                    await loadHierarchy(node.kode, childrenInner);
+                }
+            }
+        }
+
             } catch (error) {
                 containerElement.innerHTML = '<div style="color:red; text-align:center; padding: 1rem;">Gagal memuat data.</div>';
             }
