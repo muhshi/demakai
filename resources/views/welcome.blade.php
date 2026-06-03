@@ -832,8 +832,18 @@
         </div>
 
 
+        <div id="search-results-container" style="display: none;">
+            <!-- Columns will be injected here dynamically -->
+        </div>
+        <div id="search-loading" style="display: none;">
+            <div class="loading-spinner"></div>
+        </div>
+        <div id="search-empty" style="display: none; margin-top: 3rem; color: var(--text-muted);">
+            Tidak ditemukan hasil yang relevan.
+        </div>
+
         {{-- ── Panel Eksplorasi Manual ── --}}
-        <div style="width:100%; max-width:700px; margin-top:1.5rem; margin-bottom: 2rem; position: relative; z-index: 20;">
+        <div style="width:100%; max-width:1400px; margin-top:1.5rem; margin-bottom: 2rem; position: relative; z-index: 20;">
             <button id="toggle-hierarchy-btn" style="width: 100%; padding: 1rem 1.5rem; border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-color); font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; box-shadow: 0 10px 30px var(--glass-shadow); backdrop-filter: blur(10px);">
                 <span style="display: flex; align-items: center; gap: 0.75rem;">
                     <span style="font-size: 1.2rem; background: rgba(249,115,22,0.1); padding: 0.4rem; border-radius: 0.5rem;">📂</span> Eksplorasi Manual KBLI 2025
@@ -846,16 +856,7 @@
             </div>
         </div>
 
-        <div id="search-results-container" style="display: none;">
-            <!-- Columns will be injected here dynamically -->
-        </div>
-        <div id="search-loading" style="display: none;">
-            <div class="loading-spinner"></div>
-        </div>
-        <div id="search-empty" style="display: none; margin-top: 3rem; color: var(--text-muted);">
-            Tidak ditemukan hasil yang relevan.
-        </div>
-
+        
         <div class="options-grid">
             <div class="card">
                 <div class="card-icon">🏢</div>
@@ -1225,8 +1226,9 @@
                         <div class="hierarchy-header" ${onClickAttr} style="${leafStyle}">
                             <div class="hierarchy-kode">${node.kode}</div>
                             <div class="hierarchy-title">
-                                ${node.judul}
-                                ${isLeaf && node.contoh_lapangan ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem; font-weight:normal;">Contoh: ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>` : ''}
+                                <div style="font-size:1.05rem; font-weight:700; margin-bottom:0.25rem;">${node.judul}</div>
+                                ${node.deskripsi ? `<div style="font-size:0.85rem; color:var(--text-muted); font-weight:normal; line-height:1.4; margin-bottom:0.25rem;">${node.deskripsi}</div>` : ''}
+                                ${isLeaf && node.contoh_lapangan ? `<div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.5rem; font-weight:normal; background: rgba(249,115,22,0.05); padding: 0.5rem 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(249,115,22,0.1);"><strong>Contoh Lapangan:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>` : ''}
                             </div>
                             ${chevronHtml}
                         </div>
