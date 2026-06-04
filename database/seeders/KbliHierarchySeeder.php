@@ -28,43 +28,32 @@ class KbliHierarchySeeder extends Seeder
             return;
         }
 
-        // Idempotency: skip if data already exists
-        if (Kbli2025Hierarchy::exists()) {
-            $this->command->info("Data KBLI Hierarchy sudah ada, seeder dilewati.");
-            return;
-        }
-
         $this->command->info("Mengimport KBLI Hierarchies...");
         
-        $insertData = [];
         $allowedLevels = ['kategori', 'pokok', 'golongan', 'subgolongan'];
         $now = now();
+        $count = 0;
+
+        $bar = $this->command->getOutput()->createProgressBar(count($records));
+        $bar->start();
 
         foreach ($records as $row) {
             if (in_array($row['level'], $allowedLevels)) {
-                $insertData[] = [
-                    'level' => $row['level'],
-                    'kode' => $row['kode'],
-                    'judul' => $row['judul'] ?? '',
-                    'deskripsi' => $row['deskripsi'] ?? null,
-                    'parent_kode' => $row['parent_kode'] ?? null,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
+                Kbli2025Hierarchy::updateOrCreate(
+                    ['kode' => $row['kode'], 'level' => $row['level']],
+                    [
+                        'judul' => $row['judul'] ?? '',
+                        'deskripsi' => $row['deskripsi'] ?? null,
+                        'parent_kode' => $row['parent_kode'] ?? null,
+                        'updated_at' => $now,
+                    ]
+                );
+                $count++;
             }
-        }
-
-        // Chunk insert to avoid memory/parameter limits
-        $chunks = array_chunk($insertData, 500);
-        $bar = $this->command->getOutput()->createProgressBar(count($chunks));
-        $bar->start();
-
-        foreach ($chunks as $chunk) {
-            Kbli2025Hierarchy::insert($chunk);
             $bar->advance();
         }
 
         $bar->finish();
-        $this->command->info("\nSeeder selesai! " . count($insertData) . " data hierarki berhasil diimport.");
+        $this->command->info("\nSeeder selesai! " . $count . " data hierarki berhasil diimport/diupdate.");
     }
 }
