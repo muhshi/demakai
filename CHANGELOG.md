@@ -4,6 +4,22 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-06-04] - Migrasi Arsitektur CI/CD ke Pull-Based Deployment & Fix Volume Database
+
+### Added
+- **GitHub Actions Workflow (`.github/workflows/docker-build.yml`)**: Pipeline CI/CD otomatis — setiap push ke branch `main`, GitHub Actions akan build dan push Docker image ke GitHub Container Registry (`ghcr.io/muhshi/demakai:latest`). Server tidak perlu lagi compile apapun.
+- **Docker Build Caching**: Menggunakan `cache-from/cache-to: type=gha` untuk mempercepat build berikutnya di GitHub Actions.
+
+### Changed
+- **`docker-compose.yml` — Pull-Based Image**: Ganti `build: context: .` menjadi `image: ghcr.io/muhshi/demakai:latest` pada kedua service (`demakai-franken` dan `demakai-worker`). Server kini cukup jalankan `docker compose pull` tanpa build lokal.
+- **`docker-compose.yml` — Hapus Volume `app-database`**: Volume `app-database` yang meng-mount ke `/app/database` dihapus. Volume ini menyebabkan direktori `/app/database` di dalam container (termasuk seeders dan data JSON) tertimpa oleh volume kosong, sehingga seeder gagal menemukan file-nya.
+- **`deploy.sh` — Ganti Build ke Pull**: `docker compose build --no-cache` diganti dengan `docker compose pull` agar deployment lebih cepat dan konsisten.
+
+### Fixed
+- **Seeder Gagal "No such file or directory"**: Root cause adalah volume `app-database:/app/database` yang meng-override seluruh direktori `/app/database` di container dengan volume kosong persisten, sehingga file `KbliHierarchySeeder.php` dan `database/data/*.json` tidak bisa diakses meski sudah ada di image.
+
+---
+
 ## [2026-06-04] - Eksplorasi Manual KBLI 2025 & Fix Deploy Seeder
 
 ### Added

@@ -3,14 +3,14 @@ set -e
 
 echo "🚀 Deploying updates..."
 
-# 1. Pull latest code — reset local changes dulu agar pull tidak gagal
+# 1. Pull latest code
 echo "📥 Pulling from git..."
 git fetch origin main
 git reset --hard origin/main
 
-# 2. Rebuild the image (Required since code is baked into image)
-echo "🔨 Building Docker image..."
-docker compose build --no-cache demakai-franken
+# 2. Pull latest Docker image from GHCR (no build needed on server)
+echo "📦 Pulling latest Docker image..."
+docker compose pull
 
 # 3. Recreate containers
 echo "🔄 Recreating containers..."
@@ -33,7 +33,7 @@ echo "🧹 Clearing and optimizing cache..."
 docker compose exec -T demakai-franken php artisan optimize:clear
 docker compose exec -T demakai-franken php artisan optimize
 
-# 7. Publish Livewire assets (ensures JS assets match installed Livewire version)
+# 7. Publish Livewire assets
 echo "📦 Publishing Livewire assets..."
 docker compose exec -T demakai-franken php artisan livewire:publish --assets
 

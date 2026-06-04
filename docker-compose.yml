@@ -2,9 +2,7 @@ services:
   demakai-franken:
     container_name: demakai-franken
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/muhshi/demakai:latest
     env_file:
       - .env
     environment:
@@ -15,16 +13,13 @@ services:
       - "8003:80"
     volumes:
       - app-storage:/app/storage
-      - app-database:/app/database
     networks:
       - postgres-stack_ai_net
 
   demakai-worker:
     container_name: demakai-worker
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/muhshi/demakai:latest
     env_file:
       - .env
     environment:
@@ -33,13 +28,11 @@ services:
     command: "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
     volumes:
       - app-storage:/app/storage
-      - app-database:/app/database
     networks:
       - postgres-stack_ai_net
 
 volumes:
   app-storage:
-  app-database:
 
 networks:
   postgres-stack_ai_net:
