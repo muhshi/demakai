@@ -29,6 +29,7 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 - **`KbliHierarchySeeder`**: Seeder yang membaca `database/data/kbli2025_full_arsip.json` dan mengisi tabel hierarki, dengan pengecekan idempotency agar aman dijalankan berulang kali.
 
 ### Fixed
+- **Kategori Utama KBLI 2025**: Memperbaiki judul 22 kategori utama (Kategori A-V) di `database/data/kbli2025_hierarchies.json` dan `kbli2025_full_arsip.json` yang sebelumnya masih menggunakan versi KBLI 2020.
 - **Seeder Tidak Dieksekusi Saat Deploy**: Menambahkan perintah `php artisan db:seed --class=KbliHierarchySeeder --force` ke `deploy.sh` agar data hierarki KBLI otomatis tersedia di server setelah deploy.
 - **Idempotency Seeder**: `KbliHierarchySeeder` sekarang mengecek apakah data sudah ada sebelum insert, mencegah duplikasi data saat `deploy.sh` dijalankan berulang kali.
 

@@ -2,7 +2,7 @@
     {
         "level": "kategori",
         "kode": "A",
-        "judul": "PERTANIAN, KEHUTANAN DAN PERIKANAN",
+        "judul": "Pertanian, Kehutanan, dan Perikanan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -30,7 +30,7 @@
     {
         "level": "kategori",
         "kode": "B",
-        "judul": "PERTAMBANGAN DAN PENGGALIAN",
+        "judul": "Pertambangan dan Penggalian",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -72,7 +72,7 @@
     {
         "level": "kategori",
         "kode": "C",
-        "judul": "INDUSTRI PENGOLAHAN",
+        "judul": "Industri",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -247,7 +247,7 @@
     {
         "level": "kategori",
         "kode": "D",
-        "judul": "PENGADAAN LISTRIK, GAS, UAP/AIR PANAS DAN UDARA DINGIN",
+        "judul": "Penyediaan Listrik, Gas, Uap/Air Panas Dan Udara Dingin",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -261,7 +261,7 @@
     {
         "level": "kategori",
         "kode": "E",
-        "judul": "PENGADAAN AIR, PENGELOLAAN SAMPAH, LIMBAH DAN DAUR ULANG",
+        "judul": "Penyediaan Air, Penegelolaan Air Limbah, Penanganan Limbah, dan Remediasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -296,7 +296,7 @@
     {
         "level": "kategori",
         "kode": "F",
-        "judul": "KONSTRUKSI",
+        "judul": "Konstruksi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -324,7 +324,7 @@
     {
         "level": "kategori",
         "kode": "G",
-        "judul": "PERDAGANGAN BESAR DAN ECERAN; REPARASI MOBIL DAN SEPEDA MOTOR",
+        "judul": "Perdagangan Besar Dan Eceran",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -345,7 +345,7 @@
     {
         "level": "kategori",
         "kode": "H",
-        "judul": "PENGANGKUTAN DAN PERGUDANGAN",
+        "judul": "Transportasi dan Penyimpanan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -387,7 +387,7 @@
     {
         "level": "kategori",
         "kode": "I",
-        "judul": "PENYEDIAAN AKOMODASI DAN PENYEDIAAN MAKAN MINUM",
+        "judul": "Aktivitas Penyediaan Akomodasi dan Makan Minum",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -408,7 +408,7 @@
     {
         "level": "kategori",
         "kode": "J",
-        "judul": "INFORMASI DAN KOMUNIKASI",
+        "judul": "Aktivitas Penerbitan, Penyiaran, Produksi dan Distribusi Konten",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -436,7 +436,7 @@
     {
         "level": "kategori",
         "kode": "K",
-        "judul": "AKTIVITAS KEUANGAN DAN ASURANSI",
+        "judul": "Aktivitas Telekomunikasi, Pemrograman Komputer, Konsultansi, Infrastruktur Komputasi, dan Jasa Informasi Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -464,7 +464,7 @@
     {
         "level": "kategori",
         "kode": "L",
-        "judul": "REAL ESTAT",
+        "judul": "Aktivitas Keuangan dan Asuransi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -492,7 +492,7 @@
     {
         "level": "kategori",
         "kode": "M",
-        "judul": "AKTIVITAS PROFESIONAL, ILMIAH DAN TEKNIS",
+        "judul": "Aktivitas Real Estat",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -506,7 +506,7 @@
     {
         "level": "kategori",
         "kode": "N",
-        "judul": "AKTIVITAS PENYEWAAN DAN GUNA USAHA TANPA HAK OPSI, KETENAGAKERJAAN, AGEN PERJALANAN DAN PENUNJANG USAHA LAINNYA",
+        "judul": "Aktivitas Profesional, Ilmiah, dan Teknis",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -562,7 +562,7 @@
     {
         "level": "kategori",
         "kode": "O",
-        "judul": "ADMINISTRASI PEMERINTAHAN, PERTAHANAN DAN JAMINAN SOSIAL WAJIB",
+        "judul": "Aktivitas Administratif dan Penunjang Usaha",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -611,7 +611,7 @@
     {
         "level": "kategori",
         "kode": "P",
-        "judul": "PENDIDIKAN",
+        "judul": "Administrasi Pemerintahan dan Pertahanan, serta Jaminan Sosial Wajib",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -625,7 +625,7 @@
     {
         "level": "kategori",
         "kode": "Q",
-        "judul": "AKTIVITAS KESEHATAN MANUSIA DAN AKTIVITAS SOSIAL",
+        "judul": "Pendidikan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -639,7 +639,7 @@
     {
         "level": "kategori",
         "kode": "R",
-        "judul": "KESENIAN, HIBURAN DAN REKREASI",
+        "judul": "Aktivitas Kesehatan Manusia dan Aktivitas Sosial",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -667,7 +667,7 @@
     {
         "level": "kategori",
         "kode": "S",
-        "judul": "AKTIVITAS JASA LAINNYA",
+        "judul": "Kesenian, Olahraga, dan Rekreasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -702,7 +702,7 @@
     {
         "level": "kategori",
         "kode": "T",
-        "judul": "AKTIVITAS RUMAH TANGGA SEBAGAI PEMBERI KERJA; AKTIVITAS YANG MENGHASILKAN BARANG DAN JASA OLEH RUMAH TANGGA YANG DIGUNAKAN UNTUK MEMENUHI KEBUTUHAN SENDIRI",
+        "judul": "Aktivitas Jasa Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -730,7 +730,7 @@
     {
         "level": "kategori",
         "kode": "U",
-        "judul": "AKTIVITAS BADAN INTERNASIONAL DAN BADAN EKSTRA INTERNASIONAL",
+        "judul": "Aktivitas Rumah Tangga sebagai Pemberi Kerja dan Aktivitas Produksi Barang dan Jasa oleh Rumah Tangga untuk Keperluan Sendiri yang Tidak Terdiferensiasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -751,7 +751,7 @@
     {
         "level": "kategori",
         "kode": "V",
-        "judul": "AKTIVITAS LAINNYA",
+        "judul": "Aktivitas Badan Internasional dan Badan Ekstra Internasional Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },

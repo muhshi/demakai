@@ -2,7 +2,7 @@
     {
         "level": "kategori",
         "kode": "A",
-        "judul": "PERTANIAN, KEHUTANAN DAN PERIKANAN",
+        "judul": "Pertanian, Kehutanan, dan Perikanan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -30,7 +30,7 @@
     {
         "level": "kategori",
         "kode": "B",
-        "judul": "PERTAMBANGAN DAN PENGGALIAN",
+        "judul": "Pertambangan dan Penggalian",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -72,7 +72,7 @@
     {
         "level": "kategori",
         "kode": "C",
-        "judul": "INDUSTRI PENGOLAHAN",
+        "judul": "Industri",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -247,7 +247,7 @@
     {
         "level": "kategori",
         "kode": "D",
-        "judul": "PENGADAAN LISTRIK, GAS, UAP/AIR PANAS DAN UDARA DINGIN",
+        "judul": "Penyediaan Listrik, Gas, Uap/Air Panas Dan Udara Dingin",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -261,7 +261,7 @@
     {
         "level": "kategori",
         "kode": "E",
-        "judul": "PENGADAAN AIR, PENGELOLAAN SAMPAH, LIMBAH DAN DAUR ULANG",
+        "judul": "Penyediaan Air, Penegelolaan Air Limbah, Penanganan Limbah, dan Remediasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -296,7 +296,7 @@
     {
         "level": "kategori",
         "kode": "F",
-        "judul": "KONSTRUKSI",
+        "judul": "Konstruksi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -324,7 +324,7 @@
     {
         "level": "kategori",
         "kode": "G",
-        "judul": "PERDAGANGAN BESAR DAN ECERAN; REPARASI MOBIL DAN SEPEDA MOTOR",
+        "judul": "Perdagangan Besar Dan Eceran",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -345,7 +345,7 @@
     {
         "level": "kategori",
         "kode": "H",
-        "judul": "PENGANGKUTAN DAN PERGUDANGAN",
+        "judul": "Transportasi dan Penyimpanan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -387,7 +387,7 @@
     {
         "level": "kategori",
         "kode": "I",
-        "judul": "PENYEDIAAN AKOMODASI DAN PENYEDIAAN MAKAN MINUM",
+        "judul": "Aktivitas Penyediaan Akomodasi dan Makan Minum",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -408,7 +408,7 @@
     {
         "level": "kategori",
         "kode": "J",
-        "judul": "INFORMASI DAN KOMUNIKASI",
+        "judul": "Aktivitas Penerbitan, Penyiaran, Produksi dan Distribusi Konten",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -436,7 +436,7 @@
     {
         "level": "kategori",
         "kode": "K",
-        "judul": "AKTIVITAS KEUANGAN DAN ASURANSI",
+        "judul": "Aktivitas Telekomunikasi, Pemrograman Komputer, Konsultansi, Infrastruktur Komputasi, dan Jasa Informasi Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -464,7 +464,7 @@
     {
         "level": "kategori",
         "kode": "L",
-        "judul": "REAL ESTAT",
+        "judul": "Aktivitas Keuangan dan Asuransi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -492,7 +492,7 @@
     {
         "level": "kategori",
         "kode": "M",
-        "judul": "AKTIVITAS PROFESIONAL, ILMIAH DAN TEKNIS",
+        "judul": "Aktivitas Real Estat",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -506,7 +506,7 @@
     {
         "level": "kategori",
         "kode": "N",
-        "judul": "AKTIVITAS PENYEWAAN DAN GUNA USAHA TANPA HAK OPSI, KETENAGAKERJAAN, AGEN PERJALANAN DAN PENUNJANG USAHA LAINNYA",
+        "judul": "Aktivitas Profesional, Ilmiah, dan Teknis",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -562,7 +562,7 @@
     {
         "level": "kategori",
         "kode": "O",
-        "judul": "ADMINISTRASI PEMERINTAHAN, PERTAHANAN DAN JAMINAN SOSIAL WAJIB",
+        "judul": "Aktivitas Administratif dan Penunjang Usaha",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -611,7 +611,7 @@
     {
         "level": "kategori",
         "kode": "P",
-        "judul": "PENDIDIKAN",
+        "judul": "Administrasi Pemerintahan dan Pertahanan, serta Jaminan Sosial Wajib",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -625,7 +625,7 @@
     {
         "level": "kategori",
         "kode": "Q",
-        "judul": "AKTIVITAS KESEHATAN MANUSIA DAN AKTIVITAS SOSIAL",
+        "judul": "Pendidikan",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -639,7 +639,7 @@
     {
         "level": "kategori",
         "kode": "R",
-        "judul": "KESENIAN, HIBURAN DAN REKREASI",
+        "judul": "Aktivitas Kesehatan Manusia dan Aktivitas Sosial",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -667,7 +667,7 @@
     {
         "level": "kategori",
         "kode": "S",
-        "judul": "AKTIVITAS JASA LAINNYA",
+        "judul": "Kesenian, Olahraga, dan Rekreasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -702,7 +702,7 @@
     {
         "level": "kategori",
         "kode": "T",
-        "judul": "AKTIVITAS RUMAH TANGGA SEBAGAI PEMBERI KERJA; AKTIVITAS YANG MENGHASILKAN BARANG DAN JASA OLEH RUMAH TANGGA YANG DIGUNAKAN UNTUK MEMENUHI KEBUTUHAN SENDIRI",
+        "judul": "Aktivitas Jasa Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -730,7 +730,7 @@
     {
         "level": "kategori",
         "kode": "U",
-        "judul": "AKTIVITAS BADAN INTERNASIONAL DAN BADAN EKSTRA INTERNASIONAL",
+        "judul": "Aktivitas Rumah Tangga sebagai Pemberi Kerja dan Aktivitas Produksi Barang dan Jasa oleh Rumah Tangga untuk Keperluan Sendiri yang Tidak Terdiferensiasi",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -751,7 +751,7 @@
     {
         "level": "kategori",
         "kode": "V",
-        "judul": "AKTIVITAS LAINNYA",
+        "judul": "Aktivitas Badan Internasional dan Badan Ekstra Internasional Lainnya",
         "deskripsi": "",
         "parent_kode": null
     },
@@ -1690,7 +1690,7 @@
         "level": "golongan",
         "kode": "502",
         "judul": "Transportasi Perairan Darat",
-        "deskripsi": "Golongan ini mencakup: transportasi penumpang melalui sungai, terusan (kanal), danau, rawa, dan perairan darat lainnya, termasuk angkutan di dalam pelabuhan; transportasi penumpang untuk tujuan wisata atau rekreasi. Golongan ini juga mencakup: penyewaan perahu wisata dengan awak kapalnya untuk transportasi di perairan darat; pengoperasian kapal wisata, pesiar, atau tamasya di perairan darat. Golongan ini tidak mencakup: aktivitas restoran dan bar di atas kapal yang dioperasikan oleh unit terpisah, lihat subgolongan 5610 dan 5630; pengoperaian “kapal kasino terapung” yang tidak memindahkan penumpang, lihat subgolongan 9200.",
+        "deskripsi": "Golongan ini mencakup: transportasi penumpang melalui sungai, terusan (kanal), danau, rawa, dan perairan darat lainnya, termasuk angkutan di dalam pelabuhan; transportasi penumpang untuk tujuan wisata atau rekreasi. Golongan ini juga mencakup: penyewaan perahu wisata dengan awak kapalnya untuk transportasi di perairan darat; pengoperasian kapal wisata, pesiar, atau tamasya di perairan darat. Golongan ini tidak mencakup: aktivitas restoran dan bar di atas kapal yang dioperasikan oleh unit terpisah, lihat subgolongan 5610 dan 5630; pengoperaian \u201ckapal kasino terapung\u201d yang tidak memindahkan penumpang, lihat subgolongan 9200.",
         "parent_kode": "50"
     },
     {
@@ -2292,7 +2292,7 @@
         "level": "golongan",
         "kode": "855",
         "judul": "PENDIDIKAN LAINNYA",
-        "deskripsi": "Golongan ini mencakup kegiatan pendidikan (termasuk pendidikan nonformal) yang bukan bagian dari pendidikan awal dalam sistem sekolah reguler, serta tidak setara dalam muatan maupun kualifikasi dengan program tersebut. Golongan ini mencakup pelatihan untuk berbagai tujuan (keperluan profesi, hobi, atau pengembangan diri) bagi anak-anak maupun dewasa, termasuk pendidikan dan pelatihan vokasional berkelanjutan nonformal. Pendidikan nonformal didefinisikan oleh ISCED-P 2011 sebagai pendidikan yang terlembaga, disengaja, dan dirancang oleh penyelenggara pendidikan untuk menjadi tambahan, alternatif, dan/atau pelengkap terhadap pendidikan formal dalam proses pembelajaran sepanjang hayat setiap orang. Pendidikan ini ditujukan bagi semua kelompok usia, namun tidak selalu mengikuti jalur pembelajaran yang berkesinambungan dapat berlangsung dalam durasi singkat dan/atau intensitas rendah, serta umumnya diselenggarakan dalam bentuk kursus singkat, lokakarya, atau seminar. Golongan ini juga mencakup kegiatan pendidikan yang dijalankan oleh pendidik (misalnya dosen, tutor, akademisi, instruktur) yang bekerja secara mandiri atau independen. Golongan ini mencakup penyelenggaraan pendidikan seperti pelatihan olahraga untuk kelompok atau individu, pelatihan bahasa asing, pelatihan seni, drama, atau musik serta bentuk pelatihan atau pendidikan khusus lainnya yang diselenggarakan oleh kamp atau sekolah, yang tidak setara dengan pendidikan dalam golongan 851— 854. Pengajaran yang diberikan di sini mencakup olahraga, permainan dan pengajaran guru, termasuk pengajaran yoga. Golongan ini mencakup jasa tutorial akademis, lembaga bimbingan belajar, pusat belajar perbaikan, pengajaran bahasa, kecepatan membaca dan keagamaan. Golongan ini juga mencakup pelatihan seperti sekolah mengemudi mobil nonkomersial, mengemudi pesawat terbang nonkomersial, pelatihan penjaga pantai, pelatihan cara bertahan hidup, pelatihan teknik berbicara atau pidato dan komputer, pelatihan terkait produk perlindungan tanaman.",
+        "deskripsi": "Golongan ini mencakup kegiatan pendidikan (termasuk pendidikan nonformal) yang bukan bagian dari pendidikan awal dalam sistem sekolah reguler, serta tidak setara dalam muatan maupun kualifikasi dengan program tersebut. Golongan ini mencakup pelatihan untuk berbagai tujuan (keperluan profesi, hobi, atau pengembangan diri) bagi anak-anak maupun dewasa, termasuk pendidikan dan pelatihan vokasional berkelanjutan nonformal. Pendidikan nonformal didefinisikan oleh ISCED-P 2011 sebagai pendidikan yang terlembaga, disengaja, dan dirancang oleh penyelenggara pendidikan untuk menjadi tambahan, alternatif, dan/atau pelengkap terhadap pendidikan formal dalam proses pembelajaran sepanjang hayat setiap orang. Pendidikan ini ditujukan bagi semua kelompok usia, namun tidak selalu mengikuti jalur pembelajaran yang berkesinambungan dapat berlangsung dalam durasi singkat dan/atau intensitas rendah, serta umumnya diselenggarakan dalam bentuk kursus singkat, lokakarya, atau seminar. Golongan ini juga mencakup kegiatan pendidikan yang dijalankan oleh pendidik (misalnya dosen, tutor, akademisi, instruktur) yang bekerja secara mandiri atau independen. Golongan ini mencakup penyelenggaraan pendidikan seperti pelatihan olahraga untuk kelompok atau individu, pelatihan bahasa asing, pelatihan seni, drama, atau musik serta bentuk pelatihan atau pendidikan khusus lainnya yang diselenggarakan oleh kamp atau sekolah, yang tidak setara dengan pendidikan dalam golongan 851\u2014 854. Pengajaran yang diberikan di sini mencakup olahraga, permainan dan pengajaran guru, termasuk pengajaran yoga. Golongan ini mencakup jasa tutorial akademis, lembaga bimbingan belajar, pusat belajar perbaikan, pengajaran bahasa, kecepatan membaca dan keagamaan. Golongan ini juga mencakup pelatihan seperti sekolah mengemudi mobil nonkomersial, mengemudi pesawat terbang nonkomersial, pelatihan penjaga pantai, pelatihan cara bertahan hidup, pelatihan teknik berbicara atau pidato dan komputer, pelatihan terkait produk perlindungan tanaman.",
         "parent_kode": "85"
     },
     {
@@ -4714,7 +4714,7 @@
         "level": "subgolongan",
         "kode": "5021",
         "judul": "Transportasi Perairan Darat untuk Penumpang",
-        "deskripsi": "Subgolongan ini mencakup transportasi penumpang melalui sungai, terusan (kanal), danau, rawa, dan perairan darat lainnya, termasuk angkutan di dalam pelabuhan; transportasi penumpang untuk tujuan wisata atau rekreasi. Subgolongan ini juga mencakup penyewaan perahu wisata dengan awak kapalnya untuk transportasi di perairan darat; pengoperasian kapal wisata, pesiar, atau tamasya di perairan darat. Kelompok ini tidak mencakup aktivitas restoran dan bar di atas kapal yang dioperasikan oleh unit terpisah, lihat subgolongan 5610 dan 5630; pengoperaian “kapal kasino terapung” yang tidak memindahkan penumpang, lihat subgolongan 9200.",
+        "deskripsi": "Subgolongan ini mencakup transportasi penumpang melalui sungai, terusan (kanal), danau, rawa, dan perairan darat lainnya, termasuk angkutan di dalam pelabuhan; transportasi penumpang untuk tujuan wisata atau rekreasi. Subgolongan ini juga mencakup penyewaan perahu wisata dengan awak kapalnya untuk transportasi di perairan darat; pengoperasian kapal wisata, pesiar, atau tamasya di perairan darat. Kelompok ini tidak mencakup aktivitas restoran dan bar di atas kapal yang dioperasikan oleh unit terpisah, lihat subgolongan 5610 dan 5630; pengoperaian \u201ckapal kasino terapung\u201d yang tidak memindahkan penumpang, lihat subgolongan 9200.",
         "parent_kode": "502"
     },
     {
@@ -5638,7 +5638,7 @@
         "level": "subgolongan",
         "kode": "8510",
         "judul": "PENDIDIKAN PRASEKOLAH",
-        "deskripsi": "Subgolongan ini mencakup kegiatan penyediaan jasa pendidikan anak usia 4—6 tahun yang dilakukan melalui pemberian rangsangan pendidikan untuk membantu pertumbuhan dan perkembangan jasmani dan rohani agar anak memiliki kesiapan dalam memasuki pendidikan dasar, baik yang diselenggarakan oleh pemerintah maupun oleh masyarakat. Subgolongan ini tidak mencakup jasa penitipan anak (ISCED-P 2011 level 01 pengembangan pendidikan anak usia dini), lihat subgolongan 8890.",
+        "deskripsi": "Subgolongan ini mencakup kegiatan penyediaan jasa pendidikan anak usia 4\u20146 tahun yang dilakukan melalui pemberian rangsangan pendidikan untuk membantu pertumbuhan dan perkembangan jasmani dan rohani agar anak memiliki kesiapan dalam memasuki pendidikan dasar, baik yang diselenggarakan oleh pemerintah maupun oleh masyarakat. Subgolongan ini tidak mencakup jasa penitipan anak (ISCED-P 2011 level 01 pengembangan pendidikan anak usia dini), lihat subgolongan 8890.",
         "parent_kode": "851"
     },
     {
@@ -5736,7 +5736,7 @@
         "level": "subgolongan",
         "kode": "8559",
         "judul": "PENDIDIKAN LAINNYA YTDL",
-        "deskripsi": "Subgolongan ini mencakup penyediaan pengajaran dan pelatihan khusus, semacam kursus umumnya untuk orang dewasa dan tidak dapat disamakan dengan pendidikan pada golongan 851—854. Subgolongan ini tidak mencakup sekolah akademis, perguruan tinggi dan universitas. Pengajaran dapat dilaksanakan dalam berbagai bentuk, seperti fasilitas pelatihan pendidikan, lembaga pendidikan, tempat kerja, dalam kelas atau rumah dan melalui surat menyurat, radio, televisi, internet atau dengan cara lain. Pengajaran ini tidak ditujukan untuk mendapatkan ijazah sekolah, sarjana muda atau gelar sarjana. Subgolongan ini mencakup - pendidikan yang tidak berjenjang; - jasa pengajar privat akademis; - persiapan penerimaan perguruan tinggi; - pusat pembelajaran yang menawarkan kursus remedial (perbaikan); - kursus untuk meninjau ujian profesional; - pengajaran bahasa dan pengajaran keahlian percakapan; - pengajaran membaca cepat; - pengajaran Agama; - pelatihan penjaga keselamatan; - pelatihan bertahan hidup; - pelatihan berbicara di depan umum; - pelatihan komputer. Subgolongan ini tidak mencakup - program pendidikan keaksaraan formal bagi orang dewasa, lihat subgolongan 8520; - pendidikan menengah umum, lihat subgolongan 8531; - pendidikan menegah kejuruan, lihat subgolongan 8532; - kegiatan hiburan di panti lanjut usia, lihat subgolongan 9329.",
+        "deskripsi": "Subgolongan ini mencakup penyediaan pengajaran dan pelatihan khusus, semacam kursus umumnya untuk orang dewasa dan tidak dapat disamakan dengan pendidikan pada golongan 851\u2014854. Subgolongan ini tidak mencakup sekolah akademis, perguruan tinggi dan universitas. Pengajaran dapat dilaksanakan dalam berbagai bentuk, seperti fasilitas pelatihan pendidikan, lembaga pendidikan, tempat kerja, dalam kelas atau rumah dan melalui surat menyurat, radio, televisi, internet atau dengan cara lain. Pengajaran ini tidak ditujukan untuk mendapatkan ijazah sekolah, sarjana muda atau gelar sarjana. Subgolongan ini mencakup - pendidikan yang tidak berjenjang; - jasa pengajar privat akademis; - persiapan penerimaan perguruan tinggi; - pusat pembelajaran yang menawarkan kursus remedial (perbaikan); - kursus untuk meninjau ujian profesional; - pengajaran bahasa dan pengajaran keahlian percakapan; - pengajaran membaca cepat; - pengajaran Agama; - pelatihan penjaga keselamatan; - pelatihan bertahan hidup; - pelatihan berbicara di depan umum; - pelatihan komputer. Subgolongan ini tidak mencakup - program pendidikan keaksaraan formal bagi orang dewasa, lihat subgolongan 8520; - pendidikan menengah umum, lihat subgolongan 8531; - pendidikan menegah kejuruan, lihat subgolongan 8532; - kegiatan hiburan di panti lanjut usia, lihat subgolongan 9329.",
         "parent_kode": "855"
     },
     {
@@ -15774,105 +15774,105 @@
         "level": "kelompok",
         "kode": "85101",
         "judul": "PENDIDIKAN TAMAN KANAK-KANAK UMUM PEMERINTAH",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak usia 4—6 tahun dengan prioritas usia 5 tahun dan 6 tahun, menekankan pengembangan potensi anak secara menyeluruh dengan tetap memberikan pendidikan agama yang bersifat umum dan tidak mendalam pada satu agama tertentu serta diselenggarakan oleh pemerintah, seperti taman kanak-kanak negeri dan taman kanak-kanak luar biasa negeri.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak usia 4\u20146 tahun dengan prioritas usia 5 tahun dan 6 tahun, menekankan pengembangan potensi anak secara menyeluruh dengan tetap memberikan pendidikan agama yang bersifat umum dan tidak mendalam pada satu agama tertentu serta diselenggarakan oleh pemerintah, seperti taman kanak-kanak negeri dan taman kanak-kanak luar biasa negeri.",
         "parent_kode": "8510"
     },
     {
         "level": "kelompok",
         "kode": "85102",
         "judul": "PENDIDIKAN TAMAN KANAK-KANAK UMUM SWASTA",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak usia 4—6 tahun dengan prioritas usia 5 tahun dan 6 tahun, menekankan pengembangan potensi anak secara menyeluruh dengan tetap memberikan pendidikan agama yang bersifat umum dan tidak mendalam pada satu agama tertentu serta diselenggarakan oleh swasta, seperti taman kanak-kanak swasta, taman kanak-kanak hasil kerja sama dengan lembaga pendidikan asing, dan taman kanak-kanak luar biasa swasta.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak usia 4\u20146 tahun dengan prioritas usia 5 tahun dan 6 tahun, menekankan pengembangan potensi anak secara menyeluruh dengan tetap memberikan pendidikan agama yang bersifat umum dan tidak mendalam pada satu agama tertentu serta diselenggarakan oleh swasta, seperti taman kanak-kanak swasta, taman kanak-kanak hasil kerja sama dengan lembaga pendidikan asing, dan taman kanak-kanak luar biasa swasta.",
         "parent_kode": "8510"
     },
     {
         "level": "kelompok",
         "kode": "85103",
         "judul": "PENDIDIKAN PRASEKOLAH KEAGAMAAN ISLAM",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak berusia 4—6 tahun dengan fokus mengintegrasikan nilai Islam pada pembelajaran persiapan jenjang pendidikan dasar, termasuk pengenalan praktik ibadah, hafalan doa, pemahaman Al-Qur'an, seperti pendidikan anak usia dini/PAUD Al-Qur'an, raudhatul athfal/RA, bustanul athfal/BA.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi anak berusia 4\u20146 tahun dengan fokus mengintegrasikan nilai Islam pada pembelajaran persiapan jenjang pendidikan dasar, termasuk pengenalan praktik ibadah, hafalan doa, pemahaman Al-Qur'an, seperti pendidikan anak usia dini/PAUD Al-Qur'an, raudhatul athfal/RA, bustanul athfal/BA.",
         "parent_kode": "8510"
     },
     {
         "level": "kelompok",
         "kode": "85104",
         "judul": "PENDIDIKAN PRASEKOLAH KEAGAMAAN PROTESTAN, KATOLIK, HINDU, BUDDHA, ATAU KONGHUCU",
-        "deskripsi": "Kelompok ini mencakup pendidikan untuk anak berusia 4—6 tahun dengan fokus mengintegrasikan nilai Protestan, Katolik, Hindu, Buddha, atau Konghucu pada pembelajaran persiapan jenjang pendidikan dasar, seperti taman seminari, pratama widyalaya, pratama widya pasraman, dan nava dhamamasekha.",
+        "deskripsi": "Kelompok ini mencakup pendidikan untuk anak berusia 4\u20146 tahun dengan fokus mengintegrasikan nilai Protestan, Katolik, Hindu, Buddha, atau Konghucu pada pembelajaran persiapan jenjang pendidikan dasar, seperti taman seminari, pratama widyalaya, pratama widya pasraman, dan nava dhamamasekha.",
         "parent_kode": "8510"
     },
     {
         "level": "kelompok",
         "kode": "85201",
         "judul": "PENDIDIKAN DASAR UMUM PEMERINTAH",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7—12 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar negeri, sekolah luar biasa tingkat dasar negeri, dan Paket A negeri.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7\u201412 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar negeri, sekolah luar biasa tingkat dasar negeri, dan Paket A negeri.",
         "parent_kode": "8520"
     },
     {
         "level": "kelompok",
         "kode": "85202",
         "judul": "PENDIDIKAN DASAR UMUM SWASTA",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7—12 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar swasta, sekolah dasar hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa tingkat dasar swasta, dan Paket A swasta.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7\u201412 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar swasta, sekolah dasar hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa tingkat dasar swasta, dan Paket A swasta.",
         "parent_kode": "8520"
     },
     {
         "level": "kelompok",
         "kode": "85203",
         "judul": "PENDIDIKAN DASAR KEAGAMAAN ISLAM",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7—12 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah ibtidaiyah/MI, pendidikan muadalah ula, pendidikan diniyah formal ula, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang ula, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang ula.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7\u201412 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah ibtidaiyah/MI, pendidikan muadalah ula, pendidikan diniyah formal ula, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang ula, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang ula.",
         "parent_kode": "8520"
     },
     {
         "level": "kelompok",
         "kode": "85204",
         "judul": "PENDIDIKAN DASAR KEAGAMAAN PROTESTAN, KATOLIK, HINDU, BUDDHA, ATAU KONGHUCU",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7—12 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar teologi Kristen, sekolah dasar keagamaan Katolik, adi widyalaya, adi widya pasraman, dan mula dhammasekha.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 7\u201412 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah dasar teologi Kristen, sekolah dasar keagamaan Katolik, adi widyalaya, adi widya pasraman, dan mula dhammasekha.",
         "parent_kode": "8520"
     },
     {
         "level": "kelompok",
         "kode": "85311",
         "judul": "PENDIDIKAN MENENGAH PERTAMA UMUM PEMERINTAH",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13—15 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama negeri, sekolah luar biasa menengah pertama negeri, dan Paket B negeri.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13\u201415 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama negeri, sekolah luar biasa menengah pertama negeri, dan Paket B negeri.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85312",
         "judul": "PENDIDIKAN MENENGAH PERTAMA UMUM SWASTA",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13—15 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama swasta, sekolah menengah pertama hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa menengah pertama swasta, dan Paket B swasta.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13\u201415 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama swasta, sekolah menengah pertama hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa menengah pertama swasta, dan Paket B swasta.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85313",
         "judul": "PENDIDIKAN MENENGAH PERTAMA KEAGAMAAN ISLAM",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13—15 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah tsanawiyah (MTs), pendidikan muadalah wustha, pendidikan diniyah formal wustha, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang wustha, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang wustha.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13\u201415 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah tsanawiyah (MTs), pendidikan muadalah wustha, pendidikan diniyah formal wustha, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang wustha, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang wustha.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85314",
         "judul": "PENDIDIKAN MENENGAH PERTAMA KEAGAMAAN PROTESTAN, KATOLIK, HINDU, BUDDHA, ATAU KONGHUCU",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13—15 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama teologi Kristen, sekolah menengah pertama keagamaan Katolik, madyama widyalaya, madyama widya pasraman, muda dhammasekha.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 13\u201415 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah pertama teologi Kristen, sekolah menengah pertama keagamaan Katolik, madyama widyalaya, madyama widya pasraman, muda dhammasekha.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85315",
         "judul": "PENDIDIKAN MENENGAH ATAS UMUM PEMERINTAH",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16—18 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah atas negeri, sekolah luar biasa menengah tingkat atas negeri, Paket C negeri.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16\u201418 tahun dan pendidikan kesetaraan terkait yang diselenggarakan pemerintah, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah atas negeri, sekolah luar biasa menengah tingkat atas negeri, Paket C negeri.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85316",
         "judul": "PENDIDIKAN MENENGAH ATAS UMUM SWASTA",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16—18 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah atas swasta, sekolah dasar hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa menengah tingkat atas swasta, Paket C swasta.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16\u201418 tahun dan pendidikan kesetaraan terkait yang diselenggarakan swasta, berorientasi pada pembelajaran ilmu pengetahuan dan keterampilan umum, seperti sekolah menengah atas swasta, sekolah dasar hasil kerja sama dengan lembaga pendidikan asing, sekolah luar biasa menengah tingkat atas swasta, Paket C swasta.",
         "parent_kode": "8531"
     },
     {
         "level": "kelompok",
         "kode": "85317",
         "judul": "PENDIDIKAN MENENGAH ATAS KEAGAMAAN ISLAM",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16—18 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah aliyah (MA), pendidikan muadalah ulya, pendidikan diniyah formal ulya, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang ulya, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang ulya.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16\u201418 tahun dan pendidikan kesetaraan terkait yang berorientasi pada ilmuilmu keislaman, termasuk kajian Al-Qur'an, hadis, fikih, sejarah Islam, bahasa Arab, dengan tetap mencakup pempelajaran ilmu pengetahuan dan keterampilan umum, seperti madrasah aliyah (MA), pendidikan muadalah ulya, pendidikan diniyah formal ulya, pendidikan pesantren berbentuk pengkajian kitab kuning jenjang ulya, dan pendidikan kesetaraan pada pondok pesantren salafiyah jenjang ulya.",
         "parent_kode": "8531"
     },
     {
@@ -15907,7 +15907,7 @@
         "level": "kelompok",
         "kode": "85324",
         "judul": "PENDIDIKAN MENENGAH KEJURUAN KEAGAMAAN PROTESTAN, KATOLIK, HINDU, BUDDHA, ATAU KONGHUCU",
-        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16—18 tahun dan pendidikan kesetaraan terkait yang berorientasi pada pengembangan ilmu pengetahuan dan keterampilan kejuruan yang terintegrasi dengan nilai-nilai dan ajaran keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama.",
+        "deskripsi": "Kelompok ini mencakup pendidikan bagi peserta didik usia 16\u201418 tahun dan pendidikan kesetaraan terkait yang berorientasi pada pengembangan ilmu pengetahuan dan keterampilan kejuruan yang terintegrasi dengan nilai-nilai dan ajaran keagamaan Protestan, Katolik, Hindu, Buddha, atau Konghucu, termasuk pembelajaran kitab suci; hukum tata cara ibadah; bahasa klasik keagamaan; sejarah peradaban dan tokoh agama.",
         "parent_kode": "8532"
     },
     {
@@ -15970,7 +15970,7 @@
         "level": "kelompok",
         "kode": "85541",
         "judul": "PENDIDIKAN PESANTREN LAINNYA",
-        "deskripsi": "Kelompok ini mencakup satuan pendidikan pesantren yang diselenggarakan pada jalur pendidikan nonformal secara berjenjang maupun tidak berjenjang selain yang termasuk dalam kelompok pada subgolongan 851—854, termasuk juga Pesantren Takhassus AlQur'an dan Pesantren Takhassus Lainnya.",
+        "deskripsi": "Kelompok ini mencakup satuan pendidikan pesantren yang diselenggarakan pada jalur pendidikan nonformal secara berjenjang maupun tidak berjenjang selain yang termasuk dalam kelompok pada subgolongan 851\u2014854, termasuk juga Pesantren Takhassus AlQur'an dan Pesantren Takhassus Lainnya.",
         "parent_kode": "8554"
     },
     {
@@ -16453,7 +16453,7 @@
         "level": "kelompok",
         "kode": "88906",
         "judul": "Pendidikan Kelompok Bermain",
-        "deskripsi": "Pendidikan bagi anak usia 2—6 tahun dengan prioritas usia 3 tahun dan 4 tahun yang dikelola oleh pemerintah maupun masyarakat, seperti kelompok bermain, kelompok bermain hasil kerja sama dengan lembaga pendidikan asing.",
+        "deskripsi": "Pendidikan bagi anak usia 2\u20146 tahun dengan prioritas usia 3 tahun dan 4 tahun yang dikelola oleh pemerintah maupun masyarakat, seperti kelompok bermain, kelompok bermain hasil kerja sama dengan lembaga pendidikan asing.",
         "parent_kode": "8890"
     },
     {
