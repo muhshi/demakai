@@ -28,6 +28,12 @@ class KbliHierarchySeeder extends Seeder
             return;
         }
 
+        // Idempotency: skip if data already exists
+        if (Kbli2025Hierarchy::exists()) {
+            $this->command->info("Data KBLI Hierarchy sudah ada, seeder dilewati.");
+            return;
+        }
+
         $this->command->info("Mengimport KBLI Hierarchies...");
         
         $insertData = [];

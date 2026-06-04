@@ -24,6 +24,10 @@ sleep 5
 echo "📦 Running migrations..."
 docker compose exec -T demakai-franken php artisan migrate --force
 
+# 5b. Seed KBLI Hierarchy data (idempotent: skip if already populated)
+echo "🌱 Seeding KBLI 2025 Hierarchy data..."
+docker compose exec -T demakai-franken php artisan db:seed --class=KbliHierarchySeeder --force || echo "⚠️  Seeder skipped or already ran."
+
 # 6. Clear and rebuild cache
 echo "🧹 Clearing and optimizing cache..."
 docker compose exec -T demakai-franken php artisan optimize:clear
