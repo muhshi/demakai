@@ -8,9 +8,14 @@ echo "📥 Pulling from git..."
 git fetch origin main
 git reset --hard origin/main
 
-# 2. Pull latest Docker image from GHCR (no build needed on server)
-echo "📦 Pulling latest Docker image..."
-docker compose pull
+# 2. Try pulling pre-built image from GHCR, fallback to local build
+echo "📦 Pulling Docker image from GHCR..."
+if docker compose pull 2>/dev/null; then
+    echo "✅ Image pulled from GHCR"
+else
+    echo "⚠️  GHCR pull failed, building locally..."
+    docker compose build --no-cache demakai-franken
+fi
 
 # 3. Recreate containers
 echo "🔄 Recreating containers..."
