@@ -4,6 +4,20 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-06-04] - Eksplorasi Manual KBLI 2025 & Fix Deploy Seeder
+
+### Added
+- **Fitur Eksplorasi Manual KBLI 2025**: Accordion hierarkis interaktif di halaman utama (`welcome.blade.php`) untuk menjelajahi struktur KBLI dari level Kategori (A-U) hingga Kelompok (5 digit), dengan animasi smooth dan desain terintegrasi.
+- **`Kbli2025Hierarchy` Model & Migration**: Tabel `kbli2025_hierarchies` untuk menyimpan hierarki KBLI (Kategori, Pokok, Golongan, Subgolongan) dengan kolom `level`, `kode`, `judul`, `deskripsi`, dan `parent_kode`.
+- **`KbliHierarchyController`**: Controller API di `/api/kbli/hierarchy` untuk mengambil node berdasarkan `parent_kode` secara lazy-load saat accordion dibuka.
+- **`KbliHierarchySeeder`**: Seeder yang membaca `database/data/kbli2025_full_arsip.json` dan mengisi tabel hierarki, dengan pengecekan idempotency agar aman dijalankan berulang kali.
+
+### Fixed
+- **Seeder Tidak Dieksekusi Saat Deploy**: Menambahkan perintah `php artisan db:seed --class=KbliHierarchySeeder --force` ke `deploy.sh` agar data hierarki KBLI otomatis tersedia di server setelah deploy.
+- **Idempotency Seeder**: `KbliHierarchySeeder` sekarang mengecek apakah data sudah ada sebelum insert, mencegah duplikasi data saat `deploy.sh` dijalankan berulang kali.
+
+---
+
 ## [2026-04-27] - Perluasan Framework Evaluasi 10 Metode & Pemisahan Preprocessing
 
 ### Added
