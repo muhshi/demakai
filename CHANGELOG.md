@@ -4,6 +4,14 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-06-06] - Fix Pencarian Berdasarkan Kode KBLI/KBJI
+
+### Fixed
+- **Pencarian kode KBLI/KBJI di SearchService (PHP)**: Kolom `kode` tidak diikutsertakan dalam query SQL ILIKE pada metode `search()` dan `standardSearch()` di `SearchService.php`. Akibatnya, pencarian menggunakan kode 5 digit (misal: `47111`, `95320`) melalui AI Smart Search filter tidak mengembalikan hasil meskipun data ada di database. Kolom `kode` kini ditambahkan ke semua query pencarian SQL (exact phrase match dan per-token match).
+
+---
+
+
 ## [2026-06-04] - Migrasi Arsitektur CI/CD ke Pull-Based Deployment & Fix Volume Database
 
 ### Added

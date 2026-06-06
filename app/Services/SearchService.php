@@ -222,7 +222,8 @@ class SearchService
             // Coba exact phrase dulu (skor tertinggi)
             $q->where(function($sub) use ($clean) {
                 $like = '%' . $clean . '%';
-                $sub->orWhere('judul', 'ILIKE', $like)
+                $sub->orWhere('kode', 'ILIKE', $like)
+                    ->orWhere('judul', 'ILIKE', $like)
                     ->orWhere('deskripsi', 'ILIKE', $like)
                     ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
             });
@@ -233,7 +234,8 @@ class SearchService
                     foreach ($tokens as $token) {
                         $like = '%' . $token . '%';
                         $sub->where(function($tokenQuery) use ($like) {
-                            $tokenQuery->orWhere('judul', 'ILIKE', $like)
+                            $tokenQuery->orWhere('kode', 'ILIKE', $like)
+                                ->orWhere('judul', 'ILIKE', $like)
                                 ->orWhere('deskripsi', 'ILIKE', $like)
                                 ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
                         });
@@ -394,7 +396,8 @@ class SearchService
         if (!empty($clean)) {
             if ($model === null || $model === 'KBLI') {
                 $results = $results->merge(
-                    PgKBLI2025::where('judul', 'ILIKE', "%{$clean}%")
+                    PgKBLI2025::where('kode', 'ILIKE', "%{$clean}%")
+                        ->orWhere('judul', 'ILIKE', "%{$clean}%")
                         ->orWhere('deskripsi', 'ILIKE', "%{$clean}%")
                         ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", ["%{$clean}%"])
                         ->limit($limit)->get()
@@ -403,7 +406,8 @@ class SearchService
             }
             if ($model === null || $model === 'KBJI') {
                 $results = $results->merge(
-                    PgKBJI2014::where('judul', 'ILIKE', "%{$clean}%")
+                    PgKBJI2014::where('kode', 'ILIKE', "%{$clean}%")
+                        ->orWhere('judul', 'ILIKE', "%{$clean}%")
                         ->orWhere('deskripsi', 'ILIKE', "%{$clean}%")
                         ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", ["%{$clean}%"])
                         ->limit($limit)->get()
