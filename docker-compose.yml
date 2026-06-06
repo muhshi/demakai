@@ -12,10 +12,16 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - SERVER_NAME=:80
+      - PYTHON_SEARCH_ENABLED=true
+      - PYTHON_SEARCH_URL=http://demakai-python:8000
+      - PYTHON_SEARCH_METHOD=sql
+      - PYTHON_SEARCH_PROCESSING=none
     ports:
       - "8003:80"
     volumes:
       - app-storage:/app/storage
+    depends_on:
+      - demakai-python
     networks:
       - postgres-stack_ai_net
 
@@ -34,6 +40,19 @@ services:
     command: "php artisan queue:work --sleep=3 --tries=3 --max-time=3600"
     volumes:
       - app-storage:/app/storage
+    networks:
+      - postgres-stack_ai_net
+
+  demakai-python:
+    container_name: demakai-python
+    restart: unless-stopped
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
     networks:
       - postgres-stack_ai_net
 

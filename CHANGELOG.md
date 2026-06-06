@@ -4,10 +4,16 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
-## [2026-06-06] - Fix Pencarian Berdasarkan Kode KBLI/KBJI
+## [2026-06-06] - Integrasi Python Search API ke Docker Stack
+
+### Added
+- **Service `demakai-python` di `docker-compose.yml`**: Container Docker baru untuk Python FastAPI Search API. Sebelumnya, Python search API tidak pernah berjalan di server sehingga 3 metode pencarian (Standar SQL, Pintar Hybrid, Ekspansi AI) selalu jatuh ke SQL LIKE fallback yang identik.
+- **Health check Python API di `deploy.sh`**: Verifikasi otomatis bahwa Python Search API responsive setelah deployment.
+- **Environment variables `PYTHON_SEARCH_*`**: Ditambahkan ke container `demakai-franken` agar Laravel terhubung ke Python Search API (`PYTHON_SEARCH_ENABLED=true`, `PYTHON_SEARCH_URL=http://demakai-python:8000`).
 
 ### Fixed
-- **Pencarian kode KBLI/KBJI di SearchService (PHP)**: Kolom `kode` tidak diikutsertakan dalam query SQL ILIKE pada metode `search()` dan `standardSearch()` di `SearchService.php`. Akibatnya, pencarian menggunakan kode 5 digit (misal: `47111`, `95320`) melalui AI Smart Search filter tidak mengembalikan hasil meskipun data ada di database. Kolom `kode` kini ditambahkan ke semua query pencarian SQL (exact phrase match dan per-token match).
+- **3 metode pencarian menghasilkan output identik**: Root cause: `PYTHON_SEARCH_ENABLED` tidak diset di server → `SearchService::search()` selalu skip Python API dan masuk ke SQL LIKE fallback yang sama untuk semua metode. Sekarang Python API aktif sehingga setiap metode benar-benar menjalankan logika berbeda (SQL LIKE vs Hybrid Semantic Search vs Expansion+Hybrid).
+- **Pencarian kode KBLI/KBJI di SearchService (PHP)**: Kolom `kode` tidak diikutsertakan dalam query SQL ILIKE pada metode `search()` dan `standardSearch()`. Sekarang kolom `kode` ditambahkan ke semua query pencarian SQL.
 
 ---
 
