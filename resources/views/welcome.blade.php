@@ -882,6 +882,12 @@
             border-radius: 0.45rem;
             border: 1px solid rgba(249,115,22,0.12);
         }
+        .h-contoh.clamped {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         .h-icon {
             color: var(--text-muted);
             font-size: 0.7rem;
@@ -1226,8 +1232,9 @@
                         <button class="read-more-btn" onclick="toggleReadMore('${res.type}-${res.kode}', this)">Read More</button>
                     ` : ''}
                     ${res.contoh && res.contoh.length > 0 ? `
-                        <div class="result-examples">
-                            ${res.contoh.map(ex => `<span class="example-tag">${ex}</span>`).join('')}
+                        <div class="result-examples" id="examples-${res.type}-${res.kode}" data-contoh='${JSON.stringify(res.contoh).replace(/'/g, "&apos;")}'>
+                            ${res.contoh.slice(0, 5).map(ex => `<span class="example-tag">${ex}</span>`).join('')}
+                            ${res.contoh.length > 5 ? `<span class="example-tag" style="background: transparent; cursor: pointer; border: 1px dashed var(--primary);" onclick="toggleExamples('${res.type}-${res.kode}')">+${res.contoh.length - 5} lainnya</span>` : ''}
                         </div>
                     ` : ''}
                     <button class="add-example-btn" title="Ajukan Contoh Lapangan" onclick="openSubmissionModal('${res.type}', '${res.kode}', '${res.judul}')">+</button>
@@ -1243,6 +1250,22 @@
             } else {
                 desc.classList.add('clamped');
                 btn.textContent = 'Read More';
+            }
+        };
+
+        window.toggleExamples = (id) => {
+            const container = document.getElementById(`examples-${id}`);
+            const contohArr = JSON.parse(container.getAttribute('data-contoh') || '[]');
+            const isExpanded = container.classList.contains('expanded');
+            
+            if (!isExpanded) {
+                container.innerHTML = contohArr.map(ex => `<span class="example-tag">${ex}</span>`).join('') + 
+                    `<span class="example-tag" style="background: transparent; cursor: pointer; border: 1px dashed var(--primary);" onclick="toggleExamples('${id}')">Show Less</span>`;
+                container.classList.add('expanded');
+            } else {
+                container.innerHTML = contohArr.slice(0, 5).map(ex => `<span class="example-tag">${ex}</span>`).join('') + 
+                    `<span class="example-tag" style="background: transparent; cursor: pointer; border: 1px dashed var(--primary);" onclick="toggleExamples('${id}')">+${contohArr.length - 5} lainnya</span>`;
+                container.classList.remove('expanded');
             }
         };
 
@@ -1319,6 +1342,17 @@
         };
 
         // --- Hierarchy Drill-down Logic (new card grid design) ---
+
+        window.toggleReadMoreContoh = (id, btn) => {
+            const desc = document.getElementById(`h-contoh-${id}`);
+            if (desc.classList.contains('clamped')) {
+                desc.classList.remove('clamped');
+                btn.textContent = 'Show Less';
+            } else {
+                desc.classList.add('clamped');
+                btn.textContent = 'Read More';
+            }
+        };
 
         // Load top-level categories (A-U) immediately on page load
         (async function initKategoriGrid() {
@@ -1415,8 +1449,16 @@
             wrap.className = 'h-node';
 
             const isLeaf = node.is_leaf;
+            
+            let contohText = '';
+            if (isLeaf && node.contoh_lapangan) {
+                contohText = Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan;
+            }
+            const hasLongContoh = contohText.length > 150;
+            
             const contohHtml = isLeaf && node.contoh_lapangan
-                ? `<div class="h-contoh"><strong>Contoh:</strong> ${Array.isArray(node.contoh_lapangan) ? node.contoh_lapangan.join(', ') : node.contoh_lapangan}</div>`
+                ? `<div class="h-contoh ${hasLongContoh ? 'clamped' : ''}" id="h-contoh-${node.kode}"><strong>Contoh:</strong> ${contohText}</div>
+                   ${hasLongContoh ? `<button class="read-more-btn" style="margin-top:0.3rem; font-size:0.75rem;" onclick="toggleReadMoreContoh('${node.kode}', this)">Read More</button>` : ''}`
                 : '';
             const descHtml = node.deskripsi
                 ? `<div class="h-desc">${node.deskripsi.length > 200 ? node.deskripsi.substring(0, 200) + '…' : node.deskripsi}</div>`
