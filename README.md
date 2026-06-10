@@ -60,6 +60,17 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-06-10
+- **List Tabs KBLI/KBJI**: Menambahkan tab filter (Semua, KBLI 2025, KBLI 2020, KBJI 2014) pada halaman daftar `FieldExampleSubmissionResource` untuk memudahkan penyaringan data.
+- **Bulk Approval**: Menambahkan fitur _Bulk Action_ untuk menyetujui (`approve`) banyak pengajuan contoh lapangan sekaligus, baik pada resource utama maupun widget dashboard.
+- **Widget Dashboard Pending Submissions**: Menambahkan dua widget pada dashboard (`PendingSubmissionsStats`, `PendingSubmissionsTable`) untuk memudahkan persetujuan pengajuan langsung dari dashboard.
+
+### [Removed] - 2026-06-10
+- **Welcome & Filament Version**: Menghilangkan widget bawaan `AccountWidget` (Welcome) dan `FilamentInfoWidget` dari dashboard panel admin.
+
+### [Added] - 2026-06-06
+- Service `demakai-python` di `docker-compose.yml`.
+
 ### [Added] - 2026-06-03
 - Added KBLI Hierarchical Drill-down feature.
 - Created `kbli2025_hierarchies` table to separate hierarchy records (Kategori to Subgolongan) from the main 5-digit KBLI data, ensuring no impact on existing AI Search Embeddings.

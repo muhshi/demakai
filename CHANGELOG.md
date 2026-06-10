@@ -4,6 +4,20 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-06-10] - Peningkatan Pengajuan Contoh Lapangan & Dashboard
+
+### Added
+- **List Tabs KBLI/KBJI**: Menambahkan tab filter (Semua, KBLI 2025, KBLI 2020, KBJI 2014) pada halaman daftar `FieldExampleSubmissionResource` untuk memudahkan penyaringan data.
+- **Bulk Approval**: Menambahkan fitur _Bulk Action_ untuk menyetujui (`approve`) banyak pengajuan contoh lapangan sekaligus, baik pada resource utama maupun widget dashboard.
+- **Widget Dashboard Pending Submissions**: Menambahkan dua widget pada dashboard:
+  1. `PendingSubmissionsStats`: Menampilkan ringkasan jumlah pengajuan yang menunggu persetujuan.
+  2. `PendingSubmissionsTable`: Menampilkan tabel daftar pengajuan pending langsung di dashboard beserta aksi _Approve_ (termasuk _Bulk Approve_) dan _Reject_.
+
+### Removed
+- **Welcome & Filament Version**: Menghilangkan widget bawaan `AccountWidget` (Welcome) dan `FilamentInfoWidget` dari dashboard panel admin.
+
+---
+
 ## [2026-06-06] - Integrasi Python Search API ke Docker Stack
 
 ### Added
