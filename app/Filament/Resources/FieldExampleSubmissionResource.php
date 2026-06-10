@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Actions\BulkAction;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -30,7 +31,7 @@ class FieldExampleSubmissionResource extends Resource
 {
     protected static ?string $model = FieldExampleSubmission::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-plus-circle';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-plus-circle';
     protected static ?string $navigationLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $modelLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $pluralModelLabel = 'Pengajuan Contoh Lapangan';
@@ -120,7 +121,7 @@ class FieldExampleSubmissionResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    \Filament\Tables\Actions\BulkAction::make('bulkApprove')
+                    BulkAction::make('bulkApprove')
                         ->label('Approve Selected')
                         ->icon('heroicon-o-check')
                         ->color('success')
