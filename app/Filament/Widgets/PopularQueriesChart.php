@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 class PopularQueriesChart extends ChartWidget
 {
     protected ?string $heading = 'Pencarian Terpopuler';
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {

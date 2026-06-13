@@ -19,4 +19,4 @@ yarn-error.log
 /.vscode
 output/
 python/output/
-scripts_archive/
+database/backups/

@@ -4,6 +4,26 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-06-12] - Native Visitor Analytics & Integrasi Kasus Batas KBLI 2025
+
+### Added
+- **Native Visitor Analytics**:
+  - Implementasi pelacakan pengunjung secara mandiri tanpa menggunakan *library* pihak ketiga.
+  - Pembuatan *Middleware* `TrackVisitor` untuk mendeteksi *IP Address*, Sistem Operasi, dan menghitung kunjungan harian unik serta total kunjungan.
+  - Pembuatan model dan *migration* `PageVisit` untuk menyimpan data pelacakan yang aman di *database* server sendiri.
+- **Filament Dashboard Analytics**:
+  - Penambahan `VisitorStatsOverview` widget untuk menampilkan metrik kunci: Total Pengunjung, Pengunjung Hari Ini, OS Terpopuler, dan Pending Pengajuan.
+  - Implementasi grafik tren pengunjung 30 hari terakhir dengan `VisitorChartWidget`.
+  - Optimalisasi UI/UX grafik menggunakan efek *sparkline*, kurva *Bezier* (tension), penyembunyian *grid* dan desimal (*clean UI*).
+- **Integrasi Contoh Lapangan SE2026**:
+  - Mengekstrak 46 data "Contoh Lapangan" dan "Kasus Batas" dari dokumen PDF Sensus Ekonomi 2026.
+  - Pembuatan dan eksekusi `KbliExamplesSeeder` untuk menyuntikkan data contoh lapangan secara otomatis ke dalam *array JSON* di tabel KBLI 2025.
+
+### Changed
+- Penyesuaian tata letak (*layout*) dan lebar kolom (*column span*) widget di *Dashboard* Filament agar lebih rapi dan elegan.
+
+---
+
 ## [2026-06-10] - Peningkatan Pengajuan Contoh Lapangan & Dashboard
 
 ### Added
