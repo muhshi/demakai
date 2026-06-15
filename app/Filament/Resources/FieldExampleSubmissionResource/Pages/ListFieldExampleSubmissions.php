@@ -22,11 +22,16 @@ class ListFieldExampleSubmissions extends ListRecords
     public function getTabs(): array
     {
         return [
-            'Semua' => Tab::make(),
+            'Semua' => Tab::make()
+                ->badge(\App\Models\FieldExampleSubmission::count()),
             'Belum Disetujui' => Tab::make()
-                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'pending')),
+                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'pending'))
+                ->badge(\App\Models\FieldExampleSubmission::where('status', 'pending')->count())
+                ->badgeColor('warning'),
             'Sudah Disetujui' => Tab::make()
-                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'approved')),
+                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'approved'))
+                ->badge(\App\Models\FieldExampleSubmission::where('status', 'approved')->count())
+                ->badgeColor('success'),
         ];
     }
 }
