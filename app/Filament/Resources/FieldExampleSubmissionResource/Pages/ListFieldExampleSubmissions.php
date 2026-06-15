@@ -23,12 +23,10 @@ class ListFieldExampleSubmissions extends ListRecords
     {
         return [
             'Semua' => Tab::make(),
-            'KBLI 2025' => Tab::make()
-                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('type', 'KBLI 2025')),
-            'KBLI 2020' => Tab::make()
-                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('type', 'KBLI 2020')),
-            'KBJI 2014' => Tab::make()
-                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('type', 'KBJI 2014')),
+            'Belum Disetujui' => Tab::make()
+                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'pending')),
+            'Sudah Disetujui' => Tab::make()
+                ->modifyQueryUsing(fn(\Illuminate\Database\Eloquent\Builder $query) => $query->where('status', 'approved')),
         ];
     }
 }

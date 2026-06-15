@@ -67,6 +67,7 @@ All notable changes to this project will be documented in this section.
 
 ### [Changed] - 2026-06-15
 - **Dashboard Layout**: Mengubah tata letak widget Tren Pengunjung dan Pencarian Populer menjadi berdampingan (2 kolom) agar lebih rapi.
+- **Tabel Pengajuan Contoh Lapangan**: Mengubah tab filter menjadi berdasarkan status (Semua, Belum Disetujui, Sudah Disetujui) dan menambahkan pengurutan default dari yang terbaru (`created_at` descending).
 
 ### [Added] - 2026-06-10
 - **List Tabs KBLI/KBJI**: Menambahkan tab filter (Semua, KBLI 2025, KBLI 2020, KBJI 2014) pada halaman daftar `FieldExampleSubmissionResource` untuk memudahkan penyaringan data.
