@@ -78,7 +78,13 @@ class FieldExampleSubmissionResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Jenis KBLI/KBJI')
+                    ->options([
+                        'KBLI 2025' => 'KBLI 2025',
+                        'KBLI 2020' => 'KBLI 2020',
+                        'KBJI 2014' => 'KBJI 2014',
+                    ]),
             ])
             ->actions([
                 Action::make('approve')
