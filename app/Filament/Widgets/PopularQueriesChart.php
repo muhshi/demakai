@@ -10,7 +10,7 @@ class PopularQueriesChart extends ChartWidget
 {
     protected ?string $heading = 'Pencarian Terpopuler';
     protected static ?int $sort = 3;
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
     {

@@ -65,6 +65,9 @@ All notable changes to this project will be documented in this section.
 - **Filament Dashboard Analytics**: Penambahan widget `VisitorStatsOverview` dan `VisitorChartWidget` untuk statistik kunjungan.
 - **Integrasi Contoh Lapangan SE2026**: Injeksi 46 data contoh lapangan menggunakan `KbliExamplesSeeder`.
 
+### [Changed] - 2026-06-15
+- **Dashboard Layout**: Mengubah tata letak widget Tren Pengunjung dan Pencarian Populer menjadi berdampingan (2 kolom) agar lebih rapi.
+
 ### [Added] - 2026-06-10
 - **List Tabs KBLI/KBJI**: Menambahkan tab filter (Semua, KBLI 2025, KBLI 2020, KBJI 2014) pada halaman daftar `FieldExampleSubmissionResource` untuk memudahkan penyaringan data.
 - **Bulk Approval**: Menambahkan fitur _Bulk Action_ untuk menyetujui (`approve`) banyak pengajuan contoh lapangan sekaligus, baik pada resource utama maupun widget dashboard.

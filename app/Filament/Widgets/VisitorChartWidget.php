@@ -10,7 +10,7 @@ class VisitorChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Tren Pengunjung (30 Hari Terakhir)';
     protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
     {
