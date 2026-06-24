@@ -263,7 +263,7 @@ def run_comprehensive_test(queries_file=None):
 """
     for r in results_mrr:
         is_with = "Dengan" in r["name"]
-        status_html = '<span class="pill pill-success">ON (Di-Boost)</span>' if is_with else '<span class="pill pill-danger">OFF</span>'
+        status_html = '<span class="pill pill-success">Digunakan (Active)</span>' if is_with else '<span class="pill pill-neutral">Tidak Digunakan</span>'
         mrr_pill = "pill-success" if r["mrr"] > 0.7 else ("pill-danger" if r["mrr"] < 0.35 else "pill-neutral")
         html_content += f"""
                         <tr>
@@ -279,7 +279,7 @@ def run_comprehensive_test(queries_file=None):
             
             <div class="card">
                 <h2>Analisis Kueri (Metode Query Expansion)</h2>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Membandingkan hasil performa kueri spesifik saat fitur Contoh Lapangan OFF versus ON, beserta visualisasi keyword extraction.</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Membandingkan hasil performa kueri spesifik saat fitur Contoh Lapangan Tidak Digunakan versus Digunakan, beserta visualisasi keyword extraction.</p>
                 <table>
                     <thead>
                         <tr>
