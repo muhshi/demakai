@@ -1,0 +1,459 @@
+
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sensus Ekonomi 2026 | Evaluasi DEMAKAI</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --bg-main: #f4f7f6;
+                --bg-card: #ffffff;
+                --text-main: #1f2937;
+                --text-muted: #6b7280;
+                --accent: #f97316; /* Orange SE2026 */
+                --accent-dark: #c2410c;
+                --accent-glow: rgba(249, 115, 22, 0.1);
+                --danger: #ef4444;
+                --danger-bg: rgba(239, 68, 68, 0.1);
+                --success: #10b981;
+                --success-bg: rgba(16, 185, 129, 0.1);
+                --border: #e5e7eb;
+            }
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg-main);
+                color: var(--text-main);
+                margin: 0;
+                padding: 40px 20px;
+                line-height: 1.6;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 50px;
+            }
+            .header h1 {
+                font-size: 2.5rem;
+                font-weight: 800;
+                margin-bottom: 10px;
+                color: var(--accent);
+                letter-spacing: -0.02em;
+            }
+            .header p {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .card {
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 30px;
+                margin-bottom: 40px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            }
+            .card h2 {
+                margin-top: 0;
+                font-size: 1.5rem;
+                border-bottom: 2px solid var(--accent-glow);
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+                color: var(--accent-dark);
+            }
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                text-align: left;
+            }
+            th, td {
+                padding: 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            th {
+                color: var(--text-muted);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.85rem;
+                letter-spacing: 0.05em;
+                background-color: #f9fafb;
+            }
+            th:first-child {
+                border-top-left-radius: 8px;
+            }
+            th:last-child {
+                border-top-right-radius: 8px;
+            }
+            tr {
+                transition: background-color 0.2s ease;
+            }
+            tbody tr:hover {
+                background-color: var(--accent-glow);
+            }
+            .pill {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 9999px;
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+            .pill-danger {
+                background-color: var(--danger-bg);
+                color: var(--danger);
+            }
+            .pill-success {
+                background-color: var(--success-bg);
+                color: var(--success);
+            }
+            .pill-neutral {
+                background-color: #f3f4f6;
+                color: var(--text-muted);
+            }
+            .keyword-box {
+                background-color: #f1f5f9;
+                border: 1px solid #cbd5e1;
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 0.9rem;
+                color: #334155;
+            }
+            .badge-vars {
+                display: inline-block;
+                margin-top: 6px;
+                font-size: 0.75rem;
+                background-color: #ffedd5;
+                color: #c2410c;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>DEMAKAI Evaluation Report</h1>
+                <p>A/B Testing Signifikansi "Contoh Lapangan" pada Sensus Ekonomi 2026</p>
+            </div>
+            
+            <div class="card">
+                <h2>Ringkasan Kinerja (MRR)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metode & Preprocessing</th>
+                            <th>Status Fitur</th>
+                            <th>Mean Reciprocal Rank (MRR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M1: Raw</td>
+                            <td><span class="pill pill-danger">OFF</span></td>
+                            <td><span class="pill pill-neutral">0.3575</span></td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M2: Advanced</td>
+                            <td><span class="pill pill-danger">OFF</span></td>
+                            <td><span class="pill pill-danger">0.3037</span></td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M3: Expansion</td>
+                            <td><span class="pill pill-danger">OFF</span></td>
+                            <td><span class="pill pill-neutral">0.4437</span></td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M4: Raw</td>
+                            <td><span class="pill pill-success">ON (Di-Boost)</span></td>
+                            <td><span class="pill pill-success">0.9111</span></td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M5: Advanced</td>
+                            <td><span class="pill pill-success">ON (Di-Boost)</span></td>
+                            <td><span class="pill pill-success">0.8056</span></td>
+                        </tr>
+
+                        <tr>
+                            <td style="font-weight: 600; color: #1f2937;">M6: Expansion</td>
+                            <td><span class="pill pill-success">ON (Di-Boost)</span></td>
+                            <td><span class="pill pill-success">0.8444</span></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Analisis Kueri (Metode Query Expansion)</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Membandingkan hasil performa kueri spesifik saat fitur Contoh Lapangan OFF versus ON, beserta visualisasi keyword extraction.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Kueri Asli (Input Petugas)</th>
+                            <th style="width: 35%;">Keywords Extracted</th>
+                            <th style="width: 10%;">Ground Truth</th>
+                            <th style="width: 15%;">RR (Tanpa CL)</th>
+                            <th style="width: 15%;">RR (Dengan CL)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENCABUT RUMPUT LIAR DI SAWAH(MATON)</td>
+                            <td><div class="keyword-box">liar, maton, mencabut, pertanian, rumput, sawah, tanaman pangan<br><span class='badge-vars'>Vars: lahan tani padi, sawah padi, usaha tani</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01122</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MEMBUAT LEMARI KACA/ ETALASE, MENGANTAR PESANAN LEMARI KACA</td>
+                            <td><div class="keyword-box">etalase, kaca, lemari, membuat, mengantar, pesanan<br><span class='badge-vars'>Vars: bengkel kaca etalase, toko lemari kaca, usaha rak kaca</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">31011</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN PADI</td>
+                            <td><div class="keyword-box">padi, pertanian<br><span class='badge-vars'>Vars: lahan kebun, lahan sawah padi, pertanian pangan, sektor pertanian, usaha tani, usaha tani padi</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01122</span></td>
+                            <td><span class="pill pill-neutral">0.50</span></td>
+                            <td><span class="pill pill-neutral">0.50</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MEMBUAT RESOLES UNTUK DIJUAL DIPASAR KAMPUNG</td>
+                            <td><div class="keyword-box">dijual, dipasar, kampung, membuat, resoles<br><span class='badge-vars'>Vars: katering gorengan, produksi risoles, usaha jajanan pasar</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">47249</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENGAJAR MATA PELAJARAN PKN DI MTS TAHASSUS ALQURAN</td>
+                            <td><div class="keyword-box">alquran, mata, mengajar, mts, pelajaran, pkn, tahassus<br><span class='badge-vars'>Vars: instansi pendidikan, lembaga sekolah, sekolah mts</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">85316</span></td>
+                            <td><span class="pill pill-neutral">0.14</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">KARYAWAN BAGIAN PRODUKSI, PEMOTONGAN KAYU SESUAI UKURAN AKHIR DIPABRIK KAYU LAI</td>
+                            <td><div class="keyword-box">akhir, dipabrik, karyawan, kayu, lai, pemotongan, produksi, sesuai, ukuran</div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">16211</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN PADI</td>
+                            <td><div class="keyword-box">padi, pertanian<br><span class='badge-vars'>Vars: lahan kebun, lahan sawah padi, pertanian pangan, sektor pertanian, usaha tani, usaha tani padi</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01122</span></td>
+                            <td><span class="pill pill-neutral">0.50</span></td>
+                            <td><span class="pill pill-neutral">0.50</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN BAWANG MERAH HORTIKULTURAL DI SAWAH MILIK ORANG LAIN</td>
+                            <td><div class="keyword-box">bawang, hortikultural, merah, milik, pertanian, sawah, tanaman pangan<br><span class='badge-vars'>Vars: kebun bawang merah, lahan bawang, lahan kebun, sektor pertanian, usaha hortikultura, usaha tani</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01134</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">KONTRUKSI RUMAH DI DESA</td>
+                            <td><div class="keyword-box">bangunan, desa, hunian, konstruksi, kontruksi, rumah<br><span class='badge-vars'>Vars: jasa bangun rumah, kontraktor kampung, proyek bangun rumah, usaha konstruksi gedung</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERDAGANGAN BARANG BEKAS UNTUK DIJUAL LAGI</td>
+                            <td><div class="keyword-box">barang, bekas, dijual, lagi, perdagangan<br><span class='badge-vars'>Vars: lapak loak, toko barang bekas, usaha jual beli second</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">47749</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PEDAGANG MOTOR DI RUMAH SENDIRI</td>
+                            <td><div class="keyword-box">bangunan, bermotor, hunian, kendaraan, konstruksi, motor, roda dua, rumah, sendiri<br><span class='badge-vars'>Vars: bisnis motor second, jual beli motor bekas, showroom motor rumahan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">47832</span></td>
+                            <td><span class="pill pill-neutral">0.33</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">JASA TRANSPORTASI</td>
+                            <td><div class="keyword-box">transportasi<br><span class='badge-vars'>Vars: armada transportasi, jasa pengiriman logistik, usaha angkutan barang</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">49231</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PENYEDIA BHAN BAKU MAKANAN</td>
+                            <td><div class="keyword-box">baku, bhan, makanan, penyedia</div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">47213</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">TUKANG BATU</td>
+                            <td><div class="keyword-box">batu<br><span class='badge-vars'>Vars: jasa pengerjaan batu, proyek bangunan fisik, usaha renovasi</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN BAWANG MERAH HORTIKULTURAL SAWAH MILIK ORANG LAIN</td>
+                            <td><div class="keyword-box">bawang, hortikultural, merah, milik, pertanian, sawah, tanaman pangan<br><span class='badge-vars'>Vars: kebun bawang merah, lahan bawang, lahan kebun, sektor pertanian, usaha hortikultura, usaha tani</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01134</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN PADI DI SAWAH MILIK SENDIRI</td>
+                            <td><div class="keyword-box">milik, padi, pertanian, sawah, sendiri, tanaman pangan<br><span class='badge-vars'>Vars: lahan kebun, lahan sawah padi, pertanian pangan, sektor pertanian, usaha tani, usaha tani padi</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01122</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">BURUH (PELAYAN DI TOKO KLONTONG)</td>
+                            <td><div class="keyword-box">buruh, eceran, kelontong, klontong, manisan, pelayan, toko<br><span class='badge-vars'>Vars: retail kelontong, toko kebutuhan harian, warung kelontong sembako</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">47112</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENCUCI MOTOR DAN MOBIL</td>
+                            <td><div class="keyword-box">angkutan, bermotor, kendaraan, mencuci, mobil, motor, roda dua<br><span class='badge-vars'>Vars: bisnis motor second, jual beli motor bekas, showroom motor rumahan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">81290</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENJUAL BOTOK PELAS DAN PECEL</td>
+                            <td><div class="keyword-box">botok, menjual, pecel, pelas<br><span class='badge-vars'>Vars: kedai nasi pecel, usaha kuliner tradisional, warung pecel botok</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">56101</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PENYEDIAAN MAKANAN di BANGUNAN TETAP</td>
+                            <td><div class="keyword-box">bangunan, makanan, penyediaan, tetap<br><span class='badge-vars'>Vars: bisnis makanan siap saji, industri jasa boga, jasa renovasi harian, katering acara, layanan perbaikan rumah, usaha tukang borongan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">56210</span></td>
+                            <td><span class="pill pill-neutral">0.33</span></td>
+                            <td><span class="pill pill-neutral">0.33</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">BURUH BANGUNAN, MENGADUK SEMEN</td>
+                            <td><div class="keyword-box">bangunan, buruh, mengaduk, semen<br><span class='badge-vars'>Vars: bengkel konstruksi, jasa renovasi harian, layanan perbaikan rumah, proyek konstruksi gedung, usaha renovasi rumah, usaha tukang borongan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-neutral">0.50</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENJUAL ES TEH JUMBO</td>
+                            <td><div class="keyword-box">es, jumbo, menjual, teh<br><span class='badge-vars'>Vars: franchise es teh, kedai minuman es teh, stand es teh jumbo</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">56303</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">JASA ANTAR UNDANGAN ACARA</td>
+                            <td><div class="keyword-box">acara, antar, undangan<br><span class='badge-vars'>Vars: biro antar undangan, jasa kurir undangan, usaha jasa perorangan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">96909</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">JASA KONTRUKSI TUKANG BANGUNAN HARIAN</td>
+                            <td><div class="keyword-box">bangunan, harian, kontruksi<br><span class='badge-vars'>Vars: jasa renovasi harian, layanan perbaikan rumah, usaha tukang borongan</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PEYEDIA MAKANAN SIOMAY KELILING DENGAN SEPEDA</td>
+                            <td><div class="keyword-box">keliling, makanan, peyedia, sepeda, siomay<br><span class='badge-vars'>Vars: jualan makanan tidak tetap, produksi siomay, usaha siomay keliling</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">56102</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENCAMPUR SEMEN, MENGANGKUT MATERIAL, MEMASANG BATA, PLESTER DINDING</td>
+                            <td><div class="keyword-box">bata, dinding, material, memasang, mencampur, mengangkut, plester, semen<br><span class='badge-vars'>Vars: bengkel konstruksi, proyek konstruksi gedung, usaha renovasi rumah</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">MENGOPERASIKAN DAN MEMPERBAIKI MESIN PRODUKSI DAN PERAWATAN BERKALA</td>
+                            <td><div class="keyword-box">berkala, memperbaiki, mengoperasikan, mesin, perawatan, produksi<br><span class='badge-vars'>Vars: bengkel mesin pabrik, industri perlengkapan, usaha perbaikan alat</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">16101</span></td>
+                            <td><span class="pill pill-danger">0.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">PERTANIAN BAWANG MERAH MILIK ORANG LAIN</td>
+                            <td><div class="keyword-box">bawang, merah, milik, pertanian<br><span class='badge-vars'>Vars: kebun bawang merah, lahan bawang, lahan kebun, sektor pertanian, usaha hortikultura, usaha tani</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">01134</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">KONTRUSI RUMAH</td>
+                            <td><div class="keyword-box">bangunan, hunian, konstruksi, kontrusi, rumah</div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">41011</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                        <tr>
+                            <td style="color: #111827; font-weight: 500;">INDUSTRI AIR ISI ULANG</td>
+                            <td><div class="keyword-box">air, industri, isi, ulang<br><span class='badge-vars'>Vars: depot air galon, pabrik air minum, usaha air mineral</span></div></td>
+                            <td><span style="font-weight: 700; color: #ea580c;">11052</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                            <td><span class="pill pill-success">1.00</span></td>
+                        </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+    </html>
