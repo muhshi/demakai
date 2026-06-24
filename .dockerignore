@@ -15,7 +15,6 @@ phpunit.xml
 docker-compose*.yml
 deploy.sh
 scripts_archive
-python/output
 output
 .vscode
 .idea
