@@ -16,6 +16,7 @@ Mendukung opsi mode:
 """
 
 import json
+import time
 from config.database import get_connection
 from config.settings import Settings
 from .utils import search_numeric_code
@@ -36,24 +37,47 @@ except ImportError:
 # Helper: generate embedding
 # ─────────────────────────────────────────────────────────────────────────────
 
+_EMBEDDING_CACHE = {}
+
 def _generate_embedding(text: str) -> list | None:
     """
     Membuat embedding vector dari teks menggunakan Gemini API.
-    Mengembalikan None jika gagal atau API tidak tersedia.
+    Memiliki mekanisme CACHE (menghindari request berulang) 
+    dan RETRY (menghindari error 429 API Limit).
     """
     if not GEMINI_AVAILABLE or not text:
         return None
-    try:
-        result = genai.embed_content(
-            model=Settings.EMBEDDING_MODEL,
-            content=text,
-            task_type="retrieval_query",
-            output_dimensionality=768
-        )
-        return result["embedding"]
-    except Exception as e:
-        print(f"[WARNING] Gagal membuat embedding: {e}")
-        return None
+        
+    text_key = text.strip().lower()
+    if text_key in _EMBEDDING_CACHE:
+        return _EMBEDDING_CACHE[text_key]
+        
+    retries = 3
+    delay = 10  # Tunggu 10 detik jika kena limit
+    
+    for attempt in range(retries):
+        try:
+            result = genai.embed_content(
+                model=Settings.EMBEDDING_MODEL,
+                content=text,
+                task_type="retrieval_query",
+                output_dimensionality=768
+            )
+            emb = result["embedding"]
+            _EMBEDDING_CACHE[text_key] = emb
+            time.sleep(1) # Pacing ringan
+            return emb
+        except Exception as e:
+            err_msg = str(e)
+            if "429" in err_msg or "Quota exceeded" in err_msg:
+                print(f"[API LIMIT] Gemini Rate Limit. Menunggu {delay} detik (percobaan {attempt+1}/{retries})...")
+                time.sleep(delay)
+                delay *= 1.5  # Exponential backoff
+            else:
+                print(f"[WARNING] Gagal membuat embedding: {e}")
+                return None
+                
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────

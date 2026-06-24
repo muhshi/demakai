@@ -50,3 +50,12 @@ Route::get('/cekhasil-sebelum', function () {
     return response(file_get_contents($file))
         ->header('Content-Type', 'text/html');
 });
+
+Route::get('/eval-results', function () {
+    $file = base_path('python/output/comprehensive_test_results.html');
+    if (!file_exists($file)) {
+        return response("Belum ada laporan evaluasi. Silakan jalankan script python evaluate_ab_test.py terlebih dahulu.", 404);
+    }
+    return response(file_get_contents($file))
+        ->header('Content-Type', 'text/html');
+});

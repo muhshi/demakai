@@ -156,3 +156,9 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 git pull
 ./deploy.sh
+
+## Changelog
+- **2026-06-24**: 
+  - Penambahan route `/eval-results` pada Laravel web.php untuk akses public hasil A/B testing.
+  - Update `hybrid.py` dengan mekanisme In-Memory CACHE dan Exponential Backoff untuk menghindari blokir Limit API Gemini (HTTP 429).
+  - Update tema warna laporan HTML `evaluate_ab_test.py` menjadi Light Orange SE2026.
