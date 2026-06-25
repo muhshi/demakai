@@ -10,11 +10,27 @@ class KbliHierarchySeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Seeder ini otomatis di-skip jika tabel sudah terisi data,
+     * kecuali dipanggil dengan opsi --fresh untuk memaksa update ulang.
+     *
+     * Contoh force update:
+     *   php artisan db:seed --class=KbliHierarchySeeder --fresh
      */
     public function run(): void
     {
+        $existingCount = Kbli2025Hierarchy::count();
+        $isFresh = app()->runningInConsole() && in_array('--fresh', $_SERVER['argv'] ?? []);
+
+        // Skip jika data sudah ada dan tidak di-force
+        if ($existingCount > 0 && !$isFresh) {
+            $this->command->info("✅ Tabel kbli2025_hierarchies sudah terisi ({$existingCount} records). Seeder di-skip.");
+            $this->command->line("   Gunakan --fresh untuk memaksa update ulang.");
+            return;
+        }
+
         $jsonPath = database_path('data/kbli2025_full_arsip.json');
-        
+
         if (!file_exists($jsonPath)) {
             $this->command->error("File {$jsonPath} tidak ditemukan.");
             return;
@@ -29,7 +45,7 @@ class KbliHierarchySeeder extends Seeder
         }
 
         $this->command->info("Mengimport KBLI Hierarchies...");
-        
+
         $allowedLevels = ['kategori', 'pokok', 'golongan', 'subgolongan'];
         $now = now();
         $count = 0;
@@ -42,10 +58,10 @@ class KbliHierarchySeeder extends Seeder
                 Kbli2025Hierarchy::updateOrCreate(
                     ['kode' => $row['kode'], 'level' => $row['level']],
                     [
-                        'judul' => $row['judul'] ?? '',
-                        'deskripsi' => $row['deskripsi'] ?? null,
-                        'parent_kode' => $row['parent_kode'] ?? null,
-                        'updated_at' => $now,
+                        'judul'        => $row['judul'] ?? '',
+                        'deskripsi'    => $row['deskripsi'] ?? null,
+                        'parent_kode'  => $row['parent_kode'] ?? null,
+                        'updated_at'   => $now,
                     ]
                 );
                 $count++;

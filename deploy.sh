@@ -41,9 +41,11 @@ fi
 echo "📦 Running migrations..."
 docker compose exec -T demakai-franken php artisan migrate --force
 
-# 5b. Seed KBLI Hierarchy data (idempotent: skip if already populated)
+# 5b. Seed KBLI Hierarchy data (auto-skip jika sudah terisi, gunakan --fresh untuk force update)
 echo "🌱 Seeding KBLI 2025 Hierarchy data..."
-docker compose exec -T demakai-franken php artisan db:seed --class=KbliHierarchySeeder --force || echo "⚠️  Seeder skipped or already ran."
+docker compose exec -T demakai-franken php artisan db:seed --class=KbliHierarchySeeder --force || echo "⚠️  Seeder skipped atau error."
+# Catatan: untuk force update ulang (misal data JSON berubah), jalankan manual:
+#   docker compose exec demakai-franken php artisan db:seed --class=KbliHierarchySeeder --force --fresh
 
 # 6. Clear and rebuild cache
 echo "🧹 Clearing and optimizing cache..."

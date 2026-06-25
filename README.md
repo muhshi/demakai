@@ -165,3 +165,4 @@ git pull
   - Menghapus folder `python/output` dari file `.dockerignore` agar laporan evaluasi hasil A/B testing disertakan ke dalam Docker image saat deployment dan bisa diakses via web.
 - **2026-06-25**:
   - Menambahkan fitur Filament Widgets untuk menampilkan keyword yang paling sering dicari (PopularKeywordsChart) dan kode yang paling sering dicari (PopularCodesChart).
+  - Optimasi `KbliHierarchySeeder`: seeder kini otomatis di-skip jika data sudah ada di database, sehingga deploy tidak perlu menunggu proses seeding ulang. Gunakan flag `--fresh` untuk memaksa update ulang data.
