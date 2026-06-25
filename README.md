@@ -163,3 +163,5 @@ git pull
   - Update `hybrid.py` dengan mekanisme In-Memory CACHE dan Exponential Backoff untuk menghindari blokir Limit API Gemini (HTTP 429).
   - Update tema warna laporan HTML `evaluate_ab_test.py` menjadi Light Orange SE2026.
   - Menghapus folder `python/output` dari file `.dockerignore` agar laporan evaluasi hasil A/B testing disertakan ke dalam Docker image saat deployment dan bisa diakses via web.
+- **2026-06-25**:
+  - Menambahkan fitur Filament Widgets untuk menampilkan keyword yang paling sering dicari (PopularKeywordsChart) dan kode yang paling sering dicari (PopularCodesChart).
