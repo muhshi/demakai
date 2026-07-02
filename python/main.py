@@ -1,5 +1,5 @@
 """
-main.py — DEMAKAI Search System
+main.py — PINTAR KBLI Search System
 =================================
 Ganti metode lewat argumen terminal, query ditulis langsung di kode (lihat QUERY di bawah).
 
@@ -90,7 +90,7 @@ def run_single_combination(
     label = f"{search.upper()} + {processing.capitalize()}"
 
     print("\n" + "═" * 60)
-    print(f"  DEMAKAI — {label}")
+    print(f"  PINTAR KBLI — {label}")
     print(f"  Query      : \"{query}\"")
     print(f"  Search     : {search.upper()}")
     print(f"  Processing : {processing.capitalize()}")
@@ -184,7 +184,7 @@ QUERY = "pertanian"   # <── ubah query di sini
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="DEMAKAI Search System",
+        description="PINTAR KBLI Search System",
         formatter_class=argparse.RawTextHelpFormatter,
         epilog=(
             "Contoh:\n"

@@ -297,7 +297,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMAKAI - Hybrid Search + Preprocessing</title>
+  <title>PINTAR KBLI - Hybrid Search + Preprocessing</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
@@ -517,7 +517,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
   <div class="header">
     <div class="badge">Evaluasi Hybrid + Preprocessing</div>
-    <h1>DEMAKAI &mdash; Hybrid Search + Preprocessing</h1>
+    <h1>PINTAR KBLI &mdash; Hybrid Search + Preprocessing</h1>
     <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total_queries} query</p>
     <p class="meta">Database: PostgreSQL + pgvector &nbsp;&middot;&nbsp; Preprocessing: Lowercase → Stopword → Stemming (PySastrawi)</p>
 
@@ -733,7 +733,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Sistem Evaluasi Hybrid + Preprocessing &middot; Dibuat otomatis oleh evaluate_hybrid_prep.py
+    PINTAR KBLI &mdash; Sistem Evaluasi Hybrid + Preprocessing &middot; Dibuat otomatis oleh evaluate_hybrid_prep.py
   </div>
 
 </body>
@@ -750,7 +750,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("  DEMAKAI - Evaluasi Hybrid Search + Preprocessing")
+    print("  PINTAR KBLI - Evaluasi Hybrid Search + Preprocessing")
     print("  Pipeline: Query -> preprocess_advanced -> search_advanced")
     print("  Preprocessing: lowercase, stopword, stemming (PySastrawi)")
     print("  Database: PostgreSQL + pgvector")

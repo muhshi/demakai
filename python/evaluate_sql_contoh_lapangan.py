@@ -381,7 +381,7 @@ def save_html(rows: list, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMAKAI - SQL LIKE + Preprocessing + Contoh Lapangan</title>
+  <title>PINTAR KBLI - SQL LIKE + Preprocessing + Contoh Lapangan</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -511,7 +511,7 @@ def save_html(rows: list, filepath: str):
 <body>
 
   <div class="page-badge">SQL LIKE + Preprocessing + Contoh Lapangan</div>
-  <h1>DEMAKAI &mdash; SQL LIKE + Preprocessing + Contoh Lapangan</h1>
+  <h1>PINTAR KBLI &mdash; SQL LIKE + Preprocessing + Contoh Lapangan</h1>
   <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total} query evaluasi</p>
   <p class="meta">Database: PostgreSQL &nbsp;&middot;&nbsp; Preprocessing: Expansion (sinonim + variasi KBLI/KBJI)</p>
 
@@ -746,7 +746,7 @@ def save_html(rows: list, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Evaluasi SQL LIKE + Preprocessing + Contoh Lapangan &middot;
+    PINTAR KBLI &mdash; Evaluasi SQL LIKE + Preprocessing + Contoh Lapangan &middot;
     Dibuat otomatis oleh evaluate_sql_contoh_lapangan.py
   </div>
 
@@ -764,7 +764,7 @@ def save_html(rows: list, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 66)
-    print("  DEMAKAI - SQL LIKE + Preprocessing + Contoh Lapangan")
+    print("  PINTAR KBLI - SQL LIKE + Preprocessing + Contoh Lapangan")
     print("  Pipeline: Query -> Expansion -> SQL LIKE (desc + contoh)")
     print("  Database : PostgreSQL")
     print("=" * 66)

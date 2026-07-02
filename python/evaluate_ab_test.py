@@ -109,7 +109,7 @@ def run_comprehensive_test(queries_file=None):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sensus Ekonomi 2026 | Evaluasi DEMAKAI</title>
+        <title>Sensus Ekonomi 2026 | Evaluasi PINTAR KBLI</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -245,7 +245,7 @@ def run_comprehensive_test(queries_file=None):
     <body>
         <div class="container">
             <div class="header">
-                <h1>DEMAKAI Evaluation Report</h1>
+                <h1>PINTAR KBLI Evaluation Report</h1>
                 <p>A/B Testing Signifikansi "Contoh Lapangan" pada Sensus Ekonomi 2026</p>
             </div>
             

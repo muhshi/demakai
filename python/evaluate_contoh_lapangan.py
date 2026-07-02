@@ -1,7 +1,7 @@
 """
 evaluate_contoh_lapangan.py
 ============================
-Evaluasi sistem pencarian DEMAKAI tahap akhir:
+Evaluasi sistem pencarian PINTAR KBLI tahap akhir:
 
   Pipeline:
     Query
@@ -428,7 +428,7 @@ def save_html(rows: list, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMAKAI - Hybrid + Preprocessing + Contoh Lapangan</title>
+  <title>PINTAR KBLI - Hybrid + Preprocessing + Contoh Lapangan</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -560,7 +560,7 @@ def save_html(rows: list, filepath: str):
 
   <!-- Header -->
   <div class="page-badge">Evaluasi Akhir &mdash; Contoh Lapangan</div>
-  <h1>DEMAKAI &mdash; Hybrid + Preprocessing + Contoh Lapangan</h1>
+  <h1>PINTAR KBLI &mdash; Hybrid + Preprocessing + Contoh Lapangan</h1>
   <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total} query evaluasi</p>
   <p class="meta">Database: PostgreSQL + pgvector &nbsp;&middot;&nbsp; Preprocessing: Expansion (sinonim + variasi)</p>
 
@@ -778,7 +778,7 @@ def save_html(rows: list, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Sistem Evaluasi Hybrid + Preprocessing + Contoh Lapangan &middot;
+    PINTAR KBLI &mdash; Sistem Evaluasi Hybrid + Preprocessing + Contoh Lapangan &middot;
     Dibuat otomatis oleh evaluate_contoh_lapangan.py
   </div>
 
@@ -796,7 +796,7 @@ def save_html(rows: list, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 64)
-    print("  DEMAKAI - Evaluasi Hybrid + Preprocessing + Contoh Lapangan")
+    print("  PINTAR KBLI - Evaluasi Hybrid + Preprocessing + Contoh Lapangan")
     print("  Pipeline: Query -> Expansion -> Hybrid (SQL+Semantic) + Contoh")
     print("  Database : PostgreSQL + pgvector")
     print("=" * 64)

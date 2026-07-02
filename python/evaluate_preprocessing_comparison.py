@@ -1,7 +1,7 @@
 """
 evaluate_preprocessing_comparison.py
 =====================================
-Evaluasi DEMAKAI — 10 metode dengan pemisahan preprocessing yang jelas.
+Evaluasi PINTAR KBLI — 10 metode dengan pemisahan preprocessing yang jelas.
 
 JENIS PREPROCESSING:
   Advanced (PREP):
@@ -647,7 +647,7 @@ def save_html(data: dict, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>DEMAKAI - Evaluasi Preprocessing Comparison (10 Metode)</title>
+  <title>PINTAR KBLI - Evaluasi Preprocessing Comparison (10 Metode)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
     *{{box-sizing:border-box;margin:0;padding:0}}
@@ -733,7 +733,7 @@ def save_html(data: dict, filepath: str):
 
 <!-- TOP NAV -->
 <div class="topnav">
-  <span class="topnav-title">&#128202; DEMAKAI Eval (8 Metode)</span>
+  <span class="topnav-title">&#128202; PINTAR KBLI Eval (8 Metode)</span>
   {nav_items}
   <a href="#perbandingan" class="nav-link" style="border-color:#fbbf24;color:#fbbf24">&#11088; Perbandingan</a>
   <a href="#dampak" class="nav-link" style="border-color:#f472b6;color:#f472b6">&#128200; Dampak</a>
@@ -744,7 +744,7 @@ def save_html(data: dict, filepath: str):
   <!-- HEADER -->
   <div class="page-badge">Evaluasi Preprocessing Comparison — 8 Metode</div>
   <h1>Evaluasi Sistem Pencarian KBLI/KBJI</h1>
-  <p class="meta">DEMAKAI &mdash; Perbandingan SQL LIKE dan Hybrid Search &middot; Pemisahan Advanced Preprocessing &amp; Query Expansion</p>
+  <p class="meta">PINTAR KBLI &mdash; Perbandingan SQL LIKE dan Hybrid Search &middot; Pemisahan Advanced Preprocessing &amp; Query Expansion</p>
   <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total} query evaluasi &nbsp;&middot;&nbsp; PostgreSQL + pgvector</p>
 
   <!-- BADGE LEGEND -->
@@ -895,7 +895,7 @@ def save_html(data: dict, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Dashboard Evaluasi Preprocessing Comparison (10 Metode) &middot;
+    PINTAR KBLI &mdash; Dashboard Evaluasi Preprocessing Comparison (10 Metode) &middot;
     Dibuat oleh evaluate_preprocessing_comparison.py &middot; {ts}
   </div>
 </div>
@@ -935,7 +935,7 @@ def save_csv(data: dict, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("  DEMAKAI - Evaluasi Preprocessing Comparison (10 Metode)")
+    print("  PINTAR KBLI - Evaluasi Preprocessing Comparison (10 Metode)")
     print("  Pemisahan: Advanced Preprocessing vs Query Expansion")
     print("=" * 70)
     print()

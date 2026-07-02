@@ -166,3 +166,5 @@ git pull
 - **2026-06-25**:
   - Menambahkan fitur Filament Widgets untuk menampilkan keyword yang paling sering dicari (PopularKeywordsChart) dan kode yang paling sering dicari (PopularCodesChart).
   - Optimasi `KbliHierarchySeeder`: seeder kini otomatis di-skip jika data sudah ada di database, sehingga deploy tidak perlu menunggu proses seeding ulang. Gunakan flag `--fresh` untuk memaksa update ulang data.
+- **2026-07-02**:
+  - Mengubah penamaan aplikasi dari DEMAKAI menjadi PINTAR KBLI pada file frontend (welcome.blade.php), script Python, dan file jurnal draft pengguna.

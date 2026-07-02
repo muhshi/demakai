@@ -1,5 +1,5 @@
 """
-evaluate_hybrid.py -- Evaluasi Hybrid Search DEMAKAI
+evaluate_hybrid.py -- Evaluasi Hybrid Search PINTAR KBLI
 ======================================================
 Konfigurasi:
   - Database   : PostgreSQL (production) + pgvector
@@ -269,7 +269,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMAKAI - Evaluasi Hybrid Search</title>
+  <title>PINTAR KBLI - Evaluasi Hybrid Search</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
@@ -475,7 +475,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
   <div class="header">
     <div class="badge">Evaluasi Hybrid Search</div>
-    <h1>DEMAKAI &mdash; Hybrid Search</h1>
+    <h1>PINTAR KBLI &mdash; Hybrid Search</h1>
     <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total_queries} query</p>
     <p class="meta">Database: PostgreSQL + pgvector &nbsp;&middot;&nbsp; Semantic: Gemini Embedding + Cosine Distance</p>
 
@@ -636,7 +636,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Sistem Evaluasi Hybrid Search &middot; Dibuat otomatis oleh evaluate_hybrid.py
+    PINTAR KBLI &mdash; Sistem Evaluasi Hybrid Search &middot; Dibuat otomatis oleh evaluate_hybrid.py
   </div>
 
 </body>
@@ -653,7 +653,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("  DEMAKAI - Evaluasi Hybrid Search")
+    print("  PINTAR KBLI - Evaluasi Hybrid Search")
     print("  Metode  : Hybrid (Semantic Gemini + SQL LIKE)")
     print("  Database: PostgreSQL + pgvector")
     print("  Fitur   : Tanpa preprocessing, tanpa filter contoh_lapangan")

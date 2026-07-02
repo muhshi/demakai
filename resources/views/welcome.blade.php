@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Demakai - Eksplorasi KBLI & KBJI Intelligent</title>
+    <title>PINTAR KBLI - Eksplorasi KBLI & KBJI Intelligent</title>
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
@@ -919,7 +919,7 @@
     <div class="bg-gradient"></div>
 
     <nav>
-        <div class="logo">DEMAKAI.</div>
+        <div class="logo">PINTAR KBLI.</div>
         <div class="nav-links">
             @if (Route::has('login'))
                 @auth

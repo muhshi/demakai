@@ -1,5 +1,5 @@
 """
-evaluate_baseline.py -- Evaluasi Baseline DEMAKAI (SQL LIKE + SQLite)
+evaluate_baseline.py -- Evaluasi Baseline PINTAR KBLI (SQL LIKE + SQLite)
 ======================================================================
 Konfigurasi:
   - Database : SQLite lokal (demakai_baseline.db) -- BUKAN PostgreSQL
@@ -361,7 +361,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMAKAI - Evaluasi Baseline (SQL LIKE + SQLite)</title>
+  <title>PINTAR KBLI - Evaluasi Baseline (SQL LIKE + SQLite)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
@@ -586,7 +586,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
   <div class="header">
     <div class="badge">Evaluasi Baseline</div>
-    <h1>DEMAKAI &mdash; SQL LIKE Baseline</h1>
+    <h1>PINTAR KBLI &mdash; SQL LIKE Baseline</h1>
     <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total_queries} query</p>
     <p class="meta">Database: SQLite &nbsp;&middot;&nbsp; Pencarian: SQL LIKE (tanpa preprocessing)</p>
 
@@ -694,7 +694,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Sistem Evaluasi Baseline &middot; Dibuat otomatis oleh evaluate_baseline.py
+    PINTAR KBLI &mdash; Sistem Evaluasi Baseline &middot; Dibuat otomatis oleh evaluate_baseline.py
   </div>
 
 </body>
@@ -711,7 +711,7 @@ def save_html(rows_kbli: list, rows_kbji: list, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("  DEMAKAI - Evaluasi Baseline (SQL LIKE + SQLite)")
+    print("  PINTAR KBLI - Evaluasi Baseline (SQL LIKE + SQLite)")
     print("  Metode  : SQL LIKE Sederhana")
     print("  Database: SQLite (demakai_baseline.db)")
     print("  Fitur   : Tanpa hybrid, preprocessing, contoh_lapangan")

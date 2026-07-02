@@ -1,7 +1,7 @@
 """
 evaluate_all.py
 ================
-Master evaluasi DEMAKAI — menjalankan SEMUA 6 metode sekaligus
+Master evaluasi PINTAR KBLI — menjalankan SEMUA 6 metode sekaligus
 dan menghasilkan SATU dashboard HTML komprehensif.
 
 Metode:
@@ -483,7 +483,7 @@ def save_html(data: dict, filepath: str):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>DEMAKAI - Evaluasi Semua Metode Pencarian</title>
+  <title>PINTAR KBLI - Evaluasi Semua Metode Pencarian</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
     *{{box-sizing:border-box;margin:0;padding:0}}
@@ -575,7 +575,7 @@ def save_html(data: dict, filepath: str):
 
 <!-- TOP NAV -->
 <div class="topnav">
-  <span class="topnav-title">&#128202; DEMAKAI Eval</span>
+  <span class="topnav-title">&#128202; PINTAR KBLI Eval</span>
   {nav_items}
   <a href="#perbandingan" class="nav-link" style="border-color:#fbbf24;color:#fbbf24">&#11088; Perbandingan</a>
   <a href="#analisis" class="nav-link" style="border-color:#f87171;color:#f87171">&#128300; Analisis</a>
@@ -583,9 +583,9 @@ def save_html(data: dict, filepath: str):
 
 <div class="page">
   <!-- HEADER -->
-  <div class="page-badge">Evaluasi Komprehensif DEMAKAI</div>
+  <div class="page-badge">Evaluasi Komprehensif PINTAR KBLI</div>
   <h1>Evaluasi Sistem Pencarian KBLI</h1>
-  <p class="meta">DEMAKAI &mdash; Perbandingan SQL LIKE dan Hybrid Search &middot; Seluruh Tahap Pengembangan</p>
+  <p class="meta">PINTAR KBLI &mdash; Perbandingan SQL LIKE dan Hybrid Search &middot; Seluruh Tahap Pengembangan</p>
   <p class="meta">Generated: {ts} &nbsp;&middot;&nbsp; {total} query evaluasi (30 KBLI + 30 KBJI) &nbsp;&middot;&nbsp; PostgreSQL + pgvector</p>
 
   <!-- LEGEND -->
@@ -691,7 +691,7 @@ def save_html(data: dict, filepath: str):
         <div class="ana-txt">
           Berdasarkan evaluasi ini, <strong style="color:#6ee7b7">SQL LIKE + Preprocessing
           (+ Contoh Lapangan)</strong> adalah konfigurasi paling optimal untuk sistem
-          DEMAKAI: sederhana (tidak butuh GPU/API embedding setiap query), lebih cepat,
+          PINTAR KBLI: sederhana (tidak butuh GPU/API embedding setiap query), lebih cepat,
           dan menghasilkan MRR tertinggi. Hybrid tetap direkomendasikan sebagai
           fallback untuk query abstrak tanpa keyword yang jelas.
         </div>
@@ -700,7 +700,7 @@ def save_html(data: dict, filepath: str):
   </div>
 
   <div class="footer">
-    DEMAKAI &mdash; Dashboard Evaluasi Komprehensif &middot;
+    PINTAR KBLI &mdash; Dashboard Evaluasi Komprehensif &middot;
     Dibuat oleh evaluate_all.py &middot; {ts}
   </div>
 </div>
@@ -740,7 +740,7 @@ def save_csv(data: dict, filepath: str):
 
 if __name__ == "__main__":
     print("=" * 65)
-    print("  DEMAKAI - Master Evaluasi Semua Metode")
+    print("  PINTAR KBLI - Master Evaluasi Semua Metode")
     print("  6 Metode: SQL LIKE, Hybrid, +Prep, +Contoh Lapangan")
     print("=" * 65)
     print()
