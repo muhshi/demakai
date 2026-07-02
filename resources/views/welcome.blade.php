@@ -4,11 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PINTAR KBLI - Eksplorasi KBLI & KBJI Intelligent</title>
+    <title>PINTAR KBLI - Pencarian Intuitif dan Akurat KBLI KBJI</title>
 
     <!-- Meta Tags for SEO -->
     <meta name="description"
-        content="Platform cerdas untuk eksplorasi kode KBLI 2025 dan KBJI 2014 dengan teknologi pencarian pintar berbasis AI.">
+        content="Pencarian Intuitif dan Akurat KBLI KBJI. Platform cerdas untuk eksplorasi kode KBLI 2025 dan KBJI 2014 dengan teknologi pencarian pintar berbasis AI.">
     <meta name="keywords" content="KBLI 2025, KBJI 2014, Klasifikasi Bisnis, Klasifikasi Jabatan, Intelligent Search">
 
     <!-- Fonts -->
@@ -932,8 +932,8 @@
     </nav>
 
     <main>
-        <div class="badge">Next Generation Atlas</div>
-        <h1>Pencarian <span>KBLI & KBJI</span><br>Tanpa Batas.</h1>
+        <div class="badge">Pencarian Intuitif dan Akurat KBLI KBJI</div>
+        <h1>Pencarian <span>KBLI & KBJI</span><br>Lebih Cerdas & Akurat.</h1>
         <p class="subtitle">Eksplorasi ribuan klasifikasi bisnis dan jabatan dengan teknologi AI yang memudahkan
             pengambilan keputusan Anda.</p>
 
