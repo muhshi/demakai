@@ -22,4 +22,6 @@ python/output/
 database/backups/
 /storage/app/bundles/
 /storage/app/models/
+__pycache__/
+*.pyc
 Jurnal/

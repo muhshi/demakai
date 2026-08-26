@@ -28,8 +28,8 @@ def export_to_onnx(
     onnx_quant_path = os.path.join(output_dir, "kbli_model_quantized.onnx")
 
     try:
-        from transformers import AutoTokenizer, AutoModel
-        import torch
+        from transformers import AutoTokenizer, AutoModel  # type: ignore
+        import torch  # type: ignore
     except ImportError:
         print("[ERROR] transformers and torch are required for model export.")
         print("Install via: pip install torch transformers onnx onnxruntime")
@@ -106,7 +106,7 @@ def export_to_onnx(
 
     if quantize:
         try:
-            from onnxruntime.quantization import quantize_dynamic, QuantType
+            from onnxruntime.quantization import quantize_dynamic, QuantType  # type: ignore
             print("4. Applying dynamic INT8 quantization for mobile optimization...")
             quantize_dynamic(
                 model_input=onnx_path,
