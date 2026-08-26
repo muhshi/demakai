@@ -135,24 +135,33 @@ class ExportOfflineBundleCommand extends Command
                         ? implode(' ', $item->contoh_lapangan)
                         : (string) $item->contoh_lapangan;
 
-                    // Convert pgvector / array embedding to binary float32 blob for mobile
+                    // Convert pgvector / Vector object / array embedding to binary float32 blob for mobile
                     $embeddingBlob = null;
                     if (!empty($item->embedding)) {
-                        $rawEmb = is_string($item->embedding) ? json_decode($item->embedding, true) : $item->embedding;
-                        if (is_array($rawEmb)) {
+                        $rawEmb = null;
+                        if (is_object($item->embedding) && method_exists($item->embedding, 'toArray')) {
+                            $rawEmb = $item->embedding->toArray();
+                        } elseif (is_string($item->embedding)) {
+                            $rawEmb = json_decode($item->embedding, true);
+                        } elseif (is_array($item->embedding)) {
+                            $rawEmb = $item->embedding;
+                        } elseif (is_object($item->embedding)) {
+                            $rawEmb = (array) $item->embedding;
+                        }
+
+                        if (is_array($rawEmb) && count($rawEmb) > 0) {
                             $embeddingBlob = pack('f*', ...$rawEmb);
                         }
                     }
 
-                    $kbliStmt->execute([
-                        ':id' => $item->id,
-                        ':kode' => (string) $item->kode,
-                        ':judul' => (string) $item->judul,
-                        ':deskripsi' => (string) ($item->deskripsi ?? ''),
-                        ':kategori' => (string) ($item->kategori ?? ''),
-                        ':contoh_lapangan' => $contohJson,
-                        ':embedding' => $embeddingBlob,
-                    ]);
+                    $kbliStmt->bindValue(':id', $item->id, PDO::PARAM_INT);
+                    $kbliStmt->bindValue(':kode', (string) $item->kode, PDO::PARAM_STR);
+                    $kbliStmt->bindValue(':judul', (string) $item->judul, PDO::PARAM_STR);
+                    $kbliStmt->bindValue(':deskripsi', (string) ($item->deskripsi ?? ''), PDO::PARAM_STR);
+                    $kbliStmt->bindValue(':kategori', (string) ($item->kategori ?? ''), PDO::PARAM_STR);
+                    $kbliStmt->bindValue(':contoh_lapangan', $contohJson, PDO::PARAM_STR);
+                    $kbliStmt->bindValue(':embedding', $embeddingBlob, PDO::PARAM_LOB);
+                    $kbliStmt->execute();
 
                     $kbliFtsStmt->execute([
                         ':rowid' => $item->id,
@@ -194,20 +203,29 @@ class ExportOfflineBundleCommand extends Command
 
                     $embeddingBlob = null;
                     if (!empty($item->embedding)) {
-                        $rawEmb = is_string($item->embedding) ? json_decode($item->embedding, true) : $item->embedding;
-                        if (is_array($rawEmb)) {
+                        $rawEmb = null;
+                        if (is_object($item->embedding) && method_exists($item->embedding, 'toArray')) {
+                            $rawEmb = $item->embedding->toArray();
+                        } elseif (is_string($item->embedding)) {
+                            $rawEmb = json_decode($item->embedding, true);
+                        } elseif (is_array($item->embedding)) {
+                            $rawEmb = $item->embedding;
+                        } elseif (is_object($item->embedding)) {
+                            $rawEmb = (array) $item->embedding;
+                        }
+
+                        if (is_array($rawEmb) && count($rawEmb) > 0) {
                             $embeddingBlob = pack('f*', ...$rawEmb);
                         }
                     }
 
-                    $kbjiStmt->execute([
-                        ':id' => $item->id,
-                        ':kode' => (string) $item->kode,
-                        ':judul' => (string) $item->judul,
-                        ':deskripsi' => (string) ($item->deskripsi ?? ''),
-                        ':contoh_lapangan' => $contohJson,
-                        ':embedding' => $embeddingBlob,
-                    ]);
+                    $kbjiStmt->bindValue(':id', $item->id, PDO::PARAM_INT);
+                    $kbjiStmt->bindValue(':kode', (string) $item->kode, PDO::PARAM_STR);
+                    $kbjiStmt->bindValue(':judul', (string) $item->judul, PDO::PARAM_STR);
+                    $kbjiStmt->bindValue(':deskripsi', (string) ($item->deskripsi ?? ''), PDO::PARAM_STR);
+                    $kbjiStmt->bindValue(':contoh_lapangan', $contohJson, PDO::PARAM_STR);
+                    $kbjiStmt->bindValue(':embedding', $embeddingBlob, PDO::PARAM_LOB);
+                    $kbjiStmt->execute();
 
                     $kbjiFtsStmt->execute([
                         ':rowid' => $item->id,

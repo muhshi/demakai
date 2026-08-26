@@ -20,4 +20,6 @@ yarn-error.log
 output/
 python/output/
 database/backups/
+/storage/app/bundles/
+/storage/app/models/
 Jurnal/
