@@ -67,6 +67,9 @@ All notable changes to this project will be documented in this section.
 - **On-Device AI Exporter**: Script `python/utils/export_onnx_model.py` untuk konversi model multilingual sentence transformer ke format ONNX INT8 Quantized untuk inferensi lokal di HP.
 - **Panduan Integrasi Flutter**: Dokumentasi lengkap dan contoh implementasi Dart/Flutter untuk mode hybrid (Online + Offline fallback) di `docs/flutter_integration_guide.md`.
 
+### [Removed] - 2026-08-26
+- **Codebase Clean-up**: Menghapus file-file temporary, sisa snippet AI (`before/after_snippet.txt`, `patch2.py`, `patch_eval.py`), script dump one-off (`export_queries.php`, `export_queries_ui.php`), database baseline usang (`demakai_baseline.db`), dan file shell error di folder arsip.
+
 ### [Added] - 2026-06-15
 - **Native Visitor Analytics**: Implementasi pelacakan pengunjung secara mandiri dengan middleware `TrackVisitor` dan model `PageVisit`.
 - **Filament Dashboard Analytics**: Penambahan widget `VisitorStatsOverview` dan `VisitorChartWidget` untuk statistik kunjungan.
