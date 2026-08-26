@@ -105,7 +105,11 @@ class MobileSearchController extends Controller
 
         if (empty($parentKode) || $parentKode === 'null') {
             // Level Kategori (A-U)
-            $nodes = Kbli2025Hierarchy::whereNull('parent_kode')
+            $nodes = Kbli2025Hierarchy::where(function ($query) {
+                    $query->where('level', 'kategori')
+                        ->orWhereNull('parent_kode')
+                        ->orWhere('parent_kode', '');
+                })
                 ->orderBy('kode')
                 ->get()
                 ->map(fn($item) => [
