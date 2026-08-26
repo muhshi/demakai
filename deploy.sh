@@ -56,6 +56,10 @@ docker compose exec -T demakai-franken php artisan optimize
 echo "📦 Publishing Livewire assets..."
 docker compose exec -T demakai-franken php artisan livewire:publish --assets
 
+# 7b. Generate/Update Offline Bundle for Flutter mobile sync
+echo "📱 Exporting offline SQLite bundle for mobile sync..."
+docker compose exec -T demakai-franken php artisan kbli:export-bundle || echo "⚠️  Offline bundle export skipped/warning."
+
 # 8. Restart queue workers to pick up new code
 echo "🔄 Restarting queue workers..."
 docker compose exec -T demakai-franken php artisan queue:restart
