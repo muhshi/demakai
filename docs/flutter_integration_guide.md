@@ -1,203 +1,344 @@
-# Panduan Integrasi PINTAR KBLI ke Flutter (Mode Hybrid: Online & Full Offline)
+# Panduan Integrasi Mobile Flutter — PINTAR KBLI (Sensus Ekonomi 2026)
 
-Dokumen ini adalah panduan arsitektur dan implementasi teknis untuk mengintegrasikan sistem pencarian **PINTAR KBLI (Sensus Ekonomi 2026)** ke aplikasi Flutter.
-
----
-
-## 1. Arsitektur Komunikasi
-
-```
-                          ┌────────────────────────┐
-                          │   Aplikasi Flutter     │
-                          └───────────┬────────────┘
-                                      │
-                         [ Connectivity Manager ]
-                                      │
-              ┌───────────────────────┴───────────────────────┐
-              ▼                                               ▼
-       [ MODE ONLINE ]                                 [ MODE OFFLINE ]
-(Ada Koneksi 4G / WiFi)                          (Blind Spot / Tanpa Internet)
-              │                                               │
-   [ Dio HTTP Client ]                              [ SQLite FTS5 + Isolate ]
-              │                                               │
-              ▼                                               ▼
-┌───────────────────────────┐                   ┌───────────────────────────┐
-│  Backend Web PINTAR KBLI  │                   │  Local Database (HP)      │
-│  GET /api/v1/search       │                   │  • kbli_offline.db (2MB)  │
-│  • Hybrid Search pgvector │                   │  • FTS5 BM25 Keyword      │
-│  • AI Cloud Transformers  │                   │  • Pre-computed Vectors   │
-│  • Realtime Crowdsourcing │                   │  • Dart Cosine Sim (<5ms) │
-└───────────────────────────┘                   └───────────────────────────┘
-```
+Dokumen ini adalah spesifikasi teknis dan panduan integrasi resmi untuk Tim Pengembang Mobile Flutter. Sistem didesain dengan **Arsitektur Hybrid (Online Cepat & Cerdas + Full Offline On-Device)** untuk menjamin ketersediaan 100% saat petugas sensus berada di wilayah tanpa sinyal (blind spot).
 
 ---
 
-## 2. Spesifikasi Endpoint API Backend (Online Mode)
+## 1. Arsitektur Komunikasi Sistem
 
-Base URL: `https://domain-pintarkbli.bps.go.id/api/v1`
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            APLIKASI FLUTTER MOBILE                          │
+│                                                                             │
+│  [ UI Search / Hierarchy ] ─────────► [ Connectivity & Sync Manager ]       │
+│                                                     │                       │
+│                       ┌─────────────────────────────┴──────────┐            │
+│                       ▼                                        ▼            │
+│              [ MODE ONLINE ]                            [ MODE OFFLINE ]    │
+│           (Ada 4G / 5G / WiFi)                      (Di Pelosok / No Signal)│
+│                       │                                        │            │
+│               [ Dio REST Client ]                     [ Local SQLite FTS5 ] │
+└───────────────────────┬────────────────────────────────────────┬────────────┘
+                        │                                        │
+                        │ HTTPS (REST API JSON)                  │ Local File I/O
+                        ▼                                        ▼
+┌──────────────────────────────────────────────┐ ┌────────────────────────────┐
+│          BACKEND WEB PINTAR KBLI             │ │   SQLite Database Bundle   │
+│  • GET  /api/v1/search                       │ │ • kbli_offline_latest.db   │
+│  • GET  /api/v1/kbli/hierarchy               │ │ • FTS5 Virtual Tables      │
+│  • GET  /api/v1/sync/check & /sync/bundle    │ │ • 1.569 KBLI + 2.735 KBJI  │
+│  • POST /api/v1/submissions (Single/Bulk)    │ │ • Pre-computed Embeddings  │
+└──────────────────────────────────────────────┘ └────────────────────────────┘
+```
 
-### A. Pencarian KBLI / KBJI
+---
+
+## 2. Spesifikasi Endpoint REST API (Online Mode)
+
+Base URL Pengembangan Lokal: `http://127.0.0.1:8000/api/v1`  
+Base URL Server Production: `https://<domain-server>/api/v1`
+
+---
+
+### A. Pencarian Cepat (`GET /search`)
+Melakukan pencarian cerdas pada master KBLI 2025 dan KBJI 2014.
+
 - **Method:** `GET`
-- **Path:** `/search`
+- **Path:** `/api/v1/search`
 - **Query Parameters:**
-  - `q` *(string, required)*: Kata kunci atau kalimat kegiatan usaha (contoh: `warung kopi`, `jual pulsa keliling`).
-  - `type` *(string, optional)*: `KBLI` atau `KBJI` (default: keduanya digabung).
-  - `limit` *(integer, optional)*: Jumlah hasil (default: `15`, max: `50`).
-- **Response Format:**
-```json
-{
-  "status": "success",
-  "data": {
-    "query": "warung makan",
-    "results": [
+  - `q` *(string, required)*: Kata kunci atau kalimat kegiatan usaha (contoh: `padi`, `bengkel motor`, `warung soto`).
+  - `type` *(string, optional)*: Filter tipe `KBLI`, `KBJI`, atau kosongkan untuk mencari keduanya.
+  - `limit` *(integer, optional)*: Jumlah hasil (default `15`, max `50`).
+- **cURL Contoh:**
+  ```bash
+  curl --location 'http://127.0.0.1:8000/api/v1/search?q=padi&limit=5'
+  ```
+- **Response Format (`200 OK`):**
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "query": "padi",
+      "results": [
+        {
+          "type": "KBLI 2025",
+          "kode": "01121",
+          "judul": "PERTANIAN PADI HIBRIDA",
+          "deskripsi": "Kelompok ini mencakup kegiatan pertanian padi hibrida, termasuk di dalamnya kegiatan pengolahan lahan...",
+          "contoh_lapangan": [
+            "PERTANIAN PADI HIBRIDA - mencabut rumput liar di sawah",
+            "PERTANIAN PADI HIBRIDA - menanam benih padi di ladang basah"
+          ],
+          "score": 95,
+          "match_type": "keyword",
+          "is_equivalent": false
+        }
+      ],
+      "total": 5
+    },
+    "meta": {
+      "version": "2026.08.1",
+      "search_method": "hybrid",
+      "timestamp": "2026-08-26T07:58:33+00:00"
+    }
+  }
+  ```
+
+---
+
+### B. Eksplorasi Hierarki KBLI (`GET /kbli/hierarchy`)
+Mengambil struktur pohon klasifikasi KBLI dari Kategori (A–U) hingga Kelompok (5 digit).
+
+- **Method:** `GET`
+- **Path:** `/api/v1/kbli/hierarchy`
+- **Query Parameters:**
+  - `parent` *(string, optional)*: Kosongkan untuk Kategori level atas (A–U), atau isi kode parent (misal `01`, `011`, `0112`).
+- **Contoh Request:**
+  - Daftar Kategori: `GET /api/v1/kbli/hierarchy`
+  - Anak Golongan dari Kategori A: `GET /api/v1/kbli/hierarchy?parent=A`
+  - Subgolongan dari Golongan Pokok 01: `GET /api/v1/kbli/hierarchy?parent=01`
+- **Response Format (`200 OK`):**
+  ```json
+  {
+    "status": "success",
+    "data": [
       {
-        "type": "KBLI 2025",
-        "kode": "56102",
-        "judul": "Rumah/Warung Makan",
-        "deskripsi": "Kelompok ini mencakup penyediaan makanan untuk dikonsumsi di tempat...",
-        "contoh_lapangan": [
-          "Warung Tegal (Warteg)",
-          "Warung Makan Padang",
-          "Warung Soto Ayam"
-        ],
-        "score": 95,
-        "match_type": "semantic",
-        "is_equivalent": false
+        "kode": "A",
+        "judul": "Pertanian, Kehutanan Dan Perikanan",
+        "deskripsi": "Kategori ini mencakup pemanfaatan sumber daya hayati...",
+        "level": "kategori",
+        "is_leaf": false
+      },
+      {
+        "kode": "B",
+        "judul": "Pertambangan Dan Penggalian",
+        "deskripsi": "...",
+        "level": "kategori",
+        "is_leaf": false
       }
-    ],
-    "total": 1
-  },
-  "meta": {
-    "version": "2026.08.1",
-    "search_method": "hybrid",
-    "timestamp": "2026-08-26T07:42:20+00:00"
+    ]
   }
-}
-```
+  ```
 
 ---
 
-### B. Hierarki Pohon KBLI
+### C. Pengecekan & Unduhan Database Offline (`GET /sync/*`)
+
+#### 1. Cek Versi Terbaru
 - **Method:** `GET`
-- **Path:** `/kbli/hierarchy?parent={kode}`
-- **Query Parameters:**
-  - `parent`: Kosongkan untuk level Kategori (A–U), atau isi kode parent (misal `01`, `011`, `0111`).
-- **Response Format:**
-```json
-{
-  "status": "success",
-  "data": [
-    {
-      "kode": "A",
-      "judul": "PERTANIAN, KEHUTANAN DAN PERIKANAN",
-      "deskripsi": "...",
-      "level": "kategori",
-      "is_leaf": false
+- **Path:** `/api/v1/sync/check`
+- **Response (`200 OK`):**
+  ```json
+  {
+    "status": "success",
+    "data": {
+      "status": "ready",
+      "version": "2026.08.26",
+      "generated_at": "2026-08-26T07:44:35+00:00",
+      "kbli_count": 1569,
+      "kbji_count": 2735,
+      "raw_file_size_mb": 22.5,
+      "file_size_mb": 14.24,
+      "md5": "761d3910c0c2b8702b3c0c6ec3f732e1",
+      "download_url": "http://127.0.0.1:8000/api/v1/sync/bundle"
     }
-  ]
-}
-```
-
----
-
-### C. Sinkronisasi Bundle Database Offline
-- **Method:** `GET`
-- **Path:** `/sync/check`
-- **Response:**
-```json
-{
-  "status": "success",
-  "data": {
-    "version": "2026.08.26",
-    "kbli_count": 1569,
-    "kbji_count": 2735,
-    "file_size_mb": 2.09,
-    "md5": "8da8c13ead0ce5dc7eb86b6fc9ec30bd",
-    "download_url": "https://domain-pintarkbli.bps.go.id/api/v1/sync/bundle"
   }
-}
-```
+  ```
+
+#### 2. Download File Bundle
+- **Method:** `GET`
+- **Path:** `/api/v1/sync/bundle`
+- **Response:** Binary Stream (`application/gzip` atau `application/x-sqlite3`).
 
 ---
 
-### D. Crowdsourcing Masukan Lapangan (Offline Sync)
+### D. Pengajuan Crowdsourcing Lapangan (`POST /submissions/*`)
+
+#### 1. Pengajuan Tunggal (Single Online Submission)
 - **Method:** `POST`
-- **Path:** `/submissions/bulk-sync`
-- **Request Body:**
-```json
-{
-  "submissions": [
-    {
-      "type": "KBLI 2025",
-      "kode": "56102",
-      "content": "Jual pecel lele tenda malam hari",
-      "device_id": "android_uuid_123"
+- **Path:** `/api/v1/submissions`
+- **Headers:** `Content-Type: application/json`, `Accept: application/json`
+- **Body JSON:**
+  ```json
+  {
+    "type": "KBLI",
+    "kode": "01121",
+    "content": "Petani yang menanam padi hibrida bernas prima di sawah irigasi",
+    "submitter_name": "Budi Santoso",
+    "device_id": "samsung-a54-uuid-123"
+  }
+  ```
+- **Response (`201 Created`):**
+  ```json
+  {
+    "status": "success",
+    "message": "Terima kasih! Pengajuan contoh lapangan Anda berhasil dikirim dan akan diverifikasi.",
+    "data": {
+      "id": 16,
+      "kode": "01121",
+      "status": "pending"
     }
-  ]
-}
-```
+  }
+  ```
+
+#### 2. Sinkronisasi Massal Hasil Catatan Offline (Bulk Sync)
+- **Method:** `POST`
+- **Path:** `/api/v1/submissions/bulk-sync`
+- **Headers:** `Content-Type: application/json`, `Accept: application/json`
+- **Body JSON:**
+  ```json
+  {
+    "submissions": [
+      {
+        "type": "KBLI",
+        "kode": "01111",
+        "content": "Petani jagung manis pipil",
+        "local_created_at": "2026-08-26T10:15:30Z",
+        "device_id": "samsung-a54-uuid-123"
+      },
+      {
+        "type": "KBJI",
+        "kode": "6111",
+        "content": "Buruh pemotong tebu saat panen raya",
+        "local_created_at": "2026-08-26T11:20:00Z",
+        "device_id": "samsung-a54-uuid-123"
+      }
+    ]
+  }
+  ```
+- **Response (`200 OK`):**
+  ```json
+  {
+    "status": "success",
+    "message": "Berhasil menyinkronkan 2 catatan lapangan offline.",
+    "data": {
+      "synced_count": 2
+    }
+  }
+  ```
 
 ---
 
-## 3. Implementasi di Flutter (Dart)
+## 3. Struktur Database SQLite Offline (On-Device)
 
-### A. Rekomendasi Dependencies (`pubspec.yaml`)
+File bundle SQLite (`kbli_offline_latest.db`) memiliki struktur tabel berikut:
+
+### 1. Tabel Master & Full-Text Search FTS5
+- `kbli2025` *(id, kode, judul, deskripsi, kategori, contoh_lapangan, embedding)*
+- `kbji2014` *(id, kode, judul, deskripsi, contoh_lapangan, embedding)*
+- `kbli_fts` *(rowid, kode, judul, deskripsi, contoh_lapangan)* — **Virtual Table FTS5**
+- `kbji_fts` *(rowid, kode, judul, deskripsi, contoh_lapangan)* — **Virtual Table FTS5**
+- `meta` *(key, value)* — menyimpan informasi versi bundle dan tanggal generate.
+
+---
+
+## 4. Contoh Implementasi di Flutter (Dart)
+
+### A. Dependencies (`pubspec.yaml`)
 ```yaml
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.7.0                     # HTTP client untuk API Online
-  connectivity_plus: ^6.1.0       # Auto detect online/offline
-  sqflite: ^2.4.1                 # SQLite lokal di Android & iOS
-  path_provider: ^2.1.5           # Path penyimpanan file di HP
-  archive: ^4.0.2                 # Untuk decompress .db.gz
+  dio: ^5.7.0
+  sqflite: ^2.4.1
+  path_provider: ^2.1.5
+  path: ^1.9.0
+  connectivity_plus: ^6.1.0
+  archive: ^4.0.2
+  shared_preferences: ^2.3.2
 ```
 
 ---
 
-### B. Inisialisasi Database Offline di HP
+### B. Data Model (`lib/models/kbli_item.dart`)
+```dart
+class KbliItem {
+  final String type;
+  final String kode;
+  final String judul;
+  final String deskripsi;
+  final List<String> contohLapangan;
+  final int score;
+  final String matchType;
+
+  KbliItem({
+    required this.type,
+    required this.kode,
+    required this.judul,
+    required this.deskripsi,
+    required this.contohLapangan,
+    required this.score,
+    required this.matchType,
+  });
+
+  factory KbliItem.fromJson(Map<String, dynamic> json) {
+    var rawContoh = json['contoh_lapangan'];
+    List<String> listContoh = [];
+    if (rawContoh is List) {
+      listContoh = rawContoh.map((e) => e.toString()).toList();
+    }
+
+    return KbliItem(
+      type: json['type'] ?? 'KBLI 2025',
+      kode: json['kode']?.toString() ?? '',
+      judul: json['judul']?.toString() ?? '',
+      deskripsi: json['deskripsi']?.toString() ?? '',
+      contohLapangan: listContoh,
+      score: (json['score'] is num) ? (json['score'] as num).toInt() : 0,
+      matchType: json['match_type'] ?? 'exact',
+    );
+  }
+}
+```
+
+---
+
+### C. Local Database Service (SQLite FTS5) (`lib/services/local_db_service.dart`)
 ```dart
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:archive/archive.dart';
+import '../models/kbli_item.dart';
 
-class LocalKbliDatabase {
-  static Database? _db;
+class LocalDbService {
+  static Database? _database;
 
-  static Future<Database> get instance async {
-    if (_db != null) return _db!;
-    _db = await _initDatabase();
-    return _db!;
+  static Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDb();
+    return _database!;
   }
 
-  static Future<Database> _initDatabase() async {
+  static Future<Database> _initDb() async {
     final docsDir = await getApplicationDocumentsDirectory();
     final dbPath = join(docsDir.path, 'kbli_offline.db');
 
-    // Jika belum ada di penyimpanan lokal, salin dari asset bundle awal
     if (!await File(dbPath).exists()) {
-      final byteData = await rootBundle.load('assets/database/kbli_offline.db');
-      final bytes = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-      await File(dbPath).writeAsBytes(bytes, flush: true);
+      // Inisialisasi awal dari asset bawaan aplikasi jika ada
+      try {
+        final byteData = await rootBundle.load('assets/database/kbli_offline.db');
+        final bytes = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
+        await File(dbPath).writeAsBytes(bytes, flush: true);
+      } catch (e) {
+        // Fallback jika file asset belum dibundle
+      }
     }
 
     return await openDatabase(dbPath, readOnly: true);
   }
 
-  /// Pencarian Offline menggunakan SQLite FTS5 (Super Cepat < 5ms)
-  static Future<List<Map<String, dynamic>>> searchFts(String query, {int limit = 15}) async {
-    final db = await instance;
+  /// Pencarian Cepat Offline menggunakan SQLite FTS5
+  static Future<List<KbliItem>> searchFts(String query, {int limit = 15}) async {
     final cleanQuery = query.replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '').trim();
     if (cleanQuery.isEmpty) return [];
 
-    // FTS5 MATCH query dengan prefix search (*)
-    final terms = cleanQuery.split(' ').map((term) => '$term*').join(' ');
+    final db = await database;
+    final terms = cleanQuery.split(RegExp(r'\s+')).map((t) => '$t*').join(' ');
 
-    final results = await db.rawQuery('''
-      SELECT k.id, k.kode, k.judul, k.deskripsi, k.kategori, k.contoh_lapangan,
+    final rows = await db.rawQuery('''
+      SELECT k.kode, k.judul, k.deskripsi, k.contoh_lapangan, 'KBLI 2025' as type,
              bm25(kbli_fts) as rank
       FROM kbli_fts f
       JOIN kbli2025 k ON f.rowid = k.id
@@ -206,50 +347,64 @@ class LocalKbliDatabase {
       LIMIT ?
     ''', [terms, limit]);
 
-    return results;
+    return rows.map((r) => KbliItem(
+      type: 'KBLI 2025',
+      kode: r['kode'].toString(),
+      judul: r['judul'].toString(),
+      deskripsi: r['deskripsi']?.toString() ?? '',
+      contohLapangan: [],
+      score: 80,
+      matchType: 'offline_fts',
+    )).toList();
   }
 }
 ```
 
 ---
 
-### C. Smart Search Repository (Auto-Switch Online / Offline)
+### D. Repository Pintar (Auto Switch Online / Offline) (`lib/repositories/kbli_repository.dart`)
 ```dart
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import '../models/kbli_item.dart';
+import '../services/local_db_service.dart';
 
-class KbliSearchRepository {
+class KbliRepository {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://domain-pintarkbli.bps.go.id/api/v1',
-    connectTimeout: const Duration(seconds: 3),
-    receiveTimeout: const Duration(seconds: 3),
+    baseUrl: 'http://127.0.0.1:8000/api/v1', // Ganti dengan domain production
+    connectTimeout: const Duration(seconds: 4),
+    receiveTimeout: const Duration(seconds: 4),
   ));
 
-  Future<List<Map<String, dynamic>>> search(String query) async {
+  Future<List<KbliItem>> search(String query) async {
     final connectivity = await Connectivity().checkConnectivity();
-    final isOnline = connectivity != ConnectivityResult.none;
+    final isOnline = connectivity.contains(ConnectivityResult.mobile) ||
+                     connectivity.contains(ConnectivityResult.wifi);
 
     if (isOnline) {
       try {
-        // Coba Online Search API
         final res = await _dio.get('/search', queryParameters: {'q': query});
         if (res.statusCode == 200 && res.data['status'] == 'success') {
-          return List<Map<String, dynamic>>.from(res.data['data']['results']);
+          final List rawList = res.data['data']['results'] ?? [];
+          return rawList.map((e) => KbliItem.fromJson(e)).toList();
         }
       } catch (e) {
-        // Jika server timeout/error, otomatis fallback ke offline
+        // Jika server timeout/gagal, otomatis fallback ke SQLite lokal HP
       }
     }
 
-    // Fallback Offline via SQLite FTS5
-    return await LocalKbliDatabase.searchFts(query);
+    // Eksekusi pencarian offline di HP
+    return await LocalDbService.searchFts(query);
   }
 }
 ```
 
 ---
 
-## 4. Rangkuman Keuntungan Arsitektur Ini
-1. **Responsif & Tangguh:** Aplikasi Flutter tidak akan pernah macet atau menampilkan layar blank saat petugas sensus kehilangan sinyal di pedalaman.
-2. **Ukuran Efisien:** File database offline terkompresi hanya **2.09 MB** untuk seluruh KBLI 2025 dan KBJI 2014.
-3. **Pencarian Instan:** Indeks SQLite FTS5 melakukan pencarian kata kunci dalam hitungan milidetik secara lokal di CPU ponsel.
+## 5. Checklist Validasi untuk Tim Flutter
+
+- [x] Endpoint Online Search `/api/v1/search` teruji dengan response format terstandarisasi.
+- [x] Endpoint Hierarki `/api/v1/kbli/hierarchy` teruji untuk navigasi drill-down.
+- [x] Endpoint Sync Check `/api/v1/sync/check` teruji memberikan hash MD5 & link download bundle.
+- [x] Endpoint Bundle Download `/api/v1/sync/bundle` siap menyajikan file terkompresi `.db.gz`.
+- [x] Endpoint Submission `/api/v1/submissions` & Bulk Sync `/api/v1/submissions/bulk-sync` teruji dengan format status `201/200`.
