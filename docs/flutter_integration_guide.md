@@ -35,8 +35,8 @@ Dokumen ini adalah spesifikasi teknis dan panduan integrasi resmi untuk Tim Peng
 
 ## 2. Spesifikasi Endpoint REST API (Online Mode)
 
-Base URL Pengembangan Lokal: `http://127.0.0.1:8000/api/v1`  
-Base URL Server Production: `https://<domain-server>/api/v1`
+- **Production Base URL (Live Server):** `https://demakai.bpsdemak.com/api/v1`
+- **Local Development Base URL:** `http://127.0.0.1:8000/api/v1` *(atau `http://10.0.2.2:8000/api/v1` untuk Android Emulator)*
 
 ---
 
@@ -49,9 +49,9 @@ Melakukan pencarian cerdas pada master KBLI 2025 dan KBJI 2014.
   - `q` *(string, required)*: Kata kunci atau kalimat kegiatan usaha (contoh: `padi`, `bengkel motor`, `warung soto`).
   - `type` *(string, optional)*: Filter tipe `KBLI`, `KBJI`, atau kosongkan untuk mencari keduanya.
   - `limit` *(integer, optional)*: Jumlah hasil (default `15`, max `50`).
-- **cURL Contoh:**
+- **cURL Contoh (Production):**
   ```bash
-  curl --location 'http://127.0.0.1:8000/api/v1/search?q=padi&limit=5'
+  curl --location 'https://demakai.bpsdemak.com/api/v1/search?q=padi&limit=5'
   ```
 - **Response Format (`200 OK`):**
   ```json
@@ -127,6 +127,10 @@ Mengambil struktur pohon klasifikasi KBLI dari Kategori (A–U) hingga Kelompok 
 #### 1. Cek Versi Terbaru
 - **Method:** `GET`
 - **Path:** `/api/v1/sync/check`
+- **cURL Contoh (Production):**
+  ```bash
+  curl --location 'https://demakai.bpsdemak.com/api/v1/sync/check'
+  ```
 - **Response (`200 OK`):**
   ```json
   {
@@ -134,13 +138,17 @@ Mengambil struktur pohon klasifikasi KBLI dari Kategori (A–U) hingga Kelompok 
     "data": {
       "status": "ready",
       "version": "2026.08.26",
-      "generated_at": "2026-08-26T07:44:35+00:00",
+      "generated_at": "2026-08-26T08:28:11+00:00",
       "kbli_count": 1569,
       "kbji_count": 2735,
+      "raw_file_size_bytes": 23592960,
       "raw_file_size_mb": 22.5,
-      "file_size_mb": 14.24,
-      "md5": "761d3910c0c2b8702b3c0c6ec3f732e1",
-      "download_url": "http://127.0.0.1:8000/api/v1/sync/bundle"
+      "file_size_bytes": 14916415,
+      "file_size_mb": 14.23,
+      "md5": "79e088f4cda94d148184c3bcc391c98d",
+      "sha256": "b061733116efdedcf9620b83c56ff4a18281f95a00e4248b4be084bf32530236",
+      "download_url": "https://demakai.bpsdemak.com/api/v1/sync/bundle",
+      "model_download_url": "https://demakai.bpsdemak.com/api/v1/sync/model"
     }
   }
   ```
@@ -371,7 +379,7 @@ import '../services/local_db_service.dart';
 
 class KbliRepository {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://127.0.0.1:8000/api/v1', // Ganti dengan domain production
+    baseUrl: 'https://demakai.bpsdemak.com/api/v1', // URL Server Production
     connectTimeout: const Duration(seconds: 4),
     receiveTimeout: const Duration(seconds: 4),
   ));
