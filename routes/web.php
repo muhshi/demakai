@@ -59,3 +59,18 @@ Route::get('/eval-results', function () {
     return response(file_get_contents($file))
         ->header('Content-Type', 'text/html');
 });
+
+Route::get('/laporan-usulan-riil', function () {
+    $paths = [
+        base_path('output/laporan_usulan_riil.html'),
+        base_path('python/output/laporan_usulan_riil.html')
+    ];
+    foreach ($paths as $file) {
+        if (file_exists($file)) {
+            return response(file_get_contents($file))
+                ->header('Content-Type', 'text/html');
+        }
+    }
+    return response("Laporan HTML belum dibuat. Silakan jalankan python python/build_laporan_usulan_riil.py", 404);
+});
+

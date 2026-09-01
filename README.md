@@ -60,6 +60,10 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-09-01
+- **Laporan Evaluasi Data Riil Lapangan (Web Report)**: Menambahkan route `/laporan-usulan-riil` di `routes/web.php` dan generator laporan HTML Light Mode (`python/build_laporan_usulan_riil.py`) untuk transparansi publik pengujian 50 data riil usulan crowdsourcing dan log pencarian lapangan.
+- **Evaluasi & Pengujian Statistik KBLI 2025**: Script komputasi M1 s.d. M6 (`python/run_full_m1_m6_eval_50.py`), uji hipotesis berpasangan (Bootstrap CI 95%, Permutation Test, Wilcoxon Signed-Rank Test), serta audit validasi 100% kode KBLI 2025 ground truth.
+
 ### [Added] - 2026-08-26
 - **API V1 Mobile Flutter**: Implementasi endpoint REST API V1 standar (`/api/v1/search`, `/api/v1/kbli/hierarchy`, `/api/v1/submissions`, `/api/v1/submissions/bulk-sync`) untuk integrasi aplikasi mobile Flutter.
 - **Offline Bundle Generator**: Penambahan Artisan command `php artisan kbli:export-bundle` untuk mengekstrak master KBLI 2025, KBJI 2014, dan contoh lapangan ke dalam database SQLite terkompresi GZIP (`kbli_offline_latest.db.gz`, ~2.09 MB) dilengkapi virtual table FTS5.
