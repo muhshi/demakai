@@ -71,6 +71,13 @@ All notable changes to this project will be documented in this section.
 - **On-Device AI Exporter**: Script `python/utils/export_onnx_model.py` untuk konversi model multilingual sentence transformer ke format ONNX INT8 Quantized untuk inferensi lokal di HP.
 - **Panduan Integrasi Flutter**: Dokumentasi lengkap dan contoh implementasi Dart/Flutter untuk mode hybrid (Online + Offline fallback) di `docs/flutter_integration_guide.md`.
 
+### [Added] - 2026-09-07
+- **Auto-Reject Duplikat Pengajuan**:
+  - Penambahan artisan command `php artisan submissions:reject-duplicates` (dengan flag `--dry-run`) untuk mendeteksi dan menolak pengajuan contoh lapangan yang duplikat secara otomatis (mempertahankan 1 entri tertua tetap *pending*).
+  - Penambahan tombol aksi *Header Action* "Tolak Pengajuan Duplikat" di Filament Resource Pengajuan Contoh Lapangan untuk kemudahan admin panel 1-klik.
+  - Penambahan *Bulk Action* `Reject Selected` pada tabel pengajuan utama dan widget dashboard `PendingSubmissionsTable`.
+  - Penambahan tab filter status "Ditolak" beserta *badge* indikator jumlah data di halaman daftar pengajuan.
+
 ### [Removed] - 2026-08-26
 - **Codebase Clean-up**: Menghapus file-file temporary, sisa snippet AI (`before/after_snippet.txt`, `patch2.py`, `patch_eval.py`), script dump one-off (`export_queries.php`, `export_queries_ui.php`), database baseline usang (`demakai_baseline.db`), dan file shell error di folder arsip.
 

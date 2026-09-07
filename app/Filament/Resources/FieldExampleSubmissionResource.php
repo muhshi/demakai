@@ -160,6 +160,26 @@ class FieldExampleSubmissionResource extends Resource
                         })
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('bulkReject')
+                        ->label('Reject Selected')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            $count = 0;
+                            foreach ($records as $record) {
+                                if ($record->status === 'pending') {
+                                    $record->update(['status' => 'rejected']);
+                                    $count++;
+                                }
+                            }
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Pengajuan Ditolak')
+                                ->body("{$count} pengajuan berhasil diubah statusnya menjadi rejected.")
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

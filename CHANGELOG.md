@@ -4,6 +4,17 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
+## [2026-09-07] - Auto-Reject Duplikat Pengajuan Contoh Lapangan
+
+### Added
+- **Auto-Reject Duplikat Pengajuan**:
+  - Penambahan artisan command `php artisan submissions:reject-duplicates` (dengan opsi `--dry-run`) untuk menolak pengajuan yang terduplikasi (mempertahankan 1 entri pertama tetap pending).
+  - Penambahan tombol aksi *Header Action* "Tolak Pengajuan Duplikat" di halaman admin Filament `ListFieldExampleSubmissions`.
+  - Penambahan *Bulk Action* `Reject Selected` pada tabel pengajuan dan widget dashboard `PendingSubmissionsTable`.
+  - Penambahan tab status "Ditolak" beserta *badge* indikator jumlah data.
+
+---
+
 ## [2026-06-12] - Native Visitor Analytics & Integrasi Kasus Batas KBLI 2025
 
 ### Added
