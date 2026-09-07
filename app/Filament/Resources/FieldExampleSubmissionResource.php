@@ -27,6 +27,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Placeholder;
+use Illuminate\Support\HtmlString;
+
 class FieldExampleSubmissionResource extends Resource
 {
     protected static ?string $model = FieldExampleSubmission::class;
@@ -36,18 +40,118 @@ class FieldExampleSubmissionResource extends Resource
     protected static ?string $modelLabel = 'Pengajuan Contoh Lapangan';
     protected static ?string $pluralModelLabel = 'Pengajuan Contoh Lapangan';
 
+    public static function resolveModel(?string $type): ?string
+    {
+        if (!$type) return PgKBLI2025::class;
+        $typeUpper = strtoupper(trim($type));
+        if (str_contains($typeUpper, 'KBJI')) return PgKBJI2014::class;
+        if (str_contains($typeUpper, '2020')) return PgKBLI2020::class;
+        return PgKBLI2025::class;
+    }
+
+    public static function getTitleForCode(?string $type, ?string $kode): ?string
+    {
+        if (!$kode) return null;
+        $model = static::resolveModel($type);
+        if (!$model) return null;
+
+        $item = $model::where('kode', trim($kode))->first();
+        return $item?->judul;
+    }
+
+    public static function checkAlreadyAcc(?string $type, ?string $kode, ?string $content, ?int $excludeId = null): ?string
+    {
+        $cleanContent = mb_strtolower(trim((string)$content));
+        if (!$cleanContent || !$kode) return null;
+
+        $kode = trim($kode);
+        $model = static::resolveModel($type);
+
+        // 1. Cek di master tabel (contoh_lapangan)
+        if ($model) {
+            $entry = $model::where('kode', $kode)->first();
+            if ($entry && !empty($entry->contoh_lapangan)) {
+                $arr = is_array($entry->contoh_lapangan) ? $entry->contoh_lapangan : (json_decode($entry->contoh_lapangan, true) ?: []);
+                foreach ($arr as $ex) {
+                    if (mb_strtolower(trim($ex)) === $cleanContent) {
+                        $mName = class_basename($model);
+                        return "Sudah terdaftar di master {$mName} (Kode {$kode}: '{$entry->judul}')";
+                    }
+                }
+            }
+        }
+
+        // 2. Cek di pengajuan yang sudah disetujui (approved)
+        $q = FieldExampleSubmission::where('status', 'approved')
+            ->where('kode', $kode)
+            ->whereRaw('LOWER(TRIM(content)) = ?', [$cleanContent]);
+        if ($excludeId) {
+            $q->where('id', '!=', $excludeId);
+        }
+        $approved = $q->first();
+        if ($approved) {
+            return "Sudah pernah disetujui (ACC) pada pengajuan ID #{$approved->id} untuk kode {$kode}";
+        }
+
+        return null;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('type')
-                ->readOnly(),
-            TextInput::make('kode')
-                ->readOnly(),
-            Textarea::make('content')
+            Select::make('type')
+                ->label('Jenis Klasifikasi')
+                ->options([
+                    'KBLI 2025' => 'KBLI 2025',
+                    'KBLI 2020' => 'KBLI 2020',
+                    'KBJI 2014' => 'KBJI 2014',
+                ])
                 ->required()
+                ->live(),
+            TextInput::make('kode')
+                ->label('Kode KBLI / KBJI')
+                ->required()
+                ->maxLength(10)
+                ->live(onBlur: true)
+                ->helperText(function ($get) {
+                    $kode = $get('kode');
+                    $type = $get('type');
+                    if (!$kode) return null;
+                    $title = static::getTitleForCode($type, $kode);
+                    return $title ? "📖 {$title}" : '⚠️ Kode tidak ditemukan dalam database master';
+                }),
+            Placeholder::make('acc_warning')
+                ->label('')
+                ->hidden(fn ($get) => !static::checkAlreadyAcc($get('type'), $get('kode'), $get('content')))
+                ->content(function ($get) {
+                    $msg = static::checkAlreadyAcc($get('type'), $get('kode'), $get('content'));
+                    return new HtmlString('
+                        <div style="padding: 12px 16px; background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 6px; color: #92400e; font-size: 0.875rem;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.25rem;">⚠️</span>
+                                <div>
+                                    <strong style="font-weight: 600;">Peringatan: Contoh Lapangan Ini Sudah Pernah di-ACC!</strong>
+                                    <div style="margin-top: 2px;">' . e($msg) . '</div>
+                                </div>
+                            </div>
+                        </div>
+                    ');
+                })
                 ->columnSpanFull(),
-            TextInput::make('status')
-                ->readOnly(),
+            Textarea::make('content')
+                ->label('Isi Contoh Lapangan')
+                ->required()
+                ->rows(3)
+                ->live(onBlur: true)
+                ->columnSpanFull(),
+            Select::make('status')
+                ->label('Status')
+                ->options([
+                    'pending' => 'Pending',
+                    'approved' => 'Approved',
+                    'rejected' => 'Rejected',
+                ])
+                ->required(),
         ]);
     }
 
@@ -62,9 +166,15 @@ class FieldExampleSubmissionResource extends Resource
                 TextColumn::make('kode')
                     ->searchable()
                     ->copyable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->description(fn(FieldExampleSubmission $record) => static::getTitleForCode($record->type, $record->kode)),
                 TextColumn::make('content')
-                    ->limit(50),
+                    ->wrap()
+                    ->limit(100)
+                    ->description(function (FieldExampleSubmission $record) {
+                        $warn = static::checkAlreadyAcc($record->type, $record->kode, $record->content, $record->status === 'approved' ? $record->id : null);
+                        return $warn ? "⚠️ {$warn}" : null;
+                    }),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
@@ -92,13 +202,15 @@ class FieldExampleSubmissionResource extends Resource
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->visible(fn(FieldExampleSubmission $record) => $record->status === 'pending')
+                    ->modalDescription(function (FieldExampleSubmission $record) {
+                        $warn = static::checkAlreadyAcc($record->type, $record->kode, $record->content);
+                        if ($warn) {
+                            return "⚠️ PERHATIAN: {$warn}. Apakah Anda yakin tetap ingin menyetujui pengajuan ini?";
+                        }
+                        return 'Apakah Anda yakin ingin menyetujui pengajuan contoh lapangan ini? Contoh lapangan akan otomatis ditambahkan ke database master.';
+                    })
                     ->action(function (FieldExampleSubmission $record) {
-                        $model = match ($record->type) {
-                            'KBLI 2025' => PgKBLI2025::class,
-                            'KBLI 2020' => PgKBLI2020::class,
-                            'KBJI 2014' => PgKBJI2014::class,
-                            default => null,
-                        };
+                        $model = static::resolveModel($record->type);
 
                         if ($model) {
                             $entry = $model::where('kode', $record->kode)->first();

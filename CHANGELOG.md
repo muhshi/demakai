@@ -4,9 +4,16 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
-## [2026-09-07] - Auto-Reject Duplikat Pengajuan Contoh Lapangan
+## [2026-09-07] - Fitur Edit Kode & Deteksi Warning Sudah Pernah di-ACC, serta Pembersihan Duplikat
 
 ### Added
+- **Fitur Edit Kode & Live Judul Klasifikasi**:
+  - Field `kode` dan `type` pada form pengajuan contoh lapangan kini dapat diedit oleh annotator dengan *live preview* judul KBLI/KBJI.
+- **Deteksi & Warning Contoh Lapangan Sudah Pernah di-ACC**:
+  - Peringatan *real-time* (*warning callout/banner*) pada form edit saat mengetik atau mengganti kode/konten jika contoh tersebut sudah pernah disetujui (ACC) sebelumnya di database master maupun pada pengajuan yang sudah disetujui.
+  - Dialog peringatan pada konfirmasi modal aksi *Approve*.
+  - Label indikator peringatan pada kolom *content* di tabel pengajuan utama dan widget dashboard.
+  - Penambahan aksi *Edit* modal langsung di widget dashboard `PendingSubmissionsTable`.
 - **Auto-Reject Duplikat Pengajuan**:
   - Penambahan artisan command `php artisan submissions:reject-duplicates` (dengan opsi `--dry-run`) untuk menolak pengajuan yang terduplikasi (mempertahankan 1 entri pertama tetap pending).
   - Penambahan tombol aksi *Header Action* "Tolak Pengajuan Duplikat" di halaman admin Filament `ListFieldExampleSubmissions`.

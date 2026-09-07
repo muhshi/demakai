@@ -72,6 +72,11 @@ All notable changes to this project will be documented in this section.
 - **Panduan Integrasi Flutter**: Dokumentasi lengkap dan contoh implementasi Dart/Flutter untuk mode hybrid (Online + Offline fallback) di `docs/flutter_integration_guide.md`.
 
 ### [Added] - 2026-09-07
+- **Fitur Edit Kode & Deteksi Warning Sudah Pernah di-ACC**:
+  - Kolom `kode` dan `type` pada form pengajuan contoh lapangan kini dapat diedit oleh annotator/admin dengan *live preview* judul KBLI/KBJI.
+  - Penambahan komponen deteksi peringatan *real-time* (*warning banner*) pada form jika contoh lapangan tersebut sudah pernah disetujui (ACC) di database master atau di pengajuan sebelumnya.
+  - Penambahan dialog peringatan pada konfirmasi tombol *Approve* dan indikator peringatan pada tabel.
+  - Penambahan aksi *Edit* langsung pada widget dashboard `PendingSubmissionsTable` untuk kemudahan koreksi kode cepat.
 - **Auto-Reject Duplikat Pengajuan**:
   - Penambahan artisan command `php artisan submissions:reject-duplicates` (dengan flag `--dry-run`) untuk mendeteksi dan menolak pengajuan contoh lapangan yang duplikat secara otomatis (mempertahankan 1 entri tertua tetap *pending*).
   - Penambahan tombol aksi *Header Action* "Tolak Pengajuan Duplikat" di Filament Resource Pengajuan Contoh Lapangan untuk kemudahan admin panel 1-klik.
