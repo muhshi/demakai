@@ -4,9 +4,15 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
 
 ---
 
-## [2026-09-07] - Fitur Edit Kode & Deteksi Warning Sudah Pernah di-ACC, serta Pembersihan Duplikat
+## [2026-09-07] - Fitur Edit Kode & Deteksi Warning Sudah Pernah di-ACC, serta Pembersihan Duplikat & Optimasi Deploy Script
 
 ### Added
+- **Optimasi Smart Conditional Build pada `deploy.sh`**:
+  - Pengecekan cerdas perubahan git (`git diff`) antara commit sebelum dan sesudah pull untuk menentukan perlu/tidaknya build ulang Docker.
+  - Container Python Search API (`demakai-python`) hanya di-build ulang bila terdapat perubahan pada direktori `python/` atau image belum ada di host.
+  - Container Laravel/FrankenPHP (`demakai-franken`) hanya di-build/pull jika terdapat perubahan kode aplikasi/frontend.
+  - Build lokal Laravel kini memanfaatkan *Docker layer cache* (tidak lagi memakai `--no-cache` secara default), memangkas waktu build lokal dari 5–10 menit menjadi hitungan detik.
+  - Mendukung parameter CLI untuk kontrol manual: `-f` / `--force` (paksa build semua), `--python` (paksa build Python saja), `--laravel` (paksa build Laravel saja), dan `--no-cache` (build tanpa cache).
 - **Fitur Edit Kode & Live Judul Klasifikasi**:
   - Field `kode` dan `type` pada form pengajuan contoh lapangan kini dapat diedit oleh annotator dengan *live preview* judul KBLI/KBJI.
 - **Deteksi & Warning Contoh Lapangan Sudah Pernah di-ACC**:

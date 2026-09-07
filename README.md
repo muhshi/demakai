@@ -72,6 +72,12 @@ All notable changes to this project will be documented in this section.
 - **Panduan Integrasi Flutter**: Dokumentasi lengkap dan contoh implementasi Dart/Flutter untuk mode hybrid (Online + Offline fallback) di `docs/flutter_integration_guide.md`.
 
 ### [Added] - 2026-09-07
+- **Optimasi Smart Conditional Build pada `deploy.sh`**:
+  - Script deployment kini secara cerdas menganalisis perubahan file via git diff sebelum memutuskan apakah container perlu di-build ulang.
+  - Container Python Search API (`demakai-python`) hanya di-build ulang jika terdeteksi perubahan pada folder `python/` atau jika image belum ada di server.
+  - Container Laravel/FrankenPHP (`demakai-franken`) hanya di-build/pull ulang jika ada perubahan pada kode aplikasi/frontend (mengabaikan perubahan dokumentasi, python, dan git meta).
+  - Build lokal Laravel kini memanfaatkan *Docker layer caching* (menghapus flag `--no-cache` default), mempercepat waktu deployment lokal dari 5-10 menit menjadi hitungan detik.
+  - Mendukung fleksibilitas argumen CLI: `-f` / `--force` (paksa build semua), `--python` (paksa build Python saja), `--laravel` (paksa build Laravel saja), dan `--no-cache` (build bersih tanpa cache jika diperlukan).
 - **Fitur Edit Kode & Deteksi Warning Sudah Pernah di-ACC**:
   - Kolom `kode` dan `type` pada form pengajuan contoh lapangan kini dapat diedit oleh annotator/admin dengan *live preview* judul KBLI/KBJI.
   - Penambahan komponen deteksi peringatan *real-time* (*warning banner*) pada form jika contoh lapangan tersebut sudah pernah disetujui (ACC) di database master atau di pengajuan sebelumnya.
