@@ -265,9 +265,11 @@ class FieldExampleSubmissionResource extends Resource
                 TextColumn::make('kode')
                     ->searchable()
                     ->copyable()
-                    ->badge()
-                    ->color('primary')
-                    ->tooltip(fn(FieldExampleSubmission $record) => static::getTitleForCode($record->type, $record->kode)),
+                    ->weight('bold')
+                    ->description(fn(FieldExampleSubmission $record) => static::getTitleForCode($record->type, $record->kode))
+                    ->wrap()
+                    ->width('220px')
+                    ->grow(false),
                 TextColumn::make('content')
                     ->wrap()
                     ->limit(100)
@@ -283,9 +285,6 @@ class FieldExampleSubmissionResource extends Resource
                         'rejected' => 'danger',
                         default => 'gray',
                     }),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')

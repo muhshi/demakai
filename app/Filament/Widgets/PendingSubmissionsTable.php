@@ -39,19 +39,18 @@ class PendingSubmissionsTable extends BaseWidget
                 TextColumn::make('type')
                     ->badge(),
                 TextColumn::make('kode')
-                    ->badge()
-                    ->color('primary')
-                    ->tooltip(fn(FieldExampleSubmission $record) => FieldExampleSubmissionResource::getTitleForCode($record->type, $record->kode)),
+                    ->weight('bold')
+                    ->description(fn(FieldExampleSubmission $record) => FieldExampleSubmissionResource::getTitleForCode($record->type, $record->kode))
+                    ->wrap()
+                    ->width('220px')
+                    ->grow(false),
                 TextColumn::make('content')
                     ->wrap()
-                    ->limit(80)
+                    ->limit(100)
                     ->description(function (FieldExampleSubmission $record) {
                         $warn = FieldExampleSubmissionResource::checkAlreadyAcc($record->type, $record->kode, $record->content);
                         return $warn ? "⚠️ {$warn}" : null;
                     }),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->actions([
                 Action::make('approve')

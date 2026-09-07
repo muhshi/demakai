@@ -11,7 +11,7 @@ Riwayat perubahan dan milestone utama dalam pengembangan platform portal BPS dan
   - **Dua Pilihan Input Kode saat Edit**: Annotator dapat memilih antara:
     1. *Dropdown Search*: Pencarian interaktif kode atau kata kunci judul dari tabel master KBLI 2025, KBLI 2020, atau KBJI 2014.
     2. *Ketik Kode Manual*: Input langsung dengan *real-time live debounce* di mana tulisan keterangan judul di bawahnya berubah seketika mengikuti kode yang diketik.
-  - **Optimasi Kolom Kode Tabel**: Mengganti teks deskripsi panjang pada kolom `kode` menjadi *badge* kompak dan rapi, dengan judul klasifikasi tetap dapat dibaca melalui *tooltip* saat kursor diarahkan, sehingga tidak membuat tabel terlalu lebar.
+  - **Optimasi Kolom Kode & Tabel Pengajuan**: Menampilkan judul klasifikasi langsung di bawah kode dengan lebar kolom tetap (fixed width `220px`) dan teks otomatis turun ke bawah (*wrap text*), serta menghilangkan kolom `created_at` agar tampilan tabel lebih lapang dan memudahkan proses verifikasi/approval.
 - **Optimasi Smart Conditional Build pada `deploy.sh`**:
   - Pengecekan cerdas perubahan git (`git diff`) antara commit sebelum dan sesudah pull untuk menentukan perlu/tidaknya build ulang Docker.
   - Container Python Search API (`demakai-python`) hanya di-build ulang bila terdapat perubahan pada direktori `python/` atau image belum ada di host.
