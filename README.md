@@ -72,6 +72,11 @@ All notable changes to this project will be documented in this section.
 - **Panduan Integrasi Flutter**: Dokumentasi lengkap dan contoh implementasi Dart/Flutter untuk mode hybrid (Online + Offline fallback) di `docs/flutter_integration_guide.md`.
 
 ### [Added] - 2026-09-07
+- **Penyempurnaan Form Edit Kode & Kolom Tabel Pengajuan**:
+  - **Dua Pilihan Input Kode saat Edit**: Annotator kini dapat memilih metode input kode klasifikasi melalui tombol pilihan:
+    1. *Dropdown Search KBLI/KBJI*: Memungkinkan pencarian dinamis berdasarkan nama judul maupun kode langsung dari database.
+    2. *Ketik Kode Manual*: Input teks dengan *real-time live debounce* di mana judul klasifikasi langsung muncul dan berubah otomatis di bawahnya saat mengetik kode.
+  - **Optimasi Kolom Kode Tabel**: Mengubah tampilan kode di tabel pengajuan utama dan widget dashboard menjadi bentuk *badge* yang ringkas, dengan judul lengkap tetap dapat dilihat melalui *tooltip* saat hover agar tabel tidak melebar berlebihan.
 - **Optimasi Smart Conditional Build pada `deploy.sh`**:
   - Script deployment kini secara cerdas menganalisis perubahan file via git diff sebelum memutuskan apakah container perlu di-build ulang.
   - Container Python Search API (`demakai-python`) hanya di-build ulang jika terdeteksi perubahan pada folder `python/` atau jika image belum ada di server.

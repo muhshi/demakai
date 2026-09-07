@@ -28,6 +28,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Illuminate\Support\HtmlString;
 
@@ -96,9 +98,40 @@ class FieldExampleSubmissionResource extends Resource
         return null;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function searchClassifications(?string $type, string $search = ''): array
     {
-        return $schema->components([
+        $model = static::resolveModel($type);
+        if (!$model) {
+            return [];
+        }
+
+        $cleanSearch = trim($search);
+        $query = $model::query();
+
+        if ($cleanSearch !== '') {
+            $query->where(function ($q) use ($cleanSearch) {
+                $q->where('kode', 'ILIKE', "{$cleanSearch}%")
+                  ->orWhere('judul', 'ILIKE', "%{$cleanSearch}%");
+            });
+        }
+
+        return $query->orderBy('kode')
+            ->limit(30)
+            ->get(['kode', 'judul'])
+            ->mapWithKeys(fn ($item) => [$item->kode => "{$item->kode} - {$item->judul}"])
+            ->toArray();
+    }
+
+    public static function getClassificationLabel(?string $type, ?string $value): ?string
+    {
+        if (!$value) return null;
+        $title = static::getTitleForCode($type, $value);
+        return $title ? "{$value} - {$title}" : $value;
+    }
+
+    public static function getFormComponents(bool $includeStatus = true): array
+    {
+        $components = [
             Select::make('type')
                 ->label('Jenis Klasifikasi')
                 ->options([
@@ -108,18 +141,73 @@ class FieldExampleSubmissionResource extends Resource
                 ])
                 ->required()
                 ->live(),
-            TextInput::make('kode')
-                ->label('Kode KBLI / KBJI')
-                ->required()
-                ->maxLength(10)
-                ->live(onBlur: true)
+
+            Hidden::make('kode')
+                ->required(),
+
+            Radio::make('input_mode')
+                ->label('Cara Memilih/Mengubah Kode')
+                ->options([
+                    'dropdown' => 'Pilihan 1: Cari dari Dropdown List KBLI / KBJI',
+                    'manual' => 'Pilihan 2: Ketik Kode Manual',
+                ])
+                ->default('dropdown')
+                ->inline()
+                ->live()
+                ->dehydrated(false),
+
+            Select::make('kode_select')
+                ->label('Pilih Kode KBLI / KBJI')
+                ->placeholder('Ketik kata kunci atau kode untuk mencari...')
+                ->searchable()
+                ->getSearchResultsUsing(fn (string $search, $get) => static::searchClassifications($get('type'), $search))
+                ->getOptionLabelUsing(fn ($value, $get) => static::getClassificationLabel($get('type'), $value))
+                ->afterStateHydrated(function ($set, $record, $get) {
+                    $k = $record?->kode ?? $get('kode');
+                    if ($k) {
+                        $set('kode_select', $k);
+                    }
+                })
+                ->afterStateUpdated(function ($state, $set) {
+                    $set('kode', $state);
+                    $set('kode_input', $state);
+                })
+                ->live()
+                ->dehydrated(false)
                 ->helperText(function ($get) {
                     $kode = $get('kode');
                     $type = $get('type');
                     if (!$kode) return null;
                     $title = static::getTitleForCode($type, $kode);
-                    return $title ? "📖 {$title}" : '⚠️ Kode tidak ditemukan dalam database master';
-                }),
+                    return $title ? "📖 Terpilih: {$kode} - {$title}" : null;
+                })
+                ->visible(fn ($get) => ($get('input_mode') ?? 'dropdown') === 'dropdown'),
+
+            TextInput::make('kode_input')
+                ->label('Ketik Kode KBLI / KBJI')
+                ->placeholder('Contoh: 01111')
+                ->maxLength(10)
+                ->live(debounce: 300)
+                ->afterStateHydrated(function ($set, $record, $get) {
+                    $k = $record?->kode ?? $get('kode');
+                    if ($k) {
+                        $set('kode_input', $k);
+                    }
+                })
+                ->afterStateUpdated(function ($state, $set) {
+                    $set('kode', $state);
+                    $set('kode_select', $state);
+                })
+                ->dehydrated(false)
+                ->helperText(function ($get) {
+                    $kode = $get('kode_input') ?: $get('kode');
+                    $type = $get('type');
+                    if (!$kode) return 'Ketik kode di atas untuk melihat judul klasifikasi secara langsung.';
+                    $title = static::getTitleForCode($type, $kode);
+                    return $title ? "📖 {$kode} - {$title}" : '⚠️ Kode tidak ditemukan dalam database master';
+                })
+                ->visible(fn ($get) => $get('input_mode') === 'manual'),
+
             Placeholder::make('acc_warning')
                 ->label('')
                 ->hidden(fn ($get) => !static::checkAlreadyAcc($get('type'), $get('kode'), $get('content')))
@@ -138,21 +226,32 @@ class FieldExampleSubmissionResource extends Resource
                     ');
                 })
                 ->columnSpanFull(),
+
             Textarea::make('content')
                 ->label('Isi Contoh Lapangan')
                 ->required()
                 ->rows(3)
-                ->live(onBlur: true)
+                ->live(debounce: 300)
                 ->columnSpanFull(),
-            Select::make('status')
+        ];
+
+        if ($includeStatus) {
+            $components[] = Select::make('status')
                 ->label('Status')
                 ->options([
                     'pending' => 'Pending',
                     'approved' => 'Approved',
                     'rejected' => 'Rejected',
                 ])
-                ->required(),
-        ]);
+                ->required();
+        }
+
+        return $components;
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components(static::getFormComponents(true));
     }
 
     public static function table(Table $table): Table
@@ -166,8 +265,9 @@ class FieldExampleSubmissionResource extends Resource
                 TextColumn::make('kode')
                     ->searchable()
                     ->copyable()
-                    ->weight('bold')
-                    ->description(fn(FieldExampleSubmission $record) => static::getTitleForCode($record->type, $record->kode)),
+                    ->badge()
+                    ->color('primary')
+                    ->tooltip(fn(FieldExampleSubmission $record) => static::getTitleForCode($record->type, $record->kode)),
                 TextColumn::make('content')
                     ->wrap()
                     ->limit(100)

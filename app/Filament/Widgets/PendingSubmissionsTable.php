@@ -39,8 +39,9 @@ class PendingSubmissionsTable extends BaseWidget
                 TextColumn::make('type')
                     ->badge(),
                 TextColumn::make('kode')
-                    ->weight('bold')
-                    ->description(fn(FieldExampleSubmission $record) => FieldExampleSubmissionResource::getTitleForCode($record->type, $record->kode)),
+                    ->badge()
+                    ->color('primary')
+                    ->tooltip(fn(FieldExampleSubmission $record) => FieldExampleSubmissionResource::getTitleForCode($record->type, $record->kode)),
                 TextColumn::make('content')
                     ->wrap()
                     ->limit(80)
@@ -88,53 +89,7 @@ class PendingSubmissionsTable extends BaseWidget
                     ->action(fn(FieldExampleSubmission $record) => $record->update(['status' => 'rejected']))
                     ->requiresConfirmation(),
                 EditAction::make()
-                    ->form([
-                        Select::make('type')
-                            ->label('Jenis Klasifikasi')
-                            ->options([
-                                'KBLI 2025' => 'KBLI 2025',
-                                'KBLI 2020' => 'KBLI 2020',
-                                'KBJI 2014' => 'KBJI 2014',
-                            ])
-                            ->required()
-                            ->live(),
-                        TextInput::make('kode')
-                            ->label('Kode KBLI / KBJI')
-                            ->required()
-                            ->maxLength(10)
-                            ->live(onBlur: true)
-                            ->helperText(function ($get) {
-                                $kode = $get('kode');
-                                $type = $get('type');
-                                if (!$kode) return null;
-                                $title = FieldExampleSubmissionResource::getTitleForCode($type, $kode);
-                                return $title ? "📖 {$title}" : '⚠️ Kode tidak ditemukan dalam database master';
-                            }),
-                        Placeholder::make('acc_warning')
-                            ->label('')
-                            ->hidden(fn ($get) => !FieldExampleSubmissionResource::checkAlreadyAcc($get('type'), $get('kode'), $get('content')))
-                            ->content(function ($get) {
-                                $msg = FieldExampleSubmissionResource::checkAlreadyAcc($get('type'), $get('kode'), $get('content'));
-                                return new HtmlString('
-                                    <div style="padding: 12px 16px; background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; border-radius: 6px; color: #92400e; font-size: 0.875rem;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-size: 1.25rem;">⚠️</span>
-                                            <div>
-                                                <strong style="font-weight: 600;">Peringatan: Contoh Lapangan Ini Sudah Pernah di-ACC!</strong>
-                                                <div style="margin-top: 2px;">' . e($msg) . '</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ');
-                            })
-                            ->columnSpanFull(),
-                        Textarea::make('content')
-                            ->label('Isi Contoh Lapangan')
-                            ->required()
-                            ->rows(3)
-                            ->live(onBlur: true)
-                            ->columnSpanFull(),
-                    ]),
+                    ->form(FieldExampleSubmissionResource::getFormComponents(false)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
