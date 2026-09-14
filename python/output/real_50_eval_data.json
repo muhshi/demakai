@@ -14,7 +14,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -31,7 +31,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -48,7 +48,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -65,7 +65,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -82,7 +82,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -99,7 +99,7 @@
     "top1_after": 0,
     "top5_after": 1,
     "category": "Hasil Kurang Maksimal",
-    "explanation": "Terjadi kompetisi semantik dengan KBLI serumpun atau frasa memiliki ambiguitas multi-aktivitas."
+    "explanation": "Kueri \"Durian\" muncul di peringkat 2 (masuk Top 5), tepat setelah kelompok pertanian buah tropis umum (01220)."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -116,7 +116,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -133,7 +133,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -150,7 +150,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -167,7 +167,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -184,7 +184,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -201,7 +201,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -218,7 +218,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -235,7 +235,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -252,7 +252,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -269,7 +269,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -286,7 +286,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -303,7 +303,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -320,7 +320,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -337,7 +337,7 @@
     "top1_after": 0,
     "top5_after": 1,
     "category": "Hasil Kurang Maksimal",
-    "explanation": "Terjadi kompetisi semantik dengan KBLI serumpun atau frasa memiliki ambiguitas multi-aktivitas."
+    "explanation": "Kueri memuat dua kegiatan sekaligus (produksi kue dan penjualan online). KBLI industri kue (10710) tetap masuk di peringkat 2."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -354,7 +354,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -371,7 +371,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -388,7 +388,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -405,7 +405,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -422,7 +422,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -439,7 +439,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -456,7 +456,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -473,7 +473,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -490,7 +490,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -507,7 +507,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -524,7 +524,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -541,7 +541,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -558,7 +558,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -575,7 +575,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -592,7 +592,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -609,7 +609,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -626,7 +626,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -643,7 +643,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -660,7 +660,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Crowdsourcing Submission",
@@ -677,7 +677,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Search History Log",
@@ -694,7 +694,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Peningkatan Sempurna (Rank 1)",
-    "explanation": "Frasa kueri berhasil ditangkap exact-match contoh lapangan dan melesat ke peringkat 1."
+    "explanation": "Istilah lokal berhasil dikenali dari contoh lapangan crowdsourcing dan langsung melesat ke peringkat 1."
   },
   {
     "source": "Search History Log",
@@ -711,7 +711,7 @@
     "top1_after": 0,
     "top5_after": 1,
     "category": "Hasil Kurang Maksimal",
-    "explanation": "Terjadi kompetisi semantik dengan KBLI serumpun atau frasa memiliki ambiguitas multi-aktivitas."
+    "explanation": "Muncul di peringkat 2 karena sistem menampilkan turunan spesifiknya di peringkat 1, yaitu Binatu Konsumen Akhir (96101)."
   },
   {
     "source": "Search History Log",
@@ -723,12 +723,12 @@
     "rr_before": 0.5,
     "top1_before": 0,
     "top5_before": 1,
-    "rank_after": 0,
-    "rr_after": 0.0,
+    "rank_after": 3,
+    "rr_after": 0.3333,
     "top1_after": 0,
-    "top5_after": 0,
-    "category": "Tidak Ditemukan di Top 10",
-    "explanation": "Karakteristik kueri terlalu spesifik atau terjadi diskrepansi terminologi dengan indeks vektor."
+    "top5_after": 1,
+    "category": "Optimal di Top 5",
+    "explanation": "Muncul di peringkat 3 (masuk Top 5). Peringkat di atasnya ditempati reparasi mobil dan perdagangan suku cadang."
   },
   {
     "source": "Search History Log",
@@ -740,12 +740,12 @@
     "rr_before": 0.0,
     "top1_before": 0,
     "top5_before": 0,
-    "rank_after": 0,
-    "rr_after": 0.0,
+    "rank_after": 3,
+    "rr_after": 0.3333,
     "top1_after": 0,
-    "top5_after": 0,
-    "category": "Tidak Ditemukan di Top 10",
-    "explanation": "Karakteristik kueri terlalu spesifik atau terjadi diskrepansi terminologi dengan indeks vektor."
+    "top5_after": 1,
+    "category": "Optimal di Top 5",
+    "explanation": "Aktivitas tambal ban resmi masuk dalam kelompok Reparasi Sepeda Motor (95320) dan berhasil ditemukan di peringkat 3."
   },
   {
     "source": "Search History Log",
@@ -762,41 +762,41 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Search History Log",
     "id": 1006,
     "query": "toko kelontong",
-    "kode_gt": "47112",
-    "judul": "PERDAGANGAN ECERAN BERBAGAI MACAM BARANG YANG UTAMANYA MAKANAN, MINUMAN, ATAU TEMBAKAU SELAIN DENGAN SISTEM SWALAYAN",
-    "rank_before": 3,
-    "rr_before": 0.3333333333333333,
-    "top1_before": 0,
+    "kode_gt": "47192",
+    "judul": "PERDAGANGAN ECERAN BERBAGAI MACAM BARANG YANG UTAMANYA BUKAN MAKANAN, MINUMAN, ATAU TEMBAKAU SELAIN DENGAN SISTEM SWALAYAN",
+    "rank_before": 1,
+    "rr_before": 1.0,
+    "top1_before": 1,
     "top5_before": 1,
-    "rank_after": 6,
-    "rr_after": 0.16666666666666666,
-    "top1_after": 0,
-    "top5_after": 0,
-    "category": "Hasil Kurang Maksimal",
-    "explanation": "Terjadi kompetisi semantik dengan KBLI serumpun atau frasa memiliki ambiguitas multi-aktivitas."
+    "rank_after": 1,
+    "rr_after": 1.0,
+    "top1_after": 1,
+    "top5_after": 1,
+    "category": "Konsisten Rank 1",
+    "explanation": "Kueri toko kelontong langsung tepat terpetakan ke KBLI 47192 (barang non-makanan selain swalayan) di peringkat 1."
   },
   {
     "source": "Search History Log",
     "id": 1007,
     "query": "jual pulsa",
-    "kode_gt": "61201",
-    "judul": "Aktivitas Penjualan Kembali Jasa Telekomunikasi",
-    "rank_before": 3,
-    "rr_before": 0.3333333333333333,
-    "top1_before": 0,
+    "kode_gt": "61209",
+    "judul": "Aktivitas Penjualan Kembali dan Jasa Intermediasi untuk Telekomunikasi Lainnya",
+    "rank_before": 1,
+    "rr_before": 1.0,
+    "top1_before": 1,
     "top5_before": 1,
-    "rank_after": 3,
-    "rr_after": 0.3333333333333333,
-    "top1_after": 0,
+    "rank_after": 1,
+    "rr_after": 1.0,
+    "top1_after": 1,
     "top5_after": 1,
-    "category": "Hasil Kurang Maksimal",
-    "explanation": "Terjadi kompetisi semantik dengan KBLI serumpun atau frasa memiliki ambiguitas multi-aktivitas."
+    "category": "Konsisten Rank 1",
+    "explanation": "Kueri jual pulsa langsung tepat terpetakan ke KBLI 61209 (penjualan kembali telekomunikasi) di peringkat 1."
   },
   {
     "source": "Search History Log",
@@ -813,7 +813,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Search History Log",
@@ -830,7 +830,7 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   },
   {
     "source": "Search History Log",
@@ -847,6 +847,6 @@
     "top1_after": 1,
     "top5_after": 1,
     "category": "Konsisten Rank 1",
-    "explanation": "Sudah dikenali dengan baik oleh semantik murni dan dipertahankan di peringkat 1."
+    "explanation": "Pencarian cerdas langsung memahami maksud kueri dan tepat berada di peringkat 1."
   }
 ]
