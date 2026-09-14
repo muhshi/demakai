@@ -1,18 +1,43 @@
 import json
 import os
-import numpy as np
+import shutil
+
+try:
+    import numpy as np
+    def calc_mean(arr):
+        return float(np.mean(arr)) if len(arr) > 0 else 0.0
+except ImportError:
+    def calc_mean(arr):
+        return float(sum(arr) / len(arr)) if len(arr) > 0 else 0.0
 
 def generate_html_report_50(json_file="output/real_50_eval_data.json", output_html="output/laporan_usulan_riil.html"):
-    if not os.path.exists(json_file):
-        print(f"[ERROR] File {json_file} tidak ditemukan.")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(script_dir, ".."))
+
+    # Resolusi path file dataset JSON
+    candidate_json_paths = [
+        json_file,
+        os.path.join(project_root, "output", "real_50_eval_data.json"),
+        os.path.join(script_dir, "output", "real_50_eval_data.json"),
+        os.path.join(project_root, "python", "output", "real_50_eval_data.json"),
+        os.path.join(script_dir, "real_50_eval_data.json"),
+    ]
+    resolved_json = None
+    for p in candidate_json_paths:
+        if p and os.path.exists(p):
+            resolved_json = p
+            break
+
+    if not resolved_json:
+        print(f"[ERROR] File {json_file} tidak ditemukan di lokasi mana pun.")
         return
-        
-    with open(json_file, "r", encoding="utf-8") as f:
+
+    with open(resolved_json, "r", encoding="utf-8") as f:
         data = json.load(f)
-        
+
     n = len(data)
-    mrr_before = np.mean([d["rr_before"] for d in data])
-    mrr_after = np.mean([d["rr_after"] for d in data])
+    mrr_before = calc_mean([d["rr_before"] for d in data])
+    mrr_after = calc_mean([d["rr_after"] for d in data])
     top1_before = sum([d["top1_before"] for d in data])
     top1_after = sum([d["top1_after"] for d in data])
     top5_before = sum([d["top5_before"] for d in data])
@@ -361,17 +386,23 @@ def generate_html_report_50(json_file="output/real_50_eval_data.json", output_ht
 </body>
 </html>
 """
-    with open(output_html, "w", encoding="utf-8") as f:
-        f.write(html)
-        
-    try:
-        import shutil
-        os.makedirs("python/output", exist_ok=True)
-        shutil.copy(output_html, "python/output/laporan_usulan_riil.html")
-    except Exception:
-        pass
-        
-    print(f"[SUKSES] Laporan HTML Light Mode 50 Data Riil berhasil di-generate ke: {output_html}")
+    # Tulis ke path output yang ditentukan dan path standar lainnya
+    target_outputs = set([
+        os.path.abspath(output_html),
+        os.path.abspath(os.path.join(project_root, "output", "laporan_usulan_riil.html")),
+        os.path.abspath(os.path.join(project_root, "python", "output", "laporan_usulan_riil.html")),
+        os.path.abspath(os.path.join(script_dir, "output", "laporan_usulan_riil.html")),
+    ])
+
+    for target in target_outputs:
+        try:
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            with open(target, "w", encoding="utf-8") as f:
+                f.write(html)
+        except Exception as e:
+            pass
+
+    print(f"[SUKSES] Laporan HTML Light Mode 50 Data Riil berhasil di-generate ke: {output_html} dan python/output/laporan_usulan_riil.html")
     return html
 
 if __name__ == '__main__':

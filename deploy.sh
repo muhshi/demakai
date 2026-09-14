@@ -100,7 +100,7 @@ elif [ "$CHANGED_FILES" = "ALL" ]; then
     echo "ℹ️  Kondisi commit awal tidak dapat ditentukan, memicu build Laravel."
 else
     # Filter file yang mempengaruhi Laravel & Frontend
-    LARAVEL_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E "^(python/|docs/|Jurnal/|\.github/|\.cursor/|\.agents/|.*\.md$|\.gitignore$|deploy\.sh$)" | grep -v "^$" || true)
+    LARAVEL_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E "^(python/|output/|docs/|Jurnal/|\.github/|\.cursor/|\.agents/|.*\.md$|\.gitignore$|deploy\.sh$)" | grep -v "^$" || true)
     if [ -n "$LARAVEL_CHANGES" ]; then
         BUILD_LARAVEL=true
         echo "ℹ️  Perubahan terdeteksi pada kode Laravel / Frontend:"
@@ -120,7 +120,7 @@ elif [ "$CHANGED_FILES" = "ALL" ]; then
     BUILD_PYTHON=true
     echo "ℹ️  Kondisi commit awal tidak dapat ditentukan, memicu build Python."
 else
-    PYTHON_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^python/" || true)
+    PYTHON_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^python/" | grep -v -E "^python/output/" || true)
     if [ -n "$PYTHON_CHANGES" ]; then
         BUILD_PYTHON=true
         echo "ℹ️  Perubahan terdeteksi pada folder python/:"
@@ -189,7 +189,39 @@ docker compose exec -T demakai-franken php artisan livewire:publish --assets
 echo "📱 Exporting offline SQLite bundle for mobile sync..."
 docker compose exec -T demakai-franken php artisan kbli:export-bundle || echo "⚠️  Offline bundle export skipped/warning."
 
-# 15. Restart queue workers to pick up new code
+# 15. Generate/Sync HTML Evaluation Reports (Laporan Usulan Riil & Komprehensif)
+echo "📊 Memeriksa dan memperbarui Laporan Evaluasi HTML..."
+if command -v python3 >/dev/null 2>&1; then
+    python3 python/build_laporan_usulan_riil.py || true
+elif docker compose exec -T demakai-python python --version >/dev/null 2>&1; then
+    docker compose exec -T demakai-python python build_laporan_usulan_riil.py || true
+fi
+
+# Pastikan direktori tujuan tersedia di demakai-franken
+docker compose exec -T demakai-franken mkdir -p /app/output /app/python/output /app/storage/app/reports 2>/dev/null || true
+
+# Salin Laporan Usulan Riil ke container demakai-franken
+for report in "output/laporan_usulan_riil.html" "python/output/laporan_usulan_riil.html"; do
+    if [ -f "$report" ]; then
+        docker compose cp "$report" demakai-franken:/app/output/laporan_usulan_riil.html 2>/dev/null || true
+        docker compose cp "$report" demakai-franken:/app/python/output/laporan_usulan_riil.html 2>/dev/null || true
+        docker compose cp "$report" demakai-franken:/app/storage/app/reports/laporan_usulan_riil.html 2>/dev/null || true
+        echo "✅ Laporan Usulan Riil disinkronkan ke demakai-franken."
+        break
+    fi
+done
+
+# Salin Laporan Komprehensif jika tersedia
+for comp in "python/output/comprehensive_test_results.html" "output/comprehensive_test_results.html"; do
+    if [ -f "$comp" ]; then
+        docker compose cp "$comp" demakai-franken:/app/python/output/comprehensive_test_results.html 2>/dev/null || true
+        break
+    fi
+done
+
+docker compose exec -T demakai-franken chmod -R 755 /app/output /app/python/output /app/storage/app/reports 2>/dev/null || true
+
+# 16. Restart queue workers to pick up new code
 echo "🔄 Restarting queue workers..."
 docker compose exec -T demakai-franken php artisan queue:restart
 

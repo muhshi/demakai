@@ -63,7 +63,9 @@ Route::get('/eval-results', function () {
 Route::get('/laporan-usulan-riil', function () {
     $paths = [
         base_path('output/laporan_usulan_riil.html'),
-        base_path('python/output/laporan_usulan_riil.html')
+        base_path('python/output/laporan_usulan_riil.html'),
+        storage_path('app/reports/laporan_usulan_riil.html'),
+        public_path('reports/laporan_usulan_riil.html'),
     ];
     foreach ($paths as $file) {
         if (file_exists($file)) {

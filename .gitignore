@@ -17,8 +17,12 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-output/
-python/output/
+output/*
+!output/real_50_eval_data.json
+!output/laporan_usulan_riil.html
+python/output/*
+!python/output/real_50_eval_data.json
+!python/output/laporan_usulan_riil.html
 database/backups/
 /storage/app/bundles/
 /storage/app/models/
