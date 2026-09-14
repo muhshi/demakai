@@ -16,6 +16,7 @@ Route::get('/templates/kbji2014', fn() => Excel::download(new KBJI2014TemplateEx
 
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\FieldExampleSubmissionController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Auth\SsoController;
 
 Route::get('/auth/sipetra/redirect', [SsoController::class, 'redirect'])->name('sipetra.login');
@@ -24,6 +25,7 @@ Route::get('/auth/sipetra/callback', [SsoController::class, 'callback']);
 Route::get('/api/search', [SearchController::class, 'search'])->name('search.api');
 Route::get('/api/kbli/hierarchy', [\App\Http\Controllers\Api\KbliHierarchyController::class, 'getChildren'])->name('hierarchy.api');
 Route::post('/api/submissions', [FieldExampleSubmissionController::class, 'store'])->name('submissions.store');
+Route::post('/api/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
 Route::get('/cekhasilmethod', function () {
     $files = glob(base_path('python/output/*_Gabungan.html'));

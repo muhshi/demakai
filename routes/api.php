@@ -23,4 +23,7 @@ Route::prefix('v1')->group(function () {
     // 3. Crowdsourcing Submissions (Online & Bulk Offline Sync)
     Route::post('/submissions', [MobileSearchController::class, 'storeSubmission'])->name('api.v1.submissions.store');
     Route::post('/submissions/bulk-sync', [MobileSearchController::class, 'bulkSyncSubmissions'])->name('api.v1.submissions.bulk_sync');
+
+    // 4. User Feedback
+    Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->name('api.v1.feedback.store');
 });

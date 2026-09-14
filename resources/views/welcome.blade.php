@@ -653,6 +653,109 @@
             transform: translateY(-2px);
         }
 
+        /* --- Floating Feedback Button & Modal --- */
+        .feedback-fab {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 990;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.92);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 237, 0.92));
+            border: 1.5px solid rgba(249, 115, 22, 0.4);
+            padding: 0.65rem 1.15rem;
+            border-radius: 9999px;
+            color: #1e293b;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .feedback-fab:hover {
+            transform: translateY(-3px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 14px 28px -4px rgba(249, 115, 22, 0.35), 0 10px 12px -5px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+
+        .feedback-fab-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            color: var(--primary);
+        }
+
+        .feedback-fab .fab-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            display: inline-block;
+            box-shadow: 0 0 8px #22c55e;
+            animation: pulse-dot 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.7; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.25); }
+        }
+
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-chip {
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.75rem;
+            border: 1.5px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+        }
+
+        .category-chip:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+            background: rgba(255, 247, 237, 0.8);
+        }
+
+        .category-chip.active {
+            border-color: var(--primary);
+            background: rgba(249, 115, 22, 0.12);
+            color: #ea580c;
+            font-weight: 700;
+        }
+
+        @media (max-width: 640px) {
+            .feedback-fab {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.55rem 0.95rem;
+                font-size: 0.8rem;
+            }
+            .category-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .add-example-btn {
             position: absolute;
             bottom: 1.25rem;
@@ -1052,6 +1155,79 @@
         </div>
     </div>
 
+    <!-- Floating Feedback Button (Pojok Kanan Bawah) -->
+    <button id="feedback-fab-btn" class="feedback-fab" onclick="openFeedbackModal()" title="Kirim Saran atau Masukan">
+        <span class="feedback-fab-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <line x1="9" y1="10" x2="15" y2="10"></line>
+                <line x1="12" y1="7" x2="12" y2="13"></line>
+            </svg>
+        </span>
+        <span>Saran & Masukan</span>
+        <span class="fab-dot"></span>
+    </button>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 520px;">
+            <button class="modal-close" onclick="closeFeedbackModal()">&times;</button>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 1.5rem;">💡</span>
+                <h2 class="modal-title" style="margin-bottom: 0;">Saran & Masukan</h2>
+            </div>
+            <p class="modal-subtitle" style="margin-bottom: 1.25rem;">Bantu kami menyempurnakan PINTAR KBLI agar semakin akurat dan intuitif.</p>
+
+            <form id="feedback-form" onsubmit="submitFeedback(event)">
+                <input type="hidden" id="fb-category" value="saran_fitur">
+                <input type="hidden" id="fb-search-query">
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">Jenis Masukan</label>
+                    <div class="category-selector">
+                        <div class="category-chip active" onclick="selectFeedbackCategory('saran_fitur', this)">
+                            <span>💡</span> Saran Fitur Baru
+                        </div>
+                        <div class="category-chip" onclick="selectFeedbackCategory('koreksi_hasil', this)">
+                            <span>🔍</span> Koreksi Hasil KBLI
+                        </div>
+                        <div class="category-chip" onclick="selectFeedbackCategory('kendala_bug', this)">
+                            <span>🐞</span> Laporan Kendala/Bug
+                        </div>
+                        <div class="category-chip" onclick="selectFeedbackCategory('umum', this)">
+                            <span>💬</span> Masukan Umum
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fb-active-query-badge" style="display: none; margin-bottom: 1rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; background: rgba(249, 115, 22, 0.08); border: 1px dashed rgba(249, 115, 22, 0.4); font-size: 0.8rem; color: #c2410c;">
+                    📌 <strong>Kueri aktif terlampir:</strong> <span id="fb-query-text" class="font-mono" style="font-weight: bold;"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">Pesan / Saran Anda <span style="color: #ef4444;">*</span></label>
+                    <textarea id="fb-message" class="form-input" rows="4"
+                        placeholder="Tuliskan ide pengembangan, kendala, atau saran perbaikan Anda di sini..." required style="resize: vertical; min-height: 85px;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Nama / Petugas <span style="font-weight: 400; opacity: 0.7;">(Opsional)</span></label>
+                        <input type="text" id="fb-name" class="form-input" placeholder="Nama Anda" style="padding: 0.75rem 1rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label">Kontak / WA / Email <span style="font-weight: 400; opacity: 0.7;">(Opsional)</span></label>
+                        <input type="text" id="fb-contact" class="form-input" placeholder="08xx / email" style="padding: 0.75rem 1rem;">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="fb-submit-btn">
+                    <span id="fb-submit-btn-text">Kirim Masukan</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Placeholder interaction
         const searchInput = document.getElementById('search-input');
@@ -1338,6 +1514,90 @@
         window.onclick = (event) => {
             if (event.target == modal) {
                 closeSubmissionModal();
+            }
+            const fbModal = document.getElementById('feedback-modal');
+            if (fbModal && event.target == fbModal) {
+                closeFeedbackModal();
+            }
+        };
+
+        // --- Feedback Modal Logic ---
+        const feedbackModal = document.getElementById('feedback-modal');
+        const fbCategoryInput = document.getElementById('fb-category');
+        const fbQueryInput = document.getElementById('fb-search-query');
+        const fbMessageInput = document.getElementById('fb-message');
+        const fbNameInput = document.getElementById('fb-name');
+        const fbContactInput = document.getElementById('fb-contact');
+
+        window.openFeedbackModal = () => {
+            // Deteksi apakah sedang ada kueri pencarian aktif
+            const currentQ = searchInput ? searchInput.value.trim() : '';
+            if (currentQ) {
+                fbQueryInput.value = currentQ;
+                document.getElementById('fb-query-text').textContent = `"${currentQ}"`;
+                document.getElementById('fb-active-query-badge').style.display = 'block';
+            } else {
+                fbQueryInput.value = '';
+                document.getElementById('fb-active-query-badge').style.display = 'none';
+            }
+
+            feedbackModal.style.display = 'flex';
+            setTimeout(() => {
+                if (fbMessageInput) fbMessageInput.focus();
+            }, 100);
+        };
+
+        window.closeFeedbackModal = () => {
+            feedbackModal.style.display = 'none';
+        };
+
+        window.selectFeedbackCategory = (cat, elem) => {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            elem.classList.add('active');
+            fbCategoryInput.value = cat;
+        };
+
+        window.submitFeedback = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('fb-submit-btn');
+            const btnText = document.getElementById('fb-submit-btn-text');
+            const originalText = btnText.textContent;
+
+            btnText.textContent = 'Mengirim Masukan...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        category: fbCategoryInput.value,
+                        message: fbMessageInput.value,
+                        sender_name: fbNameInput.value,
+                        sender_contact: fbContactInput.value,
+                        search_query: fbQueryInput.value
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.status === 'success') {
+                    alert(data.message || 'Terima kasih banyak atas saran dan masukan Anda!');
+                    fbMessageInput.value = '';
+                    fbNameInput.value = '';
+                    fbContactInput.value = '';
+                    closeFeedbackModal();
+                } else {
+                    alert(data.message || 'Gagal mengirim masukan. Mohon periksa kembali form Anda.');
+                }
+            } catch (error) {
+                console.error('Feedback submission error:', error);
+                alert('Terjadi kendala jaringan saat mengirim masukan.');
+            } finally {
+                btnText.textContent = originalText;
+                btn.disabled = false;
             }
         };
 
