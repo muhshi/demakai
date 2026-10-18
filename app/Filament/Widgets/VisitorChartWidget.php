@@ -8,8 +8,8 @@ use Filament\Widgets\ChartWidget;
 
 class VisitorChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Tren Pengunjung (30 Hari Terakhir)';
-    protected static ?int $sort = 2;
+    protected ?string $heading = 'Tren Pengunjung Harian (30 Hari Terakhir)';
+    protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class PopularKeywordsChart extends ChartWidget
 {
-    protected ?string $heading = 'Keyword Paling Sering Dicari';
-    protected static ?int $sort = 4;
+    protected ?string $heading = 'Keyword Teks Paling Sering Dicari';
+    protected static ?int $sort = 6;
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array

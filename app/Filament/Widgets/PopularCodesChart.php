@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class PopularCodesChart extends ChartWidget
 {
-    protected ?string $heading = 'Kode Paling Sering Dicari';
-    protected static ?int $sort = 5;
+    protected ?string $heading = 'Kode KBLI/KBJI Paling Sering Dicari';
+    protected static ?int $sort = 7;
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array

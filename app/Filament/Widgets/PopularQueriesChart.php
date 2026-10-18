@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class PopularQueriesChart extends ChartWidget
 {
-    protected ?string $heading = 'Pencarian Terpopuler';
-    protected static ?int $sort = 3;
+    protected ?string $heading = 'Pencarian Terpopuler (Semua)';
+    protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
@@ -25,6 +25,8 @@ class PopularQueriesChart extends ChartWidget
                 [
                     'label' => 'Jumlah Pencarian',
                     'data' => $data->pluck('count'),
+                    'backgroundColor' => 'rgba(99, 102, 241, 0.8)',
+                    'borderRadius' => 6,
                 ],
             ],
             'labels' => $data->pluck('query'),
