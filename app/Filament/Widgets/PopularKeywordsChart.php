@@ -15,7 +15,7 @@ class PopularKeywordsChart extends ChartWidget
     protected function getData(): array
     {
         $data = SearchHistory::select('query', DB::raw('count(*) as count'))
-            ->where('query', 'GLOB', '*[a-zA-Z]*')
+            ->whereRaw("query ~* '[a-z]'")
             ->groupBy('query')
             ->orderByDesc('count')
             ->limit(10)

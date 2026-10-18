@@ -59,8 +59,10 @@ class MobileSearchController extends Controller
         $results = [];
 
         // 1. KBLI 2025
+        $rawCombined = [];
         if (empty($type) || $type === 'KBLI' || $type === 'KBLI2025') {
-            $rawKbli = $this->searchService->search($query, $limit, 'KBLI');
+            $rawKbli = $this->searchService->search($query, $limit, 'KBLI', false);
+            $rawCombined = array_merge($rawCombined, $rawKbli);
             foreach ($rawKbli as $item) {
                 $results[] = $this->formatResult($item, 'KBLI 2025');
             }
@@ -68,11 +70,15 @@ class MobileSearchController extends Controller
 
         // 2. KBJI 2014
         if (empty($type) || $type === 'KBJI' || $type === 'KBJI2014') {
-            $rawKbji = $this->searchService->search($query, $limit, 'KBJI');
+            $rawKbji = $this->searchService->search($query, $limit, 'KBJI', false);
+            $rawCombined = array_merge($rawCombined, $rawKbji);
             foreach ($rawKbji as $item) {
                 $results[] = $this->formatResult($item, 'KBJI 2014');
             }
         }
+
+        // Catat riwayat pencarian tepat 1 kali
+        $this->searchService->logHistory($query, $rawCombined);
 
         // Sort combined results by score descending
         usort($results, fn($a, $b) => ($b['score'] <=> $a['score']));

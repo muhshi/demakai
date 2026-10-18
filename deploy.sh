@@ -99,8 +99,8 @@ elif [ "$CHANGED_FILES" = "ALL" ]; then
     BUILD_LARAVEL=true
     echo "ℹ️  Kondisi commit awal tidak dapat ditentukan, memicu build Laravel."
 else
-    # Filter file yang mempengaruhi Laravel & Frontend
-    LARAVEL_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E "^(python/|output/|docs/|Jurnal/|\.github/|\.cursor/|\.agents/|.*\.md$|\.gitignore$|deploy\.sh$)" | grep -v "^$" || true)
+    # Filter file yang mempengaruhi Laravel & Frontend (Whitelist direktori/file inti aplikasi)
+    LARAVEL_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^(app/|bootstrap/|config/|database/|public/|resources/|routes/|composer\.(json|lock)|package(-lock)?\.json|vite\.config\.js|Dockerfile|Caddyfile)" | grep -v -E "(\.DS_Store|\.gitkeep|.*\.sql$|.*\.xlsx$|.*\.csv$)" || true)
     if [ -n "$LARAVEL_CHANGES" ]; then
         BUILD_LARAVEL=true
         echo "ℹ️  Perubahan terdeteksi pada kode Laravel / Frontend:"
@@ -120,7 +120,8 @@ elif [ "$CHANGED_FILES" = "ALL" ]; then
     BUILD_PYTHON=true
     echo "ℹ️  Kondisi commit awal tidak dapat ditentukan, memicu build Python."
 else
-    PYTHON_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^python/" | grep -v -E "^python/output/" || true)
+    # Filter perubahan pada file fungsional Python (abaikan output, markdown, html, dan metadata)
+    PYTHON_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^python/" | grep -v -E "^python/(output/|.*\.md$|.*\.html$|\.DS_Store)" || true)
     if [ -n "$PYTHON_CHANGES" ]; then
         BUILD_PYTHON=true
         echo "ℹ️  Perubahan terdeteksi pada folder python/:"

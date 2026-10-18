@@ -15,7 +15,7 @@ class PopularCodesChart extends ChartWidget
     protected function getData(): array
     {
         $data = SearchHistory::select('query', DB::raw('count(*) as count'))
-            ->where('query', 'NOT GLOB', '*[a-zA-Z]*')
+            ->whereRaw("query ~ '^[0-9]+$'")
             ->groupBy('query')
             ->orderByDesc('count')
             ->limit(10)

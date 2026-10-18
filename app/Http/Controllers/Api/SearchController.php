@@ -46,14 +46,14 @@ class SearchController extends Controller
             'services.python_search.processing' => $processing,
         ]);
 
-        // 1. KBLI 2025 (Python Search)
-        $rawKbli2025 = $this->searchService->search($query, 15, 'KBLI');
+        // 1. KBLI 2025 (Python Search - jangan log history per sub-pencarian)
+        $rawKbli2025 = $this->searchService->search($query, 15, 'KBLI', false);
         $kbli2025 = collect($rawKbli2025)
             ->map(fn($item) => $this->formatResult($item, 'KBLI 2025'))
             ->values();
 
-        // 2. KBJI 2014 (Python Search)
-        $rawKbji = $this->searchService->search($query, 15, 'KBJI');
+        // 2. KBJI 2014 (Python Search - jangan log history per sub-pencarian)
+        $rawKbji = $this->searchService->search($query, 15, 'KBJI', false);
         $kbji = collect($rawKbji)
             ->map(fn($item) => $this->formatResult($item, 'KBJI 2014'))
             ->values();
@@ -73,6 +73,10 @@ class SearchController extends Controller
             ->limit(10)
             ->get()
             ->map(fn($item) => $this->formatResult($item, 'KBLI 2020'));
+
+        // Catat riwayat pencarian tepat 1 kali untuk query gabungan ini
+        $combinedResults = array_merge($rawKbli2025, $rawKbji);
+        $this->searchService->logHistory($query, $combinedResults);
 
         return response()->json([
             'kbli2025' => $kbli2025,

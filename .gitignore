@@ -29,3 +29,5 @@ database/backups/
 __pycache__/
 *.pyc
 Jurnal/
+.DS_Store
+*/.DS_Store

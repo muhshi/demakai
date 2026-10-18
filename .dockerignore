@@ -19,3 +19,14 @@ output
 .vscode
 .idea
 .fleet
+.DS_Store
+*.sql
+*.xlsx
+*.csv
+Jurnal
+python
+documents
+docs
+.agents
+.cursor
+contoh_lapangan*.json

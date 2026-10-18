@@ -15,6 +15,11 @@ class SearchService
 {
     protected GeminiService $gemini;
 
+    /**
+     * Cache query yang sudah di-log dalam satu siklus request untuk mencegah duplikasi.
+     */
+    protected static array $loggedQueriesInRequest = [];
+
     // ============================================================
     // STOPWORD LIST — kata yang tidak informatif untuk search
     // ============================================================
@@ -190,12 +195,13 @@ class SearchService
      * @param string $query Use query string
      * @param int $limit
      * @param string|null $model 'KBLI' or 'KBJI' (null for both)
+     * @param bool $log Apakah riwayat pencarian dicatat ke database
      * @return array
      */
-    public function search(string $query, int $limit = 10, ?string $model = null): array
+    public function search(string $query, int $limit = 10, ?string $model = null, bool $log = true): array
     {
         if (config('services.python_search.enabled', false)) {
-            $results = $this->searchViaPython($query, $limit, $model);
+            $results = $this->searchViaPython($query, $limit, $model, $log);
             
             // Jika hasil tidak null, berarti API sukses (meskipun results-nya kosong [])
             if ($results !== null) {
@@ -256,7 +262,9 @@ class SearchService
         }
 
         $finalResults = $results->take($limit)->all();
-        $this->logHistory($query, $finalResults);
+        if ($log) {
+            $this->logHistory($query, $finalResults);
+        }
         return $finalResults;
     }
 
@@ -270,7 +278,7 @@ class SearchService
      *   PYTHON_SEARCH_METHOD=sql          (sql | hybrid)
      *   PYTHON_SEARCH_PROCESSING=none     (none | basic | advanced)
      */
-    public function searchViaPython(string $query, int $limit = 10, ?string $model = null): ?array
+    public function searchViaPython(string $query, int $limit = 10, ?string $model = null, bool $log = true): ?array
     {
         $url = config('services.python_search.url', 'http://127.0.0.1:8000');
         $searchMethod = config('services.python_search.method', 'sql');
@@ -304,7 +312,9 @@ class SearchService
             // Log sukses untuk debugging
             Log::debug("Python search success: found " . $results->count() . " results.");
             
-            $this->logHistory($query, $results->all());
+            if ($log) {
+                $this->logHistory($query, $results->all());
+            }
             return $results->all();
 
         } catch (Exception $e) {
@@ -316,23 +326,37 @@ class SearchService
         }
     }
 
-
-    protected function logHistory(string $query, array $results)
+    /**
+     * Catat histori pencarian dengan proteksi deduplikasi dalam satu request.
+     */
+    public function logHistory(string $query, array $results, bool $force = false): void
     {
         try {
+            $normalizedQuery = strtolower(trim($query));
+            if (!$force && isset(static::$loggedQueriesInRequest[$normalizedQuery])) {
+                // Cegah duplicate log jika query sama sudah tercatat di lifecycle request ini
+                return;
+            }
+            static::$loggedQueriesInRequest[$normalizedQuery] = true;
+
             $count = count($results);
             $type = 'semantic'; // Default
 
             if ($count > 0) {
-                $firstItem = $results[0];
-                // Support array (Python API) dan Eloquent object
-                $distance = is_array($firstItem)
-                    ? ($firstItem['distance'] ?? 1.0)
-                    : ($firstItem->distance ?? 1.0);
+                // Cari distance terbaik di antara seluruh hasil
+                $minDistance = 1.0;
+                foreach ($results as $item) {
+                    $distance = is_array($item)
+                        ? ($item['distance'] ?? 1.0)
+                        : ($item->distance ?? 1.0);
+                    if ($distance !== null && (float) $distance < $minDistance) {
+                        $minDistance = (float) $distance;
+                    }
+                }
 
-                if ($distance === 0.0) {
+                if ($minDistance === 0.0) {
                     $type = 'exact';
-                } elseif ($distance <= 0.05) {
+                } elseif ($minDistance <= 0.05) {
                     $type = 'keyword';
                 }
             }
@@ -348,6 +372,14 @@ class SearchService
         } catch (Exception $e) {
             Log::warning('Search history logging failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Reset cache request log (berguna untuk testing atau command batch).
+     */
+    public static function resetRequestLog(): void
+    {
+        static::$loggedQueriesInRequest = [];
     }
 
     protected function vectorSearch(array $embedding, int $limit, ?string $model = null): Collection
