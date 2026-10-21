@@ -60,6 +60,17 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-10-21
+- **Pencarian Kalimat Naratif Panjang & Context Preservation (SE2026 Ready)**:
+  - **Dynamic Relaxation & Token Coverage Scoring**: Mengganti strict `AND` token matching pada kalimat panjang (> 3 kata) dengan progressive relaxation scoring berbasis cakupan kata kunci di `SearchService.php` dan `sql_like.py`, sehingga query survei panjang (20–50+ kata narasi) tidak lagi menghasilkan 0 hasil (kosong).
+  - **Context-Preserving Phrase & Instrumental Modifier Handling**: Menghapus unordered subset token matching pada `variation_map.py` dan menggantinya dengan strict adjacent n-gram matching, serta mendeteksi kata keterangan alat/sarana transportasi (misal: "dengan sepeda motor", "menggunakan gerobak") agar tidak membajak fokus komoditas pokok (contoh: "jual pentol dengan sepeda motor" tetap tepat terarah ke KBLI 56102 makanan keliling, bukan dealer/bengkel motor).
+  - **Survey Narrative Stopwords**: Menambahkan daftar stopwords khas bahasa kuesioner sensus/survei BPS (`proses, berupa, secara, menggunakan, hingga, menghasilkan, kemudian, berbagai, macam, seperti, meliputi, siap, mendatangkannya, sebelah, dimulai, sampai, menjadi`).
+  - **Kategori & Sektor Rule 13b Alignment**: Penambahan parameter dan scoring boost `category` di Laravel API (`/api/v1/search`, `/api/search`) dan Python microservice untuk memprioritaskan rekomendasi sektor BPS (A, C, G, I 56, dll.).
+  - **Batch Anomaly Resolver SE2026 (`php artisan kbli:resolve-se2026`)**: Command Artisan untuk otomatis menyelesaikan dan mengklasifikasikan 14.246 data anomali pemantauan SE2026 (`KBLI SE2026/*.xlsx`) yang berstatus GenAI `999999`. Menghasilkan file Excel beranotasi lengkap di `storage/app/se2026_resolved/`:
+    - Kolom baru setelah Kolom L: `judul_kbli_saat_ini` (Judul KBLI sesuai isian awal petugas).
+    - Rekomendasi Top-3 KBLI PINTAR KBLI format `[KODE] - [JUDUL KBLI]` (`rekomendasi_1`, `rekomendasi_2`, `rekomendasi_3`) disertai tingkat keyakinan (*confidence*) dan alasan rekomendasi.
+
+
 ### [Added] - 2026-09-01
 - **Laporan Evaluasi Data Riil Lapangan (Web Report)**: Menambahkan route `/laporan-usulan-riil` di `routes/web.php` dan generator laporan HTML Light Mode (`python/build_laporan_usulan_riil.py`) untuk transparansi publik pengujian 50 data riil usulan crowdsourcing dan log pencarian lapangan.
 - **Evaluasi & Pengujian Statistik KBLI 2025**: Script komputasi M1 s.d. M6 (`python/run_full_m1_m6_eval_50.py`), uji hipotesis berpasangan (Bootstrap CI 95%, Permutation Test, Wilcoxon Signed-Rank Test), serta audit validasi 100% kode KBLI 2025 ground truth.

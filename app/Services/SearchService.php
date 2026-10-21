@@ -77,6 +77,8 @@ class SearchService
         'mendatangkannya',
         'sebelah',
         'dimulai',
+        'sampai',
+        'menjadi',
     ];
 
     // ============================================================
@@ -110,6 +112,10 @@ class SearchService
         'kontraktor' => ['konstruksi', 'pembangunan'],
 
         // --- PERTANIAN & PERIKANAN ---
+        'budidaya' => ['budi daya', 'pembudidayaan', 'ternak'],
+        'pembudiyaan' => ['budi daya', 'budidaya'],
+        'budi' => ['budidaya'],
+        'daya' => ['budidaya'],
         'tani' => ['pertanian', 'bercocok tanam'],
         'petani' => ['pertanian', 'perkebunan'],
         'nelayan' => ['perikanan', 'penangkapan ikan', 'tangkap'],
@@ -426,7 +432,8 @@ class SearchService
             }
         } else {
             // Progressive relaxation scoring untuk long/narrative queries (> 3 tokens)
-            $uniqueTokens = array_values(array_unique(array_filter($tokens, fn($t) => mb_strlen($t) >= 2)));
+            $expandedTokens = $preprocessed['expanded_tokens'] ?? $preprocessed['expanded'] ?? $tokens;
+            $uniqueTokens = array_values(array_unique(array_filter($expandedTokens, fn($t) => mb_strlen($t) >= 2)));
             if (empty($uniqueTokens)) {
                 $uniqueTokens = $tokens;
             }
@@ -450,7 +457,7 @@ class SearchService
 
             foreach ($uniqueTokens as $tok) {
                 $tokLike = '%' . $tok . '%';
-                $scoreParts[] = "(CASE WHEN kode ILIKE ? THEN 5 WHEN judul ILIKE ? THEN 4 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 2 WHEN deskripsi ILIKE ? THEN 1 ELSE 0 END)";
+                $scoreParts[] = "(CASE WHEN kode ILIKE ? THEN 5 WHEN judul ILIKE ? THEN 5 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 4 WHEN deskripsi ILIKE ? THEN 3 ELSE 0 END)";
                 $bindings[] = $tokLike;
                 $bindings[] = $tokLike;
                 $bindings[] = $tokLike;

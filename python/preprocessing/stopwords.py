@@ -35,7 +35,7 @@ STOPWORDS = {
     # ── Survey narrative noise words ─────────────────────────
     "memberikan", "proses", "berupa", "secara", "menggunakan",
     "menghasilkan", "kemudian", "macam", "meliputi", "siap",
-    "mendatangkannya", "sebelah", "dimulai",
+    "mendatangkannya", "sebelah", "dimulai", "sampai", "menjadi",
 
     # ── Angka / satuan ────────────────────────────────────────
     "satu", "dua", "tiga", "dll", "dsb", "dsb.",

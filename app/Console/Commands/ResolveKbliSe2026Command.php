@@ -174,17 +174,58 @@ class ResolveKbliSe2026Command extends Command
                 if ($genaiKbli === '999999' || $genaiKbli === '' || $genaiKbli === '0') {
                     $countResolved++;
 
-                    // Clean corporate prefixes like PT/CV and extraneous punctuation
+                    // Clean corporate prefixes like PT/CV, person name in parenthesis, and extraneous punctuation
                     $cleanedNama = preg_replace('/\b(PT|CV|UD|PD|PO|FA)\b\.?/i', '', $namaUsaha);
+                    $cleanedNama = preg_replace('/\([^)]*\)/', '', $cleanedNama);
                     $cleanedNama = trim(preg_replace('/[(),.]/', ' ', $cleanedNama));
+                    $cleanedNama = preg_replace('/\bbudidaya\b/i', 'budi daya', $cleanedNama);
+                    $cleanedNama = preg_replace('/\bpembudiyaan\b/i', 'budi daya', $cleanedNama);
 
-                    $combinedQuery = trim($cleanedNama . ' ' . $uraianKegiatan);
-                    if (empty($combinedQuery)) {
-                        $combinedQuery = $uraianKegiatan ?: $namaUsaha;
+                    $cleanedUraian = preg_replace('/\bbudidaya\b/i', 'budi daya', $uraianKegiatan);
+                    $cleanedUraian = preg_replace('/\bpembudiyaan\b/i', 'budi daya', $cleanedUraian);
+
+                    $searchResults = [];
+                    $seenCodes = [];
+
+                    // 1. Coba pencarian dengan nama usaha yang bersih jika ringkas & informatif
+                    $wordCountNama = count(array_filter(explode(' ', $cleanedNama)));
+                    if (!empty($cleanedNama) && $wordCountNama >= 1 && $wordCountNama <= 5) {
+                        $resNama = $searchService->search($cleanedNama, 3, 'KBLI', false, null);
+                        foreach ($resNama as $r) {
+                            $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
+                            if ($k && !isset($seenCodes[$k])) {
+                                $searchResults[] = $r;
+                                $seenCodes[$k] = true;
+                            }
+                        }
                     }
 
-                    // Perform search
-                    $searchResults = $searchService->search($combinedQuery, 3, 'KBLI', false, $categoryHint);
+                    // 2. Tambahkan pencarian gabungan (nama usaha + uraian) dengan batasan sektor jika ada
+                    $combinedQuery = trim($cleanedNama . ' ' . $cleanedUraian);
+                    if (empty($combinedQuery)) {
+                        $combinedQuery = $cleanedUraian ?: $cleanedNama;
+                    }
+
+                    $resCombined = $searchService->search($combinedQuery, 3, 'KBLI', false, $categoryHint);
+                    foreach ($resCombined as $r) {
+                        $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
+                        if ($k && !isset($seenCodes[$k])) {
+                            $searchResults[] = $r;
+                            $seenCodes[$k] = true;
+                        }
+                    }
+
+                    // 3. Fallback unconstrained jika masih kosong
+                    if (empty($searchResults)) {
+                        $resFallback = $searchService->search($combinedQuery, 3, 'KBLI', false, null);
+                        foreach ($resFallback as $r) {
+                            $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
+                            if ($k && !isset($seenCodes[$k])) {
+                                $searchResults[] = $r;
+                                $seenCodes[$k] = true;
+                            }
+                        }
+                    }
 
                     if (!empty($searchResults[0])) {
                         $r = $searchResults[0];

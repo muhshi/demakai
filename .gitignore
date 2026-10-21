@@ -29,5 +29,7 @@ database/backups/
 __pycache__/
 *.pyc
 Jurnal/
+KBLI SE2026/
+storage/app/se2026_resolved/
 .DS_Store
 */.DS_Store
