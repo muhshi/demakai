@@ -59,6 +59,24 @@ class SearchService
         'tukang',
         'pedagang',
         'pekerja',
+        // Survey narrative noise words
+        'memberikan',
+        'menyediakan',
+        'proses',
+        'berupa',
+        'secara',
+        'menggunakan',
+        'hingga',
+        'menghasilkan',
+        'kemudian',
+        'berbagai',
+        'macam',
+        'seperti',
+        'meliputi',
+        'siap',
+        'mendatangkannya',
+        'sebelah',
+        'dimulai',
     ];
 
     // ============================================================
@@ -154,16 +172,71 @@ class SearchService
         $clean = preg_replace('/[^a-z0-9\s]/', ' ', $clean);
         $clean = preg_replace('/\s+/', ' ', trim($clean));
 
-        // Step 2: Tokenize
-        $tokens = array_values(array_filter(explode(' ', $clean)));
+        // Step 2: Tokenize raw tokens
+        $rawTokens = array_values(array_filter(explode(' ', $clean)));
+
+        // Step 2b: Deteksi Instrumental Modifiers dan Core Activity
+        $instrumentIntroducers = ['menggunakan', 'pakai', 'memakai', 'menaiki', 'mengendarai'];
+        $boundaryWords = ['untuk', 'agar', 'supaya', 'sehingga', 'kemudian', 'lalu', 'tetapi', 'namun', 'karena', 'guna'];
+        $toolWords = ['gerobak', 'sepeda', 'motor', 'mobil', 'pickup', 'pikup', 'truk', 'truck', 'becak', 'bentor', 'perahu', 'kapal', 'mesin', 'alat', 'kendaraan', 'rombong', 'obrok', 'keranjang'];
+
+        $instrumentalIndices = [];
+        $instrumentalModifiers = [];
+        $n = count($rawTokens);
+
+        for ($i = 0; $i < $n; $i++) {
+            $t = $rawTokens[$i];
+            $isInstrumentStart = false;
+
+            if (in_array($t, $instrumentIntroducers, true)) {
+                $isInstrumentStart = true;
+            } elseif (in_array($t, ['dengan', 'pada'], true)) {
+                // Check if followed by tool/vehicle word within 1-2 tokens
+                for ($k = 1; $k <= 2 && ($i + $k) < $n; $k++) {
+                    if (in_array($rawTokens[$i + $k], $toolWords, true)) {
+                        $isInstrumentStart = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($isInstrumentStart) {
+                // Mark tokens in instrumental span until boundary word
+                for ($j = $i; $j < $n; $j++) {
+                    if ($j > $i && in_array($rawTokens[$j], $boundaryWords, true)) {
+                        break;
+                    }
+                    $instrumentalIndices[$j] = true;
+                    $tok = $rawTokens[$j];
+                    if (!in_array($tok, $this->stopwords, true) && !in_array($tok, $instrumentIntroducers, true) && !in_array($tok, ['dengan', 'pada', 'yang'], true)) {
+                        $instrumentalModifiers[] = $tok;
+                    }
+                }
+                $i = $j - 1; // Advance loop to end of span
+            }
+        }
+
+        $instrumentalModifiers = array_values(array_unique($instrumentalModifiers));
 
         // Step 3: Stopword removal
-        $filtered = array_values(array_diff($tokens, $this->stopwords));
+        $filtered = array_values(array_diff($rawTokens, $this->stopwords));
 
         // Fallback: jika semua token dihapus stopword, gunakan token original
         if (empty($filtered)) {
-            $filtered = $tokens;
+            $filtered = $rawTokens;
         }
+
+        // Core activity: tokens outside instrumental spans and outside stopwords
+        $coreTokens = [];
+        foreach ($rawTokens as $idx => $tok) {
+            if (!isset($instrumentalIndices[$idx]) && !in_array($tok, $this->stopwords, true)) {
+                $coreTokens[] = $tok;
+            }
+        }
+        if (empty($coreTokens)) {
+            $coreTokens = $filtered;
+        }
+        $coreActivity = implode(' ', $coreTokens);
 
         // Step 4: Synonym expansion
         $expanded = $filtered;
@@ -182,10 +255,14 @@ class SearchService
         }
 
         return [
-            'original' => $query,                                    // Input asli user
-            'clean' => implode(' ', $filtered),                   // Setelah stopword removal
-            'tokens' => $filtered,                                 // Token utama (tanpa stopword)
-            'expanded' => array_values(array_unique($expanded)),     // Token + sinonim
+            'original' => $query,                                       // Input asli user
+            'clean' => implode(' ', $filtered),                         // Setelah stopword removal
+            'tokens' => $filtered,                                      // Token utama (tanpa stopword)
+            'core_activity' => $coreActivity,                           // Aktivitas & komoditas inti
+            'core_tokens' => $coreTokens,                               // Token inti (tanpa instrumen)
+            'instrumental_modifiers' => $instrumentalModifiers,         // Alat/kendaraan/sarana
+            'expanded' => array_values(array_unique($expanded)),        // Token + sinonim
+            'expanded_tokens' => array_values(array_unique($expanded)), // Alias for consistency
         ];
     }
 

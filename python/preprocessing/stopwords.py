@@ -32,6 +32,11 @@ STOPWORDS = {
     "lain", "lainnya", "berbagai", "beberapa", "semua",
     "hal", "cara",
 
+    # ── Survey narrative noise words ─────────────────────────
+    "memberikan", "proses", "berupa", "secara", "menggunakan",
+    "menghasilkan", "kemudian", "macam", "meliputi", "siap",
+    "mendatangkannya", "sebelah", "dimulai",
+
     # ── Angka / satuan ────────────────────────────────────────
     "satu", "dua", "tiga", "dll", "dsb", "dsb.",
 }
