@@ -89,6 +89,58 @@ class SearchRequest(BaseModel):
     limit:      int = 10
     model:      Optional[str] = None   # KBLI | KBJI | None (keduanya)
     mode:       Optional[str] = None   # sql_expansion | hybrid_expansion | dll
+    category:   Optional[str] = None   # KBLI Category (A-U or 2-digit division)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# KBLI Category Division Mapping
+# ─────────────────────────────────────────────────────────────────────────────
+
+CATEGORY_DIVISIONS = {
+    'A': ['01', '02', '03'],
+    'B': ['05', '06', '07', '08', '09'],
+    'C': [f"{i:02d}" for i in range(10, 34)],
+    'D': ['35'],
+    'E': ['36', '37', '38', '39'],
+    'F': ['41', '42', '43'],
+    'G': ['45', '46', '47'],
+    'H': ['49', '50', '51', '52', '53'],
+    'I': ['55', '56'],
+    'J': ['58', '59', '60', '61', '62', '63'],
+    'K': ['64', '65', '66'],
+    'L': ['68'],
+    'M': ['69', '70', '71', '72', '73', '74', '75'],
+    'N': ['77', '78', '79', '80', '81', '82'],
+    'O': ['84'],
+    'P': ['85'],
+    'Q': ['86', '87', '88'],
+    'R': ['90', '91', '92', '93'],
+    'S': ['94', '95', '96'],
+    'T': ['97', '98'],
+    'U': ['99'],
+}
+
+def get_category_divisions(category: Optional[str]) -> list:
+    if not category:
+        return []
+    cat = category.strip().upper()
+    import re
+    # 2-digit number e.g. "56"
+    if re.match(r'^\d{2}$', cat):
+        return [cat]
+    # Letter followed by 2 digits e.g. "I56" or "I 56"
+    m = re.match(r'^[A-Z]\s*(\d{2})$', cat)
+    if m:
+        return [m.group(1)]
+    # Extract letter
+    m = re.search(r'([A-Z])', cat)
+    if m:
+        letter = m.group(1)
+        if letter in CATEGORY_DIVISIONS:
+            if letter == 'I' and '56' in cat:
+                return ['56']
+            return CATEGORY_DIVISIONS[letter]
+    return []
 
 
 class SearchResponse(BaseModel):
@@ -170,15 +222,33 @@ def search(req: SearchRequest):
         # Tambahkan mode lain jika perlu
 
     try:
+        cat_divs = get_category_divisions(req.category)
+        fetch_limit = max(req.limit * 3, 30) if cat_divs else req.limit
+
         if req.processing == "none":
             # Tanpa preprocessing — query mentah
             fn      = SEARCH_RAW_FN[req.search]
-            results = fn(req.query, limit=req.limit, model=req.model)
+            results = fn(req.query, limit=fetch_limit, model=req.model)
         else:
             # Dengan preprocessing
             preprocessed = PREPROCESSING_FN[req.processing](req.query)
             fn           = SEARCH_FN[(req.search, req.processing)]
-            results      = fn(preprocessed, limit=req.limit, model=req.model)
+            results      = fn(preprocessed, limit=fetch_limit, model=req.model)
+
+        if cat_divs:
+            matching = []
+            non_matching = []
+            for item in results:
+                kode_str = str(item.get("kode", "")).strip()
+                if kode_str[:2] in cat_divs:
+                    item_copy = dict(item)
+                    item_copy["_boost"] = (str(item_copy.get("_boost") or "") + " category_match").strip()
+                    if item_copy.get("distance") is not None:
+                        item_copy["distance"] = max(0.005, float(item_copy["distance"]) * 0.5)
+                    matching.append(item_copy)
+                else:
+                    non_matching.append(item)
+            results = (matching + non_matching)[:req.limit]
 
         # Serialisasi hasil — pastikan semua field JSON-serializable
         serialized = []

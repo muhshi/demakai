@@ -46,6 +46,7 @@ class MobileSearchController extends Controller
 
         $limit = min((int) $request->input('limit', 15), 50);
         $type = strtoupper((string) $request->input('type', '')); // 'KBLI' | 'KBJI' | ''
+        $category = $request->input('category');
         $searchMethod = $request->input('search_method', config('services.python_search.method', 'hybrid'));
         $processing = $request->input('processing', config('services.python_search.processing', 'expansion'));
 
@@ -61,19 +62,19 @@ class MobileSearchController extends Controller
         // 1. KBLI 2025
         $rawCombined = [];
         if (empty($type) || $type === 'KBLI' || $type === 'KBLI2025') {
-            $rawKbli = $this->searchService->search($query, $limit, 'KBLI', false);
+            $rawKbli = $this->searchService->search($query, $limit, 'KBLI', false, $category);
             $rawCombined = array_merge($rawCombined, $rawKbli);
             foreach ($rawKbli as $item) {
-                $results[] = $this->formatResult($item, 'KBLI 2025');
+                $results[] = $this->formatResult($item, 'KBLI 2025', $category);
             }
         }
 
         // 2. KBJI 2014
         if (empty($type) || $type === 'KBJI' || $type === 'KBJI2014') {
-            $rawKbji = $this->searchService->search($query, $limit, 'KBJI', false);
+            $rawKbji = $this->searchService->search($query, $limit, 'KBJI', false, $category);
             $rawCombined = array_merge($rawCombined, $rawKbji);
             foreach ($rawKbji as $item) {
-                $results[] = $this->formatResult($item, 'KBJI 2014');
+                $results[] = $this->formatResult($item, 'KBJI 2014', $category);
             }
         }
 
@@ -246,7 +247,7 @@ class MobileSearchController extends Controller
     /**
      * Format result row into a standardized response array.
      */
-    protected function formatResult($item, string $type): array
+    protected function formatResult($item, string $type, ?string $category = null): array
     {
         $get = function ($key, $default = null) use ($item) {
             if (is_array($item)) return $item[$key] ?? $default;
@@ -254,7 +255,23 @@ class MobileSearchController extends Controller
         };
 
         $distance = $get('distance');
-        $score = $distance !== null ? max(0, min(100, round((1 - (float) $distance) * 100))) : 0;
+        $matchScore = $get('match_score');
+        if ($distance !== null) {
+            $score = max(0, min(100, round((1 - (float) $distance) * 100)));
+        } elseif ($matchScore !== null) {
+            $score = min(100, (int) $matchScore);
+        } else {
+            $score = 50;
+        }
+
+        $kode = (string) $get('kode', '');
+        $categoryDivs = $this->searchService->getCategoryDivisions($category);
+        if (!empty($categoryDivs)) {
+            $div = substr($kode, 0, 2);
+            if (in_array($div, $categoryDivs, true)) {
+                $score = min(100, $score + 30);
+            }
+        }
 
         $contoh = $get('contoh_lapangan');
         if (!is_array($contoh)) {

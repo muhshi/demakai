@@ -267,18 +267,81 @@ class SearchService
     }
 
     /**
+     * KBLI 2025 Section/Category to 2-digit division mapping.
+     */
+    protected array $categoryDivisions = [
+        'A' => ['01', '02', '03'],
+        'B' => ['05', '06', '07', '08', '09'],
+        'C' => ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33'],
+        'D' => ['35'],
+        'E' => ['36', '37', '38', '39'],
+        'F' => ['41', '42', '43'],
+        'G' => ['45', '46', '47'],
+        'H' => ['49', '50', '51', '52', '53'],
+        'I' => ['55', '56'],
+        'J' => ['58', '59', '60', '61', '62', '63'],
+        'K' => ['64', '65', '66'],
+        'L' => ['68'],
+        'M' => ['69', '70', '71', '72', '73', '74', '75'],
+        'N' => ['77', '78', '79', '80', '81', '82'],
+        'O' => ['84'],
+        'P' => ['85'],
+        'Q' => ['86', '87', '88'],
+        'R' => ['90', '91', '92', '93'],
+        'S' => ['94', '95', '96'],
+        'T' => ['97', '98'],
+        'U' => ['99'],
+    ];
+
+    /**
+     * Parse and map a category indicator string to a list of 2-digit divisions.
+     */
+    public function getCategoryDivisions(?string $category): array
+    {
+        if (empty($category)) {
+            return [];
+        }
+        $cat = strtoupper(trim($category));
+
+        // 1. Direct 2-digit numeric division, e.g. "56" or "47"
+        if (preg_match('/^(\d{2})$/', $cat, $m)) {
+            return [$m[1]];
+        }
+
+        // 2. Section + 2-digit division, e.g. "I56" or "I 56"
+        if (preg_match('/^[A-Z]\s*(\d{2})$/', $cat, $m)) {
+            return [$m[1]];
+        }
+
+        // 3. Section letter e.g. "G", "G - Perdagangan", "Kategori A"
+        if (preg_match('/([A-Z])/', $cat, $m)) {
+            $letter = $m[1];
+            if (isset($this->categoryDivisions[$letter])) {
+                // Special handling for I 56 when '56' appears in string
+                if ($letter === 'I' && str_contains($cat, '56')) {
+                    return ['56'];
+                }
+                return $this->categoryDivisions[$letter];
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Perform hybrid search (Semantic + Keyword)
      * 
      * @param string $query Use query string
      * @param int $limit
      * @param string|null $model 'KBLI' or 'KBJI' (null for both)
      * @param bool $log Apakah riwayat pencarian dicatat ke database
+     * @param string|null $category Kategori KBLI (e.g. 'A', 'G', 'I56')
      * @return array
      */
-    public function search(string $query, int $limit = 10, ?string $model = null, bool $log = true): array
+    public function search(string $query, int $limit = 10, ?string $model = null, bool $log = true, ?string $category = null): array
     {
         if (config('services.python_search.enabled', false)) {
-            $results = $this->searchViaPython($query, $limit, $model, $log);
+            $results = $this->searchViaPython($query, $limit, $model, $log, $category);
             
             // Jika hasil tidak null, berarti API sukses (meskipun results-nya kosong [])
             if ($results !== null) {
@@ -299,6 +362,9 @@ class SearchService
         $clean = $preprocessed['clean'];
         $coreActivity = $preprocessed['core_activity'] ?? '';
         $coreTokens = $preprocessed['core_tokens'] ?? $tokens;
+
+        $categoryDivs = $this->getCategoryDivisions($category);
+        $catSqlList = !empty($categoryDivs) ? "'" . implode("','", array_map('addslashes', $categoryDivs)) . "'" : null;
 
         $results = collect();
         
@@ -331,14 +397,32 @@ class SearchService
             };
 
             if ($model === null || $model === 'KBLI') {
+                $kbliQ = PgKBLI2025::where($applyQuery);
+                $cleanLike = '%' . $clean . '%';
+                if ($catSqlList) {
+                    $kbliQ->orderByRaw("(CASE WHEN SUBSTRING(kode, 1, 2) IN ({$catSqlList}) THEN 50 ELSE 0 END) + (CASE WHEN judul ILIKE ? THEN 10 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 5 ELSE 0 END) DESC", [$cleanLike, $cleanLike]);
+                } else {
+                    $kbliQ->orderByRaw("(CASE WHEN judul ILIKE ? THEN 10 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 5 ELSE 0 END) DESC", [$cleanLike, $cleanLike]);
+                }
                 $results = $results->merge(
-                    PgKBLI2025::where($applyQuery)->limit($limit)->get()
+                    $kbliQ->limit($limit)->get()
                 );
             }
             if ($model === null || $model === 'KBJI') {
+                $kbjiQ = PgKBJI2014::where($applyQuery);
+                $cleanLike = '%' . $clean . '%';
+                $kbjiQ->orderByRaw("(CASE WHEN judul ILIKE ? THEN 10 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 5 ELSE 0 END) DESC", [$cleanLike, $cleanLike]);
                 $results = $results->merge(
-                    PgKBJI2014::where($applyQuery)->limit($limit)->get()
+                    $kbjiQ->limit($limit)->get()
                 );
+            }
+
+            if (!empty($categoryDivs)) {
+                $results = $results->sortByDesc(function ($item) use ($categoryDivs) {
+                    $kode = is_array($item) ? ($item['kode'] ?? '') : ($item->kode ?? '');
+                    $div = substr((string)$kode, 0, 2);
+                    return in_array($div, $categoryDivs, true) ? 100 : 0;
+                });
             }
         } else {
             // Progressive relaxation scoring untuk long/narrative queries (> 3 tokens)
@@ -349,6 +433,11 @@ class SearchService
 
             $scoreParts = [];
             $bindings = [];
+
+            // Category bonus jika ada kategori spesifik
+            if (!empty($categoryDivs)) {
+                $scoreParts[] = "(CASE WHEN SUBSTRING(kode, 1, 2) IN ({$catSqlList}) THEN 25 ELSE 0 END)";
+            }
 
             // Core activity bonus jika ada dan bermakna
             if (!empty($coreActivity) && mb_strlen($coreActivity) >= 3 && $coreActivity !== $clean) {
@@ -370,21 +459,31 @@ class SearchService
 
             $scoreExpr = implode(' + ', $scoreParts);
 
-            $executeRelaxed = function($modelClass) use ($scoreExpr, $bindings, $limit) {
+            $executeRelaxed = function($modelClass) use ($scoreExpr, $bindings, $limit, $catSqlList) {
                 // Cobalah ambang batas >= 2 terlebih dahulu (match di judul/contoh_lapangan atau multiple di deskripsi)
-                $rows = $modelClass::select('*')
+                $query = $modelClass::select('*')
                     ->selectRaw("({$scoreExpr}) AS match_score", $bindings)
-                    ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [2]))
-                    ->orderByDesc('match_score')
+                    ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [2]));
+
+                if ($catSqlList) {
+                    $query->orderByRaw("(CASE WHEN SUBSTRING(kode, 1, 2) IN ({$catSqlList}) THEN 1 ELSE 0 END) DESC");
+                }
+
+                $rows = $query->orderByDesc('match_score')
                     ->limit($limit)
                     ->get();
 
                 if ($rows->isEmpty()) {
                     // Fallback ambang batas >= 1
-                    $rows = $modelClass::select('*')
+                    $fallbackQ = $modelClass::select('*')
                         ->selectRaw("({$scoreExpr}) AS match_score", $bindings)
-                        ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [1]))
-                        ->orderByDesc('match_score')
+                        ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [1]));
+
+                    if ($catSqlList) {
+                        $fallbackQ->orderByRaw("(CASE WHEN SUBSTRING(kode, 1, 2) IN ({$catSqlList}) THEN 1 ELSE 0 END) DESC");
+                    }
+
+                    $rows = $fallbackQ->orderByDesc('match_score')
                         ->limit($limit)
                         ->get();
                 }
@@ -399,7 +498,17 @@ class SearchService
                 $results = $results->merge($executeRelaxed(PgKBJI2014::class));
             }
 
-            $results = $results->sortByDesc('match_score');
+            if (!empty($categoryDivs)) {
+                $results = $results->sortByDesc(function ($item) use ($categoryDivs) {
+                    $kode = is_array($item) ? ($item['kode'] ?? '') : ($item->kode ?? '');
+                    $div = substr((string)$kode, 0, 2);
+                    $catMatch = in_array($div, $categoryDivs, true) ? 100 : 0;
+                    $score = is_array($item) ? ($item['match_score'] ?? 0) : ($item->match_score ?? 0);
+                    return $catMatch + $score;
+                });
+            } else {
+                $results = $results->sortByDesc('match_score');
+            }
         }
 
         $finalResults = $results->take($limit)->all();
@@ -419,7 +528,7 @@ class SearchService
      *   PYTHON_SEARCH_METHOD=sql          (sql | hybrid)
      *   PYTHON_SEARCH_PROCESSING=none     (none | basic | advanced)
      */
-    public function searchViaPython(string $query, int $limit = 10, ?string $model = null, bool $log = true): ?array
+    public function searchViaPython(string $query, int $limit = 10, ?string $model = null, bool $log = true, ?string $category = null): ?array
     {
         $url = config('services.python_search.url', 'http://127.0.0.1:8000');
         $searchMethod = config('services.python_search.method', 'sql');
@@ -436,6 +545,7 @@ class SearchService
             'mode' => $mode,
             'limit' => $limit,
             'model' => $model,
+            'category' => $category,
         ];
 
         try {
@@ -449,6 +559,17 @@ class SearchService
 
             $data = $response->json();
             $results = collect($data['results'] ?? []);
+
+            $categoryDivs = $this->getCategoryDivisions($category);
+            if (!empty($categoryDivs)) {
+                $results = $results->sortBy(function ($item) use ($categoryDivs) {
+                    $kode = is_array($item) ? ($item['kode'] ?? '') : ($item->kode ?? '');
+                    $div = substr((string)$kode, 0, 2);
+                    $isMatch = in_array($div, $categoryDivs, true);
+                    $dist = is_array($item) ? ($item['distance'] ?? 1.0) : ($item->distance ?? 1.0);
+                    return $isMatch ? (float)$dist * 0.5 : (float)$dist + 1.0;
+                });
+            }
             
             // Log sukses untuk debugging
             Log::debug("Python search success: found " . $results->count() . " results.");

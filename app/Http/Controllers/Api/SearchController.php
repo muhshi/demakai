@@ -46,21 +46,26 @@ class SearchController extends Controller
             'services.python_search.processing' => $processing,
         ]);
 
+        $category = $request->input('category');
+
         // 1. KBLI 2025 (Python Search - jangan log history per sub-pencarian)
-        $rawKbli2025 = $this->searchService->search($query, 15, 'KBLI', false);
+        $rawKbli2025 = $this->searchService->search($query, 15, 'KBLI', false, $category);
         $kbli2025 = collect($rawKbli2025)
             ->map(fn($item) => $this->formatResult($item, 'KBLI 2025'))
             ->values();
 
         // 2. KBJI 2014 (Python Search - jangan log history per sub-pencarian)
-        $rawKbji = $this->searchService->search($query, 15, 'KBJI', false);
+        $rawKbji = $this->searchService->search($query, 15, 'KBJI', false, $category);
         $kbji = collect($rawKbji)
             ->map(fn($item) => $this->formatResult($item, 'KBJI 2014'))
             ->values();
 
         // 3. KBLI 2020 (Legacy SQL - Belum di-index vektor)
         $keywords = array_filter(explode(' ', strtolower(trim($query))));
-        $kbli2020 = PgKBLI2020::query()
+        $categoryDivs = $this->searchService->getCategoryDivisions($category);
+        $catSqlList = !empty($categoryDivs) ? "'" . implode("','", array_map('addslashes', $categoryDivs)) . "'" : null;
+
+        $kbli2020Query = PgKBLI2020::query()
             ->select(['kode', 'judul', 'deskripsi', 'contoh_lapangan'])
             ->where(function ($q) use ($keywords) {
                 foreach ($keywords as $kw) {
@@ -69,7 +74,13 @@ class SearchController extends Controller
                         ->orWhereRaw('LOWER(judul) LIKE ?', [$like])
                         ->orWhereRaw('LOWER(deskripsi) LIKE ?', [$like]);
                 }
-            })
+            });
+
+        if ($catSqlList) {
+            $kbli2020Query->orderByRaw("(CASE WHEN SUBSTRING(kode, 1, 2) IN ({$catSqlList}) THEN 1 ELSE 0 END) DESC");
+        }
+
+        $kbli2020 = $kbli2020Query
             ->limit(10)
             ->get()
             ->map(fn($item) => $this->formatResult($item, 'KBLI 2020'));
