@@ -34,4 +34,20 @@ class SearchServiceLongQueryTest extends TestCase
         $this->assertContains('pengolahan', $prep['tokens']);
         $this->assertContains('pentol', $prep['tokens']);
     }
+
+    public function test_long_survey_queries_return_relevant_results(): void
+    {
+        $service = app(SearchService::class);
+        $queries = [
+            'Menjual takoyaki keliling di desa desa sebelah',
+            'PEMBUDIYAAN JANGKRIK DIMULAI DARI TELUR HINGGA BESAR (SIAP PANEN)',
+            'melakukan proses pengolahan bahan baku daging tepung bumbu menjadi pentol siap saji di rumah kemudian memasarkannya secara keliling menggunakan gerobak yang dimodifikasi pada sepeda motor',
+            'Usaha jasa pengolahan pascapanen sarang burung walet berupa pembersihan sarang walet mentah dirty bird nest melalui proses perendaman pembersihan kotoran'
+        ];
+
+        foreach ($queries as $q) {
+            $res = $service->search($q, 5, 'KBLI', false);
+            $this->assertNotEmpty($res, "Query '$q' must not return empty results");
+        }
+    }
 }

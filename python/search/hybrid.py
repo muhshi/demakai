@@ -169,8 +169,10 @@ def _keyword_search(cursor, table: str, token_groups: list, limit: int, variatio
     for token in all_tokens:
         pat = f"%{token}%"
         score_expr_parts.append(
-            "(CASE WHEN kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
-            f"OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 1 ELSE 0 END)"
+            "(CASE WHEN kode ILIKE %s THEN 5 "
+            "WHEN judul ILIKE %s THEN 4 "
+            f"WHEN (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 2 "
+            "WHEN deskripsi ILIKE %s THEN 1 ELSE 0 END)"
         )
         or_params.extend([pat, pat, pat, pat])
         or_conds.append(
@@ -294,10 +296,16 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     kbli_vars = preprocessed.get("kbli_variations", [])
     kbji_vars = preprocessed.get("kbji_variations", [])
 
-    # FIX #1: Embed dari query ORIGINAL (bukan clean/expanded).
-    # Model Gemini lebih akurat untuk teks pendek natural.
-    # Teks expansion yang panjang menambah noise ke representasi vektor.
-    embed_text = preprocessed.get("original", "") or preprocessed.get("clean", "")
+    tokens = preprocessed.get("tokens", [])
+    core_activity = (preprocessed.get("core_activity") or "").strip()
+
+    # FIX #1: Jika query panjang (> 3 token) dan core_activity terdeteksi,
+    # gunakan core_activity untuk embedding agar tidak terdilusi narasi survei.
+    # Untuk query pendek/natural, gunakan original query.
+    if core_activity and len(tokens) > 3:
+        embed_text = core_activity
+    else:
+        embed_text = preprocessed.get("original", "") or preprocessed.get("clean", "")
     embedding = _generate_embedding(embed_text)
 
     semantic_kbli, semantic_kbji = [], []
@@ -335,7 +343,7 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
     # Expanded tokens (25+ kata) menyebabkan terlalu banyak false-positive match
     # di field contoh_lapangan/judul, sehingga item tidak relevan di-boost secara salah.
     # Core tokens (~5 kata) jauh lebih presisi untuk menentukan boost.
-    core_tokens = preprocessed.get("tokens", [])
+    core_tokens = preprocessed.get("core_tokens") or preprocessed.get("tokens", [])
 
     return _merge_and_boost(semantic, keyword, core_tokens)[:limit]
 
@@ -354,11 +362,14 @@ def search_advanced(preprocessed: dict, limit: int = None, model: str = None) ->
         finally:
             conn.close()
 
-    # FIX: Embed dari query original — stemmed_clean lebih baik dari expanded,
-    # tapi query original paling akurat untuk Gemini embedding.
-    embed_text = preprocessed.get("original", "") or preprocessed.get("stemmed_clean") or preprocessed.get("clean", "")
     tokens     = preprocessed.get("stemmed_tokens") or preprocessed.get("tokens", [])
     token_groups = [[t] for t in tokens]
+    core_activity = (preprocessed.get("core_activity") or "").strip()
+
+    if core_activity and len(tokens) > 3:
+        embed_text = core_activity
+    else:
+        embed_text = preprocessed.get("original", "") or preprocessed.get("stemmed_clean") or preprocessed.get("clean", "")
 
     embedding = _generate_embedding(embed_text)
 

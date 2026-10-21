@@ -297,45 +297,109 @@ class SearchService
         $preprocessed = $this->preprocessQuery($query);
         $tokens = $preprocessed['tokens'];
         $clean = $preprocessed['clean'];
+        $coreActivity = $preprocessed['core_activity'] ?? '';
+        $coreTokens = $preprocessed['core_tokens'] ?? $tokens;
 
         $results = collect();
         
-        // Fungsi helper untuk membangun query per token
-        $applyQuery = function ($q) use ($tokens, $clean) {
-            // Coba exact phrase dulu (skor tertinggi)
-            $q->where(function($sub) use ($clean) {
-                $like = '%' . $clean . '%';
-                $sub->orWhere('kode', 'ILIKE', $like)
-                    ->orWhere('judul', 'ILIKE', $like)
-                    ->orWhere('deskripsi', 'ILIKE', $like)
-                    ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
-            });
-
-            // Jika banyak kata, tambahkan AND logic per token agar lebih fleksibel
-            if (count($tokens) > 1) {
-                $q->orWhere(function($sub) use ($tokens) {
-                    foreach ($tokens as $token) {
-                        $like = '%' . $token . '%';
-                        $sub->where(function($tokenQuery) use ($like) {
-                            $tokenQuery->orWhere('kode', 'ILIKE', $like)
-                                ->orWhere('judul', 'ILIKE', $like)
-                                ->orWhere('deskripsi', 'ILIKE', $like)
-                                ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
-                        });
-                    }
+        if (count($tokens) <= 3) {
+            // Fungsi helper untuk membangun query per token (High precision untuk query pendek)
+            $applyQuery = function ($q) use ($tokens, $clean) {
+                // Coba exact phrase dulu (skor tertinggi)
+                $q->where(function($sub) use ($clean) {
+                    $like = '%' . $clean . '%';
+                    $sub->orWhere('kode', 'ILIKE', $like)
+                        ->orWhere('judul', 'ILIKE', $like)
+                        ->orWhere('deskripsi', 'ILIKE', $like)
+                        ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
                 });
-            }
-        };
 
-        if ($model === null || $model === 'KBLI') {
-            $results = $results->merge(
-                PgKBLI2025::where($applyQuery)->limit($limit)->get()
-            );
-        }
-        if ($model === null || $model === 'KBJI') {
-            $results = $results->merge(
-                PgKBJI2014::where($applyQuery)->limit($limit)->get()
-            );
+                // Jika banyak kata, tambahkan AND logic per token agar lebih fleksibel
+                if (count($tokens) > 1) {
+                    $q->orWhere(function($sub) use ($tokens) {
+                        foreach ($tokens as $token) {
+                            $like = '%' . $token . '%';
+                            $sub->where(function($tokenQuery) use ($like) {
+                                $tokenQuery->orWhere('kode', 'ILIKE', $like)
+                                    ->orWhere('judul', 'ILIKE', $like)
+                                    ->orWhere('deskripsi', 'ILIKE', $like)
+                                    ->orWhereRaw("CAST(contoh_lapangan AS TEXT) ILIKE ?", [$like]);
+                            });
+                        }
+                    });
+                }
+            };
+
+            if ($model === null || $model === 'KBLI') {
+                $results = $results->merge(
+                    PgKBLI2025::where($applyQuery)->limit($limit)->get()
+                );
+            }
+            if ($model === null || $model === 'KBJI') {
+                $results = $results->merge(
+                    PgKBJI2014::where($applyQuery)->limit($limit)->get()
+                );
+            }
+        } else {
+            // Progressive relaxation scoring untuk long/narrative queries (> 3 tokens)
+            $uniqueTokens = array_values(array_unique(array_filter($tokens, fn($t) => mb_strlen($t) >= 2)));
+            if (empty($uniqueTokens)) {
+                $uniqueTokens = $tokens;
+            }
+
+            $scoreParts = [];
+            $bindings = [];
+
+            // Core activity bonus jika ada dan bermakna
+            if (!empty($coreActivity) && mb_strlen($coreActivity) >= 3 && $coreActivity !== $clean) {
+                $coreLike = '%' . $coreActivity . '%';
+                $scoreParts[] = "(CASE WHEN judul ILIKE ? THEN 8 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 4 WHEN deskripsi ILIKE ? THEN 2 ELSE 0 END)";
+                $bindings[] = $coreLike;
+                $bindings[] = $coreLike;
+                $bindings[] = $coreLike;
+            }
+
+            foreach ($uniqueTokens as $tok) {
+                $tokLike = '%' . $tok . '%';
+                $scoreParts[] = "(CASE WHEN kode ILIKE ? THEN 5 WHEN judul ILIKE ? THEN 4 WHEN CAST(contoh_lapangan AS TEXT) ILIKE ? THEN 2 WHEN deskripsi ILIKE ? THEN 1 ELSE 0 END)";
+                $bindings[] = $tokLike;
+                $bindings[] = $tokLike;
+                $bindings[] = $tokLike;
+                $bindings[] = $tokLike;
+            }
+
+            $scoreExpr = implode(' + ', $scoreParts);
+
+            $executeRelaxed = function($modelClass) use ($scoreExpr, $bindings, $limit) {
+                // Cobalah ambang batas >= 2 terlebih dahulu (match di judul/contoh_lapangan atau multiple di deskripsi)
+                $rows = $modelClass::select('*')
+                    ->selectRaw("({$scoreExpr}) AS match_score", $bindings)
+                    ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [2]))
+                    ->orderByDesc('match_score')
+                    ->limit($limit)
+                    ->get();
+
+                if ($rows->isEmpty()) {
+                    // Fallback ambang batas >= 1
+                    $rows = $modelClass::select('*')
+                        ->selectRaw("({$scoreExpr}) AS match_score", $bindings)
+                        ->whereRaw("({$scoreExpr}) >= ?", array_merge($bindings, [1]))
+                        ->orderByDesc('match_score')
+                        ->limit($limit)
+                        ->get();
+                }
+
+                return $rows;
+            };
+
+            if ($model === null || $model === 'KBLI') {
+                $results = $results->merge($executeRelaxed(PgKBLI2025::class));
+            }
+            if ($model === null || $model === 'KBJI') {
+                $results = $results->merge($executeRelaxed(PgKBJI2014::class));
+            }
+
+            $results = $results->sortByDesc('match_score');
         }
 
         $finalResults = $results->take($limit)->all();

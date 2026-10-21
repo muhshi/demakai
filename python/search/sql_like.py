@@ -39,32 +39,44 @@ def _run_query(cursor, table: str, pattern: str, limit: int) -> list:
     return cursor.fetchall()
 
 
-def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
+def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int, core_activity: str = None) -> list:
     """
-    Fallback: SQL ILIKE per token dengan OR logic.
-    Setiap token dicek di judul/deskripsi/contoh_lapangan.
-    Diurutkan berdasarkan skor yang memprioritaskan match di judul lebih tinggi.
-
-    FIX: Bobot match:
-      - judul match  = 3 poin (paling relevan)
-      - deskripsi    = 2 poin
-      - contoh_lapangan = 1 poin (paling longgar, kurangi bobotnya)
-    Ini mencegah item yang hanya kebetulan muncul di contoh_lapangan
-    menyerobot item yang judul-nya benar-benar cocok.
+    Fallback / Progressive Relaxation: SQL ILIKE per token dengan OR logic dan weighted scoring.
+    Setiap token dicek di kode/judul/deskripsi/contoh_lapangan.
+    Diurutkan berdasarkan skor:
+      - kode match = 5 poin
+      - judul match = 4 poin
+      - contoh_lapangan match = 2 poin
+      - deskripsi match = 1 poin
+    Jika core_activity ada, beri bonus kecocokan frasa inti.
     """
-    if not tokens:
+    if not tokens and not core_activity:
         return []
 
+    tokens = [t for t in tokens if t]
     score_parts = []
     params = []
+
+    # Optional core activity phrase match bonus
+    if core_activity and len(core_activity) >= 3:
+        core_pat = f"%{core_activity}%"
+        score_parts.append(
+            "(CASE WHEN kode ILIKE %s THEN 8 "
+            "WHEN judul ILIKE %s THEN 8 "
+            f"WHEN (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 4 "
+            "WHEN deskripsi ILIKE %s THEN 2 "
+            "ELSE 0 END)"
+        )
+        params.extend([core_pat, core_pat, core_pat, core_pat])
+
     for token in tokens:
         pat = f"%{token}%"
-        # Skor berbobot: judul=3, deskripsi=2, contoh_lapangan=1
+        # Skor berbobot: kode=5, judul=4, contoh_lapangan=2, deskripsi=1
         score_parts.append(
-            "(CASE WHEN kode ILIKE %s THEN 4 "
-            "WHEN judul ILIKE %s THEN 3 "
-            "WHEN deskripsi ILIKE %s THEN 2 "
-            f"WHEN (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 1 "
+            "(CASE WHEN kode ILIKE %s THEN 5 "
+            "WHEN judul ILIKE %s THEN 4 "
+            f"WHEN (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1) THEN 2 "
+            "WHEN deskripsi ILIKE %s THEN 1 "
             "ELSE 0 END)"
         )
         params.extend([pat, pat, pat, pat])
@@ -72,6 +84,14 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
     # OR conditions untuk WHERE
     or_conditions = []
     where_params = []
+    if core_activity and len(core_activity) >= 3:
+        core_pat = f"%{core_activity}%"
+        or_conditions.append(
+            "(kode ILIKE %s OR judul ILIKE %s OR deskripsi ILIKE %s "
+            f"OR (CAST(contoh_lapangan AS TEXT) ILIKE %s AND {1 if USE_CL else 0}=1))"
+        )
+        where_params.extend([core_pat, core_pat, core_pat, core_pat])
+
     for token in tokens:
         pat = f"%{token}%"
         or_conditions.append(
@@ -80,8 +100,8 @@ def _run_query_or_tokens(cursor, table: str, tokens: list, limit: int) -> list:
         )
         where_params.extend([pat, pat, pat, pat])
 
-    score_expr = " + ".join(score_parts)
-    where_expr = " OR ".join(or_conditions)
+    score_expr = " + ".join(score_parts) if score_parts else "0"
+    where_expr = " OR ".join(or_conditions) if or_conditions else "1=1"
 
     sql = f"""
         SELECT *, ({score_expr}) AS _match_score
@@ -246,25 +266,31 @@ def search_expansion(preprocessed: dict, limit: int = None, model: str = None) -
                         results.append({**r, "_source": "KBJI", "_boost": "and_expanded_groups"})
                         existing_ids.add(r.get("id"))
 
-            # Step 3: OR per expanded token (High Recall)
+            # Step 3: OR per token dengan progressive relaxation scoring
             # FIX: Jalankan HANYA jika Step 1 & 2 benar-benar kosong.
-            # Sebelumnya: berjalan jika len(results) < limit → mencemari hasil yang sudah ada.
-            # Sekarang: last resort saja — hanya jika sistem benar-benar tidak menemukan apapun.
-            if not results and augmented_expanded:
+            # Menggunakan scoring berbobot (judul > contoh_lapangan > deskripsi)
+            if not results and (augmented_expanded or tokens):
                 existing_ids_step3 = set()
+                core_activity = preprocessed.get("core_activity", "")
+                core_tokens = preprocessed.get("core_tokens", tokens)
+
+                # Prioritaskan tokens dan core_tokens untuk scoring
+                tokens_to_score = list(dict.fromkeys([t for t in (core_tokens or tokens) if len(t) >= 2]))
+                if not tokens_to_score:
+                    tokens_to_score = augmented_expanded
 
                 if model is None or model == "KBLI":
-                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, augmented_expanded, limit)
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, tokens_to_score, limit, core_activity=core_activity)
                     for r in rows:
                         if r.get("id") not in existing_ids_step3:
-                            results.append({**r, "_source": "KBLI", "_boost": "or_expanded_fallback"})
+                            results.append({**r, "_source": "KBLI", "_boost": "or_relaxed_scoring"})
                             existing_ids_step3.add(r.get("id"))
 
                 if model is None or model == "KBJI":
-                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, augmented_expanded, limit)
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, tokens_to_score, limit, core_activity=core_activity)
                     for r in rows:
                         if r.get("id") not in existing_ids_step3:
-                            results.append({**r, "_source": "KBJI", "_boost": "or_expanded_fallback"})
+                            results.append({**r, "_source": "KBJI", "_boost": "or_relaxed_scoring"})
                             existing_ids_step3.add(r.get("id"))
     finally:
         release_connection(conn)
@@ -418,6 +444,16 @@ def search_multi_token(preprocessed: dict, limit: int = None, model: str = None,
                 cur.execute(sql, params)
                 rows = cur.fetchall()
                 results.extend([{**r, "_source": "KBJI"} for r in rows])
+
+            # Progressive relaxation fallback jika AND kosong dan tokens > 1
+            if not results and len(tokens) > 1:
+                core_act = preprocessed.get("core_activity", "")
+                if model is None or model == "KBLI":
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBLI, tokens, limit, core_activity=core_act)
+                    results.extend([{**r, "_source": "KBLI", "_boost": "relaxed_multi_token"} for r in rows])
+                if model is None or model == "KBJI":
+                    rows = _run_query_or_tokens(cur, Settings.TABLE_KBJI, tokens, limit, core_activity=core_act)
+                    results.extend([{**r, "_source": "KBJI", "_boost": "relaxed_multi_token"} for r in rows])
     finally:
         conn.close()
 
