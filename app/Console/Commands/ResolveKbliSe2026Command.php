@@ -55,7 +55,7 @@ class ResolveKbliSe2026Command extends Command
      */
     public function handle(SearchService $searchService): int
     {
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '-1');
 
         $sample = $this->option('sample') ? (int) $this->option('sample') : null;
         $fileOption = $this->option('file');
@@ -93,7 +93,19 @@ class ResolveKbliSe2026Command extends Command
         $kbli2020 = PgKBLI2020::pluck('judul', 'kode')->toArray();
         $this->line("Loaded " . count($kbli2025) . " KBLI 2025 records and " . count($kbli2020) . " KBLI 2020 records.");
 
-        // 3. Process each file
+        // 3. In-memory search cache to speed up repeated queries across 14,000+ rows
+        $searchMemoryCache = [];
+        $searchCached = function (string $query, int $limit = 3, ?string $cat = null) use ($searchService, &$searchMemoryCache) {
+            $key = $query . '|' . $limit . '|' . ($cat ?? '');
+            if (isset($searchMemoryCache[$key])) {
+                return $searchMemoryCache[$key];
+            }
+            $res = $searchService->search($query, $limit, 'KBLI', false, $cat);
+            $searchMemoryCache[$key] = $res;
+            return $res;
+        };
+
+        // 4. Process each file
         foreach ($filesToProcess as $inputFile) {
             $this->info("\nProcessing file: " . basename($inputFile));
             $startTime = microtime(true);
@@ -190,7 +202,7 @@ class ResolveKbliSe2026Command extends Command
                     // 1. Coba pencarian dengan nama usaha yang bersih jika ringkas & informatif
                     $wordCountNama = count(array_filter(explode(' ', $cleanedNama)));
                     if (!empty($cleanedNama) && $wordCountNama >= 1 && $wordCountNama <= 5) {
-                        $resNama = $searchService->search($cleanedNama, 3, 'KBLI', false, null);
+                        $resNama = $searchCached($cleanedNama, 3, null);
                         foreach ($resNama as $r) {
                             $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
                             if ($k && !isset($seenCodes[$k])) {
@@ -206,7 +218,7 @@ class ResolveKbliSe2026Command extends Command
                         $combinedQuery = $cleanedUraian ?: $cleanedNama;
                     }
 
-                    $resCombined = $searchService->search($combinedQuery, 3, 'KBLI', false, $categoryHint);
+                    $resCombined = $searchCached($combinedQuery, 3, $categoryHint);
                     foreach ($resCombined as $r) {
                         $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
                         if ($k && !isset($seenCodes[$k])) {
@@ -217,7 +229,7 @@ class ResolveKbliSe2026Command extends Command
 
                     // 3. Fallback unconstrained jika masih kosong
                     if (empty($searchResults)) {
-                        $resFallback = $searchService->search($combinedQuery, 3, 'KBLI', false, null);
+                        $resFallback = $searchCached($combinedQuery, 3, null);
                         foreach ($resFallback as $r) {
                             $k = is_array($r) ? ($r['kode'] ?? '') : ($r->kode ?? '');
                             if ($k && !isset($seenCodes[$k])) {
