@@ -62,14 +62,18 @@ All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-22
 - **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow, Default Fasih, Skip Action, Koreksi Riwayat & Sheet Template Bot)**:
-  - **Sheet "template bot" untuk Bot RPA Fasih (Hanya Data Selesai Dikerjakan)**:
+  - **Sheet "template bot" untuk Bot RPA Fasih (Mode Murni Append-Only & Proteksi Modifikasi Manual)**:
     - Menambahkan sheet pendamping bernama `template bot` di spreadsheet verifikasi dengan format 3 kolom wajib bot RPA: `assignment_id`, `kbli_baru`, dan `remark`.
-    - **Filter Data Selesai**: Sheet ini secara eksklusif hanya memuat baris-baris penugasan yang telah diselesaikan oleh verifikator (berstatus `Selesai`), sehingga data yang belum dikerjakan tidak masuk ke antrean bot RPA.
+    - **Proteksi Data Modifikasi Manual (Murni Append-Only)**:
+      - Menghapus pembersihan sheet (`.clear()`) sepenuhnya.
+      - Membaca seluruh `assignment_id` yang sudah ada di sheet `template bot`.
+      - **Hanya menambahkan (*append*) baris penugasan selesai baru** yang belum ada di sheet `template bot`.
+      - Baris-baris penugasan yang sudah ada dan telah diubah/diperbaiki manual oleh pengguna **dijamin 100% utuh dan tidak akan pernah ditimpa atau dihapus**.
     - **Logika RPA Bot**:
       - Jika KBLI lama (Fasih) sama dengan KBLI baru (hasil verifikasi/rekomendasi): kolom `kbli_baru` dikosongkan (`""`) dan `remark` diisi `"#0"`.
       - Jika KBLI lama berbeda dengan KBLI baru: kolom `kbli_baru` memuat kode KBLI 5 digit baru dan `remark` diisi `"#1"`.
-    - **Sinkronisasi Real-Time (`syncRowToTemplateBot`)**: Setiap kali verifikator menyelesaikan penugasan baru atau mengoreksi penugasan, baris penugasan tersebut langsung otomatis ditambahkan / diperbarui secara instan di sheet `template bot`.
-    - **Generator Manual & Otomatis**: Generator dapat dijalankan melalui menu Spreadsheet (`⚡ PINTAR KBLI > 🤖 Buat / Perbarui Sheet "template bot"`) atau tombol `🤖 Template Bot` di header Verifikator 5 Baris.
+    - **Sinkronisasi Real-Time (`syncRowToTemplateBot`)**: Setiap kali verifikator menyelesaikan penugasan baru di antarmuka Verifikator 5 Baris, baris penugasan tersebut hanya di-append jika belum ada di sheet `template bot`.
+    - **Menu & Tombol Generator Aman**: Tersedia di menu Spreadsheet (`⚡ PINTAR KBLI > 🤖 Tambahkan Data Selesai ke "template bot" (Append Only)`) dan tombol `🤖 Template Bot` pada UI modal verifikator.
   - **Dataset Merging & Google Drive Upload**: Menggabungkan seluruh hasil resolusi anomali SE2026 (`storage/app/se2026_resolved/*.xlsx`, total 14.246 baris data) menjadi satu dataset gabungan (`merged_se2026_cleaning_dataset.csv`) dan mengunggahnya ke Google Drive sebagai Google Spreadsheet (`PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`) di folder KBLI melalui `python/utils/upload_google_spreadsheet.py`.
   - **Container-Bound Apps Script Deployment**: Implementasi automation script `python/utils/deploy_apps_script.py` untuk mengunggah dan mendeploy script project bound langsung ke Google Spreadsheet target via Google Apps Script API.
   - **Repository Clean-Up (.gitignore)**: Mengabaikan seluruh isi folder lokal `KBLI SE2026/` dari pelacakan git remote repository (GitHub) untuk menjaga kerahasiaan berkas survei internal, dengan tetap mendukung deployment otomatis ke Google Apps Script via script `deploy_apps_script.py`.
