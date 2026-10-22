@@ -1,0 +1,2204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Verifikator 5 Baris KBLI SE2026 - PINTAR KBLI</title>
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --primary-hover: #172554;
+      --primary-light: #2563EB;
+      --primary-subtle: #EFF6FF;
+      --accent-green: #16A34A;
+      --accent-green-hover: #15803D;
+      --accent-green-bg: #DCFCE7;
+      --accent-green-border: #86EFAC;
+      --accent-red: #DC2626;
+      --accent-red-bg: #FEE2E2;
+      --accent-orange: #EA580C;
+      --accent-orange-bg: #FFEDD5;
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --border-dark: #CBD5E1;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 12px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+      color: #FFFFFF;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #E0F2FE;
+      color: #0369A1;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: #F1F5F9;
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: #FFFFFF;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+      font-weight: 700;
+    }
+
+    /* Top Controls Group */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding: 7px 32px 7px 12px;
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #FFFFFF;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .select-wrapper select:focus {
+      border-color: var(--primary-light);
+    }
+
+    .select-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .btn-user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-subtle);
+      border: 1px solid #BFDBFE;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-user-badge:hover {
+      background: #DBEAFE;
+    }
+
+    .btn-user-badge span.action {
+      font-weight: 500;
+      font-size: 11px;
+      color: #2563EB;
+      text-decoration: underline;
+    }
+
+    /* Filter & Status Bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filter-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .stat-pill strong {
+      color: var(--text-main);
+      font-weight: 800;
+    }
+
+    .stat-pill.highlight strong {
+      color: var(--accent-orange);
+    }
+
+    .stat-pill.success strong {
+      color: var(--accent-green);
+    }
+
+    .filter-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--text-main);
+      border: 1px solid var(--border-dark);
+    }
+
+    .btn-secondary:hover {
+      background: #F1F5F9;
+    }
+
+    .btn-success {
+      background: var(--accent-green);
+      color: #FFFFFF;
+    }
+
+    .btn-success:hover {
+      background: var(--accent-green-hover);
+    }
+
+    .btn-fasih {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+    }
+
+    .btn-fasih:hover {
+      background: #DBEAFE;
+      border-color: #93C5FD;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Assignment Cards List */
+    .batch-cards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .assignment-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      position: relative;
+    }
+
+    .assignment-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: #CBD5E1;
+    }
+
+    /* Card Completed State */
+    .assignment-card.completed {
+      background: #F0FDF4;
+      border-color: var(--accent-green-border);
+      box-shadow: 0 2px 10px rgba(22, 163, 74, 0.08);
+    }
+
+    /* Card Saving State */
+    .assignment-card.saving {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    /* Card Header Meta Badges */
+    .card-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .card-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #F1F5F9;
+      color: #475569;
+    }
+
+    .tag.tag-no {
+      background: #1E3A8A;
+      color: #FFFFFF;
+      font-size: 12px;
+    }
+
+    .tag.tag-kec {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .tag.tag-desa {
+      background: #E0E7FF;
+      color: #3730A3;
+    }
+
+    .tag.tag-sls {
+      background: #F3E8FF;
+      color: #6B21A8;
+    }
+
+    .tag.tag-id {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      color: #64748B;
+      font-family: monospace;
+      font-size: 10px;
+    }
+
+    .card-status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #FEF3C7;
+      color: #B45309;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-status-badge.done {
+      background: #DCFCE7;
+      color: #15803D;
+    }
+
+    /* Card Main Content */
+    .card-content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .usaha-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .uraian-box {
+      background: #F8FAFC;
+      border-left: 3px solid #3B82F6;
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .uraian-box strong {
+      color: #1E3A8A;
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    /* Comparison Section (Current KBLI vs Recommendations) */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    @media (max-width: 860px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kbli-col-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Current KBLI Box */
+    .kbli-current-box {
+      background: #F1F5F9;
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .kbli-current-code {
+      font-size: 14px;
+      font-weight: 800;
+      color: #334155;
+      font-family: monospace;
+      margin-bottom: 2px;
+    }
+
+    .kbli-current-title {
+      font-size: 12px;
+      color: #64748B;
+      line-height: 1.35;
+    }
+
+    /* Recommendations Chips List */
+    .rec-chips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .rec-chip {
+      background: #F0F9FF;
+      border: 1px solid #BAE6FD;
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .rec-chip:hover {
+      background: #E0F2FE;
+      border-color: #7DD3FC;
+      transform: translateX(2px);
+    }
+
+    .rec-chip.rec-1 {
+      background: #EFF6FF;
+      border: 2px solid #3B82F6;
+      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .rec-chip.rec-1:hover {
+      background: #DBEAFE;
+      border-color: #2563EB;
+    }
+
+    .rec-chip-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rec-chip-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .rec-badge-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #BFDBFE;
+      color: #1E40AF;
+    }
+
+    .rec-chip.rec-1 .rec-badge-label {
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+
+    .rec-code {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0F172A;
+      font-family: monospace;
+    }
+
+    .rec-conf {
+      font-size: 10px;
+      font-weight: 700;
+      color: #0284C7;
+      background: #E0F2FE;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .rec-chip.rec-1 .rec-conf {
+      color: #1D4ED8;
+      background: #DBEAFE;
+    }
+
+    .rec-title {
+      font-size: 11px;
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .rec-chip-action {
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563EB;
+      white-space: nowrap;
+      padding: 3px 6px;
+      border-radius: 5px;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    /* Verification Form Action Bar */
+    .card-action-bar {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .input-verification-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .input-verification-group label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1E293B;
+      white-space: nowrap;
+    }
+
+    .input-kbli-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .input-kbli {
+      width: 140px;
+      padding: 8px 12px;
+      border: 2px solid #3B82F6;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F172A;
+      font-family: monospace;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.15s ease;
+      background: #FFFFFF;
+    }
+
+    .input-kbli:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .action-buttons-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Success Feedback View on Completed Card */
+    .success-feedback-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: #DCFCE7;
+      border: 1px solid #86EFAC;
+      border-radius: 8px;
+      padding: 10px 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .success-feedback-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #15803D;
+    }
+
+    .success-feedback-meta {
+      font-size: 11px;
+      font-weight: 500;
+      color: #166534;
+    }
+
+    /* Bottom Pagination Bar */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination-info {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Modal User Name */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .modal-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-body input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border-dark);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .modal-body input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Monitoring Tab View */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .stats-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-card-value {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-main);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .kpi-card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .kpi-primary .kpi-card-value { color: var(--primary); }
+    .kpi-success .kpi-card-value { color: var(--accent-green); }
+    .kpi-orange .kpi-card-value { color: var(--accent-orange); }
+
+    .monitoring-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .monitoring-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-box-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-monitoring {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .table-monitoring th {
+      text-align: left;
+      padding: 8px 10px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .table-monitoring td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+    }
+
+    .table-monitoring tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .badge-rank {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+      background: #E2E8F0;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .badge-rank.rank-1 { background: #FEF08A; color: #854D0E; }
+    .badge-rank.rank-2 { background: #E2E8F0; color: #475569; }
+    .badge-rank.rank-3 { background: #FFEDD5; color: #9A3412; }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #1E293B;
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeIn 0.2s ease;
+      pointer-events: auto;
+    }
+
+    .toast.success { background: #15803D; }
+    .toast.error { background: #DC2626; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Skeleton Loading Placeholder */
+    .skeleton-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .skeleton-line {
+      height: 14px;
+      background: #E2E8F0;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: #FFFFFF;
+      border: 2px dashed var(--border-dark);
+      border-radius: 14px;
+      padding: 40px 20px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="brand-section">
+      <div class="brand-logo">⚡</div>
+      <div>
+        <div class="brand-title">
+          PINTAR KBLI
+          <span class="brand-badge">SE2026 Demak</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tabBtnVerifier" onclick="switchTab('verifier')">
+        📋 Verifikasi (5 Baris)
+      </button>
+      <button class="tab-btn" id="tabBtnMonitoring" onclick="switchTab('monitoring')">
+        📊 Rekap Monitoring
+      </button>
+    </div>
+
+    <!-- Top Controls: Sheet, Kecamatan, User Badge -->
+    <div class="top-controls">
+      <div class="select-wrapper" title="Pilih Sheet Target">
+        <select id="sheetSelect" onchange="onSheetChange()">
+          <option value="ALL">Semua Sheet</option>
+        </select>
+      </div>
+
+      <div class="select-wrapper" title="Filter Kecamatan">
+        <select id="kecSelect" onchange="onKecChange()">
+          <option value="ALL">Semua Kecamatan (14)</option>
+        </select>
+      </div>
+
+      <button class="btn-user-badge" id="btnUserBadge" onclick="openNameModal()" title="Klik untuk mengganti nama verifikator">
+        👤 <span id="currentUserNameLabel">Petugas</span>
+        <span class="action">(Ganti)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TAB 1: BATCH 5 VERIFIER VIEW -->
+  <main id="viewVerifier" class="tab-content active">
+
+    <!-- Filter & Progress Summary Bar -->
+    <div class="filter-bar">
+      <div class="filter-stats">
+        <div class="stat-pill highlight">
+          <span>Sisa Data:</span>
+          <strong id="statRemaining">-</strong>
+        </div>
+        <div class="stat-pill success">
+          <span>Selesai Sesi Ini:</span>
+          <strong id="statSessionDone">0</strong>
+        </div>
+        <div class="stat-pill">
+          <span>Batch:</span>
+          <strong id="statBatchCount">5 Assignment</strong>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-secondary" onclick="loadBatchData(true)" title="Segarkan dan muat ulang 5 data dari awal">
+          🔄 Muat Ulang
+        </button>
+        <button class="btn btn-primary" id="btnNextBatchTop" onclick="loadBatchData(false)" title="Muat 5 data berikutnya yang belum selesai">
+          ➡️ Muat 5 Data Berikutnya
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards Container (5 Assignments) -->
+    <div id="cardsContainer" class="batch-cards-container">
+      <!-- Loading Skeleton Cards will appear here on initial load -->
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="width: 30%;"></div>
+        <div class="skeleton-line" style="width: 70%; height: 22px;"></div>
+        <div class="skeleton-line" style="width: 100%; height: 50px;"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line" style="width: 30%;"></div>
+        <div class="skeleton-line" style="width: 70%; height: 22px;"></div>
+        <div class="skeleton-line" style="width: 100%; height: 50px;"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Pagination / Next Action Bar -->
+    <div class="pagination-bar" id="paginationBar">
+      <div class="pagination-info" id="paginationInfo">
+        Menampilkan 5 assignment batch verifikasi aktif.
+      </div>
+      <div>
+        <button class="btn btn-primary" id="btnNextBatchBottom" onclick="loadBatchData(false)">
+          ➡️ Muat 5 Data Berikutnya
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- TAB 2: MONITORING & LEADERBOARD VIEW -->
+  <section id="viewMonitoring" class="tab-content">
+    <div class="filter-bar">
+      <div class="filter-stats">
+        <span class="stat-pill">📊 Ringkasan Progress Pembersihan KBLI SE2026</span>
+        <span class="stat-pill">Terakhir Diperbarui: <strong id="monitoringLastUpdated">-</strong></span>
+      </div>
+      <div>
+        <button class="btn btn-secondary" onclick="loadMonitoringData()">
+          🔄 Segarkan Rekap
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="stats-kpi-grid">
+      <div class="kpi-card kpi-primary">
+        <div class="kpi-card-title">Total Data Target</div>
+        <div class="kpi-card-value" id="kpiTotal">-</div>
+        <div class="kpi-card-desc">Baris anomali KBLI SE2026</div>
+      </div>
+      <div class="kpi-card kpi-success">
+        <div class="kpi-card-title">Total Selesai</div>
+        <div class="kpi-card-value" id="kpiDone">-</div>
+        <div class="kpi-card-desc" id="kpiPercentDone">0% dari keseluruhan target</div>
+      </div>
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-card-title">Sisa Belum Selesai</div>
+        <div class="kpi-card-value" id="kpiRemaining">-</div>
+        <div class="kpi-card-desc">Memerlukan verifikasi lanjutan</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-title">Kontribusi Anda</div>
+        <div class="kpi-card-value" id="kpiMyDone">-</div>
+        <div class="kpi-card-desc" id="kpiMyUserLabel">Diverifikasi atas nama Anda</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard & Details Grid -->
+    <div class="monitoring-grid">
+      <!-- Petugas Leaderboard -->
+      <div class="panel-box">
+        <div class="panel-box-title">
+          <span>🏆 Pengerjaan per Petugas (Leaderboard)</span>
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);" id="leaderboardTotalPetugas">0 Petugas Aktif</span>
+        </div>
+        <table class="table-monitoring">
+          <thead>
+            <tr>
+              <th style="width: 38px;">#</th>
+              <th>Nama Petugas</th>
+              <th style="text-align: right;">Selesai</th>
+              <th style="text-align: right;">Porsi (%)</th>
+            </tr>
+          </thead>
+          <tbody id="petugasLeaderboardBody">
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                Memuat data leaderboard...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Kecamatan Progress Breakdown -->
+      <div class="panel-box">
+        <div class="panel-box-title">
+          <span>📍 Progres per Kecamatan</span>
+        </div>
+        <table class="table-monitoring">
+          <thead>
+            <tr>
+              <th>Kecamatan</th>
+              <th style="text-align: right;">Total</th>
+              <th style="text-align: right;">Selesai</th>
+              <th style="text-align: right;">Sisa</th>
+              <th style="text-align: right;">Progres</th>
+            </tr>
+          </thead>
+          <tbody id="kecamatanProgressBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">
+                Memuat progres kecamatan...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal Dialog: Input/Ganti Nama Petugas -->
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>👤 Identitas Petugas Verifikator</h3>
+      <p>Masukkan nama lengkap atau inisial Anda. Setiap pengerjaan verifikasi akan dicatat atas nama ini.</p>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="inputPetugasName" placeholder="Contoh: Budi Santoso / Tim SE Demak" maxlength="50" onkeyup="handleNameInputKey(event)">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="btnCancelNameModal" onclick="closeNameModal()" style="display: none;">Batal</button>
+      <button class="btn btn-primary" onclick="savePetugasName()">Simpan & Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  /**
+   * =========================================================================
+   * PINTAR KBLI - FRONTEND BATCH VERIFIER CONTROLLER
+   * Handles user onboarding, 5-row batch loading, auto-default KBLI input,
+   * Fasih-SM linking, single-click submission, and monitoring recap.
+   * =========================================================================
+   */
+
+  // State
+  var state = {
+    userName: '',
+    currentSheet: '',
+    currentKec: 'ALL',
+    startIndex: 2,
+    sessionDoneCount: 0,
+    totalRemaining: 0,
+    currentItems: [],
+    isLoadingBatch: false
+  };
+
+  // 14 Kecamatan di Kabupaten Demak sebagai default
+  var DEMAK_KECAMATAN = [
+    'Bonang', 'Demak', 'Dempet', 'Gajah', 'Guntur',
+    'Karanganyar', 'Karangawen', 'Karangtengah', 'Kebonagung',
+    'Mijen', 'Mranggen', 'Sayung', 'Wedung', 'Wonosalam'
+  ];
+
+  /**
+   * Inisialisasi saat halaman dimuat
+   */
+  window.addEventListener('DOMContentLoaded', function() {
+    initUserIdentity();
+    initKecamatanDropdown();
+    initSheetsDropdown();
+    loadBatchData(true);
+  });
+
+  /**
+   * 1. IDENTITAS PENGGUNA (LOCALSTORAGE & MODAL)
+   */
+  function initUserIdentity() {
+    var savedName = localStorage.getItem('se2026_petugas_name');
+    if (savedName && savedName.trim()) {
+      state.userName = savedName.trim();
+      updateUserBadge();
+    } else {
+      openNameModal(true); // Wajib diisi jika baru pertama kali
+    }
+  }
+
+  function updateUserBadge() {
+    var label = document.getElementById('currentUserNameLabel');
+    if (label) {
+      label.textContent = state.userName || 'Petugas';
+    }
+    var kpiLabel = document.getElementById('kpiMyUserLabel');
+    if (kpiLabel) {
+      kpiLabel.textContent = 'Diverifikasi atas nama: ' + (state.userName || 'Anda');
+    }
+  }
+
+  function openNameModal(isMandatory) {
+    var modal = document.getElementById('nameModal');
+    var input = document.getElementById('inputPetugasName');
+    var cancelBtn = document.getElementById('btnCancelNameModal');
+
+    if (input) {
+      input.value = state.userName || '';
+    }
+    if (cancelBtn) {
+      cancelBtn.style.display = isMandatory ? 'none' : 'inline-flex';
+    }
+    if (modal) {
+      modal.classList.add('open');
+      setTimeout(function() {
+        if (input) input.focus();
+      }, 100);
+    }
+  }
+
+  function closeNameModal() {
+    var modal = document.getElementById('nameModal');
+    if (modal) {
+      modal.classList.remove('open');
+    }
+  }
+
+  function handleNameInputKey(e) {
+    if (e.key === 'Enter') {
+      savePetugasName();
+    }
+  }
+
+  function savePetugasName() {
+    var input = document.getElementById('inputPetugasName');
+    var val = input ? input.value.trim() : '';
+
+    if (!val) {
+      showToast('Harap masukkan nama petugas verifikator.', 'error');
+      return;
+    }
+
+    state.userName = val;
+    localStorage.setItem('se2026_petugas_name', val);
+    updateUserBadge();
+    closeNameModal();
+    showToast('Identitas tersimpan: ' + val, 'success');
+  }
+
+  /**
+   * 2. DROPDOWN KECAMATAN & SHEET
+   */
+  function initKecamatanDropdown() {
+    var sel = document.getElementById('kecSelect');
+    if (!sel) return;
+
+    // Bersihkan kecuali opsi pertama (ALL)
+    sel.innerHTML = '<option value="ALL">Semua Kecamatan (14)</option>';
+    DEMAK_KECAMATAN.forEach(function(kec) {
+      var opt = document.createElement('option');
+      opt.value = kec;
+      opt.textContent = 'Kec. ' + kec;
+      sel.appendChild(opt);
+    });
+
+    // Panggil backend GAS jika tersedia untuk daftar dinamis dari sheet
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(list) {
+          if (list && list.length > 0) {
+            sel.innerHTML = '<option value="ALL">Semua Kecamatan (' + list.length + ')</option>';
+            list.forEach(function(kec) {
+              var opt = document.createElement('option');
+              opt.value = kec;
+              opt.textContent = 'Kec. ' + kec;
+              sel.appendChild(opt);
+            });
+            if (state.currentKec) {
+              sel.value = state.currentKec;
+            }
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Gagal memuat kecamatan dinamis, gunakan default Demak:', err);
+        })
+        .getKecamatanList(state.currentSheet);
+    }
+  }
+
+  function initSheetsDropdown() {
+    var sel = document.getElementById('sheetSelect');
+    if (!sel) return;
+
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(sheets) {
+          if (sheets && sheets.length > 0) {
+            sel.innerHTML = '';
+            sheets.forEach(function(name, idx) {
+              var opt = document.createElement('option');
+              opt.value = name;
+              opt.textContent = '📄 ' + name;
+              if (idx === 0) {
+                opt.selected = true;
+                state.currentSheet = name;
+              }
+              sel.appendChild(opt);
+            });
+          }
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Gagal memuat daftar sheet:', err);
+        })
+        .getSheetsList();
+    }
+  }
+
+  function onSheetChange() {
+    var sel = document.getElementById('sheetSelect');
+    if (sel) {
+      state.currentSheet = sel.value;
+      initKecamatanDropdown();
+      loadBatchData(true);
+    }
+  }
+
+  function onKecChange() {
+    var sel = document.getElementById('kecSelect');
+    if (sel) {
+      state.currentKec = sel.value;
+      loadBatchData(true);
+    }
+  }
+
+  /**
+   * 3. TAB NAVIGATION
+   */
+  function switchTab(tabId) {
+    var btnVer = document.getElementById('tabBtnVerifier');
+    var btnMon = document.getElementById('tabBtnMonitoring');
+    var viewVer = document.getElementById('viewVerifier');
+    var viewMon = document.getElementById('viewMonitoring');
+
+    if (tabId === 'verifier') {
+      if (btnVer) btnVer.classList.add('active');
+      if (btnMon) btnMon.classList.remove('active');
+      if (viewVer) viewVer.classList.add('active');
+      if (viewMon) viewMon.classList.remove('active');
+    } else {
+      if (btnVer) btnVer.classList.remove('active');
+      if (btnMon) btnMon.classList.add('active');
+      if (viewVer) viewVer.classList.remove('active');
+      if (viewMon) viewMon.classList.add('active');
+      loadMonitoringData();
+    }
+  }
+
+  /**
+   * 4. BATCH 5 DATA LOADING
+   */
+  function loadBatchData(resetIndex) {
+    if (state.isLoadingBatch) return;
+    state.isLoadingBatch = true;
+
+    if (resetIndex) {
+      state.startIndex = 2;
+    }
+
+    setButtonsLoading(true);
+    renderSkeletonCards();
+
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(response) {
+          state.isLoadingBatch = false;
+          setButtonsLoading(false);
+          handleBatchResponse(response);
+        })
+        .withFailureHandler(function(err) {
+          state.isLoadingBatch = false;
+          setButtonsLoading(false);
+          showToast('Gagal memuat data: ' + (err.message || err), 'error');
+          renderEmptyState('Terjadi kesalahan saat memuat data. Silakan coba klik Muat Ulang.');
+        })
+        .get5Assignments(state.currentSheet, state.userName, state.currentKec, state.startIndex);
+    } else {
+      // Mock data untuk pengujian lokal di browser tanpa Google Apps Script backend
+      setTimeout(function() {
+        state.isLoadingBatch = false;
+        setButtonsLoading(false);
+        var mockResponse = getMockBatchResponse();
+        handleBatchResponse(mockResponse);
+      }, 500);
+    }
+  }
+
+  function setButtonsLoading(isLoading) {
+    var btnTop = document.getElementById('btnNextBatchTop');
+    var btnBtm = document.getElementById('btnNextBatchBottom');
+    if (btnTop) {
+      btnTop.disabled = isLoading;
+      btnTop.textContent = isLoading ? '⏳ Memuat...' : '➡️ Muat 5 Data Berikutnya';
+    }
+    if (btnBtm) {
+      btnBtm.disabled = isLoading;
+      btnBtm.textContent = isLoading ? '⏳ Memuat...' : '➡️ Muat 5 Data Berikutnya';
+    }
+  }
+
+  function handleBatchResponse(response) {
+    if (!response || !response.success) {
+      var msg = (response && response.message) ? response.message : 'Gagal memuat batch data.';
+      showToast(msg, 'error');
+      renderEmptyState(msg);
+      return;
+    }
+
+    state.currentItems = response.items || [];
+    state.totalRemaining = response.totalRemaining || 0;
+    if (response.nextStartIndex && response.nextStartIndex > 0) {
+      state.startIndex = response.nextStartIndex;
+    }
+
+    updateHeaderStats();
+
+    if (state.currentItems.length === 0) {
+      renderEmptyState('Semua data verifikasi untuk filter ini telah selesai dikerjakan! 🎉');
+      return;
+    }
+
+    renderAssignmentCards(state.currentItems);
+  }
+
+  function updateHeaderStats() {
+    var statRem = document.getElementById('statRemaining');
+    if (statRem) statRem.textContent = state.totalRemaining.toLocaleString('id-ID');
+
+    var statDone = document.getElementById('statSessionDone');
+    if (statDone) statDone.textContent = state.sessionDoneCount.toLocaleString('id-ID');
+
+    var statBatch = document.getElementById('statBatchCount');
+    if (statBatch) statBatch.textContent = state.currentItems.length + ' Assignment';
+
+    var pagInfo = document.getElementById('paginationInfo');
+    if (pagInfo) {
+      pagInfo.textContent = 'Menampilkan ' + state.currentItems.length + ' data. Sisa antrean: ' + state.totalRemaining.toLocaleString('id-ID') + ' baris.';
+    }
+  }
+
+  /**
+   * 5. CARD RENDERING & AUTO-DEFAULT KBLI
+   */
+  function renderAssignmentCards(items) {
+    var container = document.getElementById('cardsContainer');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    items.forEach(function(item, index) {
+      var card = createCardElement(item, index);
+      container.appendChild(card);
+    });
+  }
+
+  function createCardElement(item, index) {
+    var card = document.createElement('div');
+    card.className = 'assignment-card';
+    card.id = 'card-' + item.rowIndex;
+
+    // Default KBLI yang Benar: otomatis diambil dari Rekomendasi 1 Code
+    var defaultKbli = item.rekomendasi_1_code || extractCode(item.rekomendasi_1) || '';
+
+    // Rekomendasi 1, 2, 3 chips markup
+    var recsHtml = '';
+
+    if (item.rekomendasi_1) {
+      recsHtml += `
+        <div class="rec-chip rec-1" onclick="applyRecommendation(${item.rowIndex}, '${escapeHtml(item.rekomendasi_1_code)}')" title="Klik untuk menerapkan Rekomendasi 1">
+          <div class="rec-chip-info">
+            <div class="rec-chip-header">
+              <span class="rec-badge-label">⭐ Rek 1</span>
+              <span class="rec-code">${escapeHtml(item.rekomendasi_1_code || '')}</span>
+              ${item.confidence_1 ? `<span class="rec-conf">${escapeHtml(item.confidence_1)}</span>` : ''}
+            </div>
+            <div class="rec-title">${escapeHtml(item.rekomendasi_1)}</div>
+          </div>
+          <div class="rec-chip-action">Gunakan ↵</div>
+        </div>
+      `;
+    }
+
+    if (item.rekomendasi_2) {
+      recsHtml += `
+        <div class="rec-chip" onclick="applyRecommendation(${item.rowIndex}, '${escapeHtml(item.rekomendasi_2_code)}')" title="Klik untuk menerapkan Rekomendasi 2">
+          <div class="rec-chip-info">
+            <div class="rec-chip-header">
+              <span class="rec-badge-label">Rek 2</span>
+              <span class="rec-code">${escapeHtml(item.rekomendasi_2_code || '')}</span>
+              ${item.confidence_2 ? `<span class="rec-conf">${escapeHtml(item.confidence_2)}</span>` : ''}
+            </div>
+            <div class="rec-title">${escapeHtml(item.rekomendasi_2)}</div>
+          </div>
+          <div class="rec-chip-action">Gunakan ↵</div>
+        </div>
+      `;
+    }
+
+    if (item.rekomendasi_3) {
+      recsHtml += `
+        <div class="rec-chip" onclick="applyRecommendation(${item.rowIndex}, '${escapeHtml(item.rekomendasi_3_code)}')" title="Klik untuk menerapkan Rekomendasi 3">
+          <div class="rec-chip-info">
+            <div class="rec-chip-header">
+              <span class="rec-badge-label">Rek 3</span>
+              <span class="rec-code">${escapeHtml(item.rekomendasi_3_code || '')}</span>
+              ${item.confidence_3 ? `<span class="rec-conf">${escapeHtml(item.confidence_3)}</span>` : ''}
+            </div>
+            <div class="rec-title">${escapeHtml(item.rekomendasi_3)}</div>
+          </div>
+          <div class="rec-chip-action">Gunakan ↵</div>
+        </div>
+      `;
+    }
+
+    if (!recsHtml) {
+      recsHtml = '<div style="font-size: 12px; color: var(--text-muted); font-style: italic;">Tidak ada rekomendasi otomatis.</div>';
+    }
+
+    card.innerHTML = `
+      <!-- Card Meta Badges -->
+      <div class="card-meta-bar">
+        <div class="card-tags">
+          <span class="tag tag-no">#${item.no || (index + 1)}</span>
+          <span class="tag tag-kec">📍 Kec. ${escapeHtml(item.kecamatan || '-')}</span>
+          <span class="tag tag-desa">Desa ${escapeHtml(item.desa || '-')}</span>
+          <span class="tag tag-sls">SLS ${escapeHtml(item.kode_sls || '-')}</span>
+          <span class="tag tag-id" title="Assignment ID">ID: ${escapeHtml(item.assignment_id || '-')}</span>
+        </div>
+        <div class="card-status-badge" id="statusBadge-${item.rowIndex}">
+          ⏳ Belum Diverifikasi
+        </div>
+      </div>
+
+      <!-- Main Business & Activity Narrative -->
+      <div class="card-content-grid">
+        <div>
+          <h2 class="usaha-title">${escapeHtml(item.nama_usaha || 'Tanpa Nama Usaha')}</h2>
+          <div class="uraian-box">
+            <strong>Uraian Kegiatan Usaha:</strong>
+            ${escapeHtml(item.uraian_kegiatan || '-')}
+          </div>
+        </div>
+
+        <!-- Comparison: Current vs Recommendations -->
+        <div class="comparison-grid">
+          <div>
+            <div class="kbli-col-title">📋 KBLI Saat Ini di Fasih</div>
+            <div class="kbli-current-box">
+              <div class="kbli-current-code">${escapeHtml(item.kbli_saat_ini || '-')}</div>
+              <div class="kbli-current-title">${escapeHtml(item.judul_kbli_saat_ini || 'Judul tidak tersedia')}</div>
+              ${item.rule_terpicu ? `<div style="font-size: 11px; color: #EA580C; font-weight: 700; margin-top: 6px;">⚠️ ${escapeHtml(item.rule_terpicu)}</div>` : ''}
+            </div>
+          </div>
+
+          <div>
+            <div class="kbli-col-title">💡 Rekomendasi PINTAR KBLI (Klik untuk Pilih)</div>
+            <div class="rec-chips-list">
+              ${recsHtml}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action & Submission Bar -->
+      <div class="card-action-bar" id="actionBar-${item.rowIndex}">
+        <div class="input-verification-group">
+          <label for="inputKbli-${item.rowIndex}">KBLI yang Benar:</label>
+          <div class="input-kbli-wrapper">
+            <input 
+              type="text" 
+              class="input-kbli" 
+              id="inputKbli-${item.rowIndex}" 
+              value="${escapeHtml(defaultKbli)}" 
+              placeholder="5 Digit" 
+              maxlength="5"
+              data-original-rec1="${escapeHtml(item.rekomendasi_1_code || '')}"
+            >
+          </div>
+          <span class="input-hint">💡 Default Rekomendasi 1 (${escapeHtml(item.rekomendasi_1_code || '-')}). Edit jika berbeda.</span>
+        </div>
+
+        <div class="action-buttons-group">
+          <a href="${escapeHtml(item.link_fasih_sm || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih" title="Buka form edit assignment langsung di aplikasi Fasih-SM BPS">
+            🔗 Buka Fasih
+          </a>
+          <button class="btn btn-success" id="btnSubmit-${item.rowIndex}" onclick="submitCard(${item.rowIndex})">
+            ✅ Selesai
+          </button>
+        </div>
+      </div>
+    `;
+
+    return card;
+  }
+
+  function applyRecommendation(rowIndex, code) {
+    if (!code) return;
+    var input = document.getElementById('inputKbli-' + rowIndex);
+    if (input) {
+      input.value = code;
+      input.focus();
+      input.style.backgroundColor = '#FEF08A';
+      setTimeout(function() {
+        input.style.backgroundColor = '#FFFFFF';
+      }, 300);
+      showToast('KBLI diganti ke Rekomendasi: ' + code, 'success');
+    }
+  }
+
+  /**
+   * 6. SUBMIT ASSIGNMENT VERIFICATION
+   */
+  function submitCard(rowIndex) {
+    var card = document.getElementById('card-' + rowIndex);
+    var input = document.getElementById('inputKbli-' + rowIndex);
+    var btnSubmit = document.getElementById('btnSubmit-' + rowIndex);
+
+    if (!input) return;
+
+    var finalKbli = input.value.trim();
+    var origRec1 = input.getAttribute('data-original-rec1') || '';
+
+    if (!finalKbli) {
+      showToast('Kode KBLI tidak boleh kosong. Harap isi 5 digit.', 'error');
+      input.focus();
+      return;
+    }
+
+    if (!state.userName) {
+      openNameModal(true);
+      return;
+    }
+
+    // Set UI visual loading
+    if (card) card.classList.add('saving');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = '⏳ Menyimpan...';
+    }
+
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (card) card.classList.remove('saving');
+          if (res && res.success) {
+            handleSaveSuccess(rowIndex, res.status_kbli, res.kbli_final_benar, res.petugas_verifikasi, res.waktu_selesai);
+          } else {
+            if (btnSubmit) {
+              btnSubmit.disabled = false;
+              btnSubmit.textContent = '✅ Selesai';
+            }
+            showToast('Gagal menyimpan: ' + (res.error || 'Terjadi kesalahan.'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (card) card.classList.remove('saving');
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = '✅ Selesai';
+          }
+          showToast('Error server: ' + (err.message || err), 'error');
+        })
+        .submitAssignment(state.currentSheet, rowIndex, state.userName, finalKbli, origRec1);
+    } else {
+      // Mock save untuk pengujian browser
+      setTimeout(function() {
+        if (card) card.classList.remove('saving');
+        var isMatch = (extractCode(finalKbli) === extractCode(origRec1));
+        var status = isMatch ? 'KBLI Sudah Benar Sesuai Rekomendasi 1' : ('KBLI Diubah ke: ' + finalKbli);
+        handleSaveSuccess(rowIndex, status, finalKbli, state.userName, '2026-10-22 09:00:00');
+      }, 400);
+    }
+  }
+
+  function handleSaveSuccess(rowIndex, statusKbli, finalKbli, petugas, waktu) {
+    var card = document.getElementById('card-' + rowIndex);
+    var actionBar = document.getElementById('actionBar-' + rowIndex);
+    var badge = document.getElementById('statusBadge-' + rowIndex);
+
+    if (card) {
+      card.classList.add('completed');
+    }
+
+    if (badge) {
+      badge.className = 'card-status-badge done';
+      badge.innerHTML = '✅ ' + escapeHtml(statusKbli);
+    }
+
+    if (actionBar) {
+      actionBar.innerHTML = `
+        <div class="success-feedback-box">
+          <div class="success-feedback-text">
+            <span>✅</span>
+            <div>
+              <div><strong>${escapeHtml(statusKbli)}</strong> (KBLI: <code>${escapeHtml(finalKbli)}</code>)</div>
+              <div class="success-feedback-meta">Diverifikasi oleh: <strong>${escapeHtml(petugas)}</strong> pada ${escapeHtml(waktu)}</div>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;" onclick="reEditCard(${rowIndex}, '${escapeHtml(finalKbli)}')">
+              ✏️ Koreksi Ulang
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    state.sessionDoneCount++;
+    if (state.totalRemaining > 0) state.totalRemaining--;
+    updateHeaderStats();
+
+    showToast('Tersimpan! ' + statusKbli, 'success');
+  }
+
+  function reEditCard(rowIndex, currentKbli) {
+    var card = document.getElementById('card-' + rowIndex);
+    var actionBar = document.getElementById('actionBar-' + rowIndex);
+    var badge = document.getElementById('statusBadge-' + rowIndex);
+
+    if (card) card.classList.remove('completed');
+    if (badge) {
+      badge.className = 'card-status-badge';
+      badge.innerHTML = '⏳ Belum Diverifikasi';
+    }
+
+    if (actionBar) {
+      actionBar.innerHTML = `
+        <div class="input-verification-group">
+          <label for="inputKbli-${rowIndex}">KBLI yang Benar:</label>
+          <div class="input-kbli-wrapper">
+            <input 
+              type="text" 
+              class="input-kbli" 
+              id="inputKbli-${rowIndex}" 
+              value="${escapeHtml(currentKbli)}" 
+              placeholder="5 Digit" 
+              maxlength="5"
+            >
+          </div>
+          <span class="input-hint">Koreksi kembali kode KBLI jika diperlukan.</span>
+        </div>
+        <div class="action-buttons-group">
+          <button class="btn btn-success" id="btnSubmit-${rowIndex}" onclick="submitCard(${rowIndex})">
+            ✅ Simpan Ulang
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * 7. MONITORING & LEADERBOARD TAB
+   */
+  function loadMonitoringData() {
+    var tablePetugas = document.getElementById('petugasLeaderboardBody');
+    var tableKec = document.getElementById('kecamatanProgressBody');
+
+    if (tablePetugas) {
+      tablePetugas.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">Memuat data leaderboard...</td></tr>';
+    }
+    if (tableKec) {
+      tableKec.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Memuat data progres...</td></tr>';
+    }
+
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          renderMonitoringDashboard(data);
+        })
+        .withFailureHandler(function(err) {
+          showToast('Gagal memuat monitoring: ' + (err.message || err), 'error');
+        })
+        .getMonitoringData(state.currentSheet, state.userName, state.currentKec);
+    } else {
+      // Mock data monitoring
+      setTimeout(function() {
+        renderMonitoringDashboard(getMockMonitoringData());
+      }, 400);
+    }
+  }
+
+  function renderMonitoringDashboard(data) {
+    if (!data) return;
+
+    // KPI
+    var elTotal = document.getElementById('kpiTotal');
+    var elDone = document.getElementById('kpiDone');
+    var elRemaining = document.getElementById('kpiRemaining');
+    var elMyDone = document.getElementById('kpiMyDone');
+    var elPercent = document.getElementById('kpiPercentDone');
+    var elLastUp = document.getElementById('monitoringLastUpdated');
+
+    var total = data.total || 0;
+    var done = data.done || 0;
+    var remaining = data.remaining || (total - done);
+    var myDone = data.myDone || 0;
+    var pct = total > 0 ? ((done / total) * 100).toFixed(1) : 0;
+
+    if (elTotal) elTotal.textContent = total.toLocaleString('id-ID');
+    if (elDone) elDone.textContent = done.toLocaleString('id-ID');
+    if (elRemaining) elRemaining.textContent = remaining.toLocaleString('id-ID');
+    if (elMyDone) elMyDone.textContent = myDone.toLocaleString('id-ID');
+    if (elPercent) elPercent.textContent = pct + '% selesai diverifikasi';
+    if (elLastUp) elLastUp.textContent = data.lastUpdated || '-';
+
+    // Petugas Leaderboard
+    var tablePetugas = document.getElementById('petugasLeaderboardBody');
+    var totalPetugasLabel = document.getElementById('leaderboardTotalPetugas');
+    var byPetugas = data.byPetugas || {};
+    var petugasArr = [];
+
+    for (var pet in byPetugas) {
+      petugasArr.push({ name: pet, count: byPetugas[pet] });
+    }
+    petugasArr.sort(function(a, b) { return b.count - a.count; });
+
+    if (totalPetugasLabel) {
+      totalPetugasLabel.textContent = petugasArr.length + ' Petugas Aktif';
+    }
+
+    if (tablePetugas) {
+      if (petugasArr.length === 0) {
+        tablePetugas.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">Belum ada pengerjaan verifikasi yang tercatat.</td></tr>';
+      } else {
+        var pHtml = '';
+        petugasArr.forEach(function(item, idx) {
+          var rank = idx + 1;
+          var rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
+          var sharePct = done > 0 ? ((item.count / done) * 100).toFixed(1) : 0;
+          var isMe = (state.userName && item.name.toLowerCase() === state.userName.toLowerCase());
+
+          pHtml += `
+            <tr style="${isMe ? 'background: #EFF6FF; font-weight: 700;' : ''}">
+              <td><span class="badge-rank ${rankClass}">${rank}</span></td>
+              <td>${escapeHtml(item.name)} ${isMe ? ' <span style="font-size: 10px; color: #2563EB;">(Anda)</span>' : ''}</td>
+              <td style="text-align: right; font-weight: 800;">${item.count.toLocaleString('id-ID')}</td>
+              <td style="text-align: right; color: var(--text-muted);">${sharePct}%</td>
+            </tr>
+          `;
+        });
+        tablePetugas.innerHTML = pHtml;
+      }
+    }
+
+    // Kecamatan Progress
+    var tableKec = document.getElementById('kecamatanProgressBody');
+    var byKec = data.byKecamatan || {};
+    var kecArr = [];
+
+    for (var k in byKec) {
+      kecArr.push({
+        kec: k,
+        total: byKec[k].total || 0,
+        done: byKec[k].done || 0,
+        remaining: byKec[k].remaining || 0
+      });
+    }
+    kecArr.sort(function(a, b) { return a.kec.localeCompare(b.kec); });
+
+    if (tableKec) {
+      if (kecArr.length === 0) {
+        tableKec.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Tidak ada data kecamatan.</td></tr>';
+      } else {
+        var kHtml = '';
+        kecArr.forEach(function(item) {
+          var kPct = item.total > 0 ? ((item.done / item.total) * 100).toFixed(1) : 0;
+          kHtml += `
+            <tr>
+              <td><strong>Kec. ${escapeHtml(item.kec)}</strong></td>
+              <td style="text-align: right;">${item.total.toLocaleString('id-ID')}</td>
+              <td style="text-align: right; font-weight: 700; color: var(--accent-green);">${item.done.toLocaleString('id-ID')}</td>
+              <td style="text-align: right; color: var(--accent-orange);">${item.remaining.toLocaleString('id-ID')}</td>
+              <td style="text-align: right; font-weight: 800;">${kPct}%</td>
+            </tr>
+          `;
+        });
+        tableKec.innerHTML = kHtml;
+      }
+    }
+  }
+
+  /**
+   * 8. UI HELPERS & SKELETON
+   */
+  function renderSkeletonCards() {
+    var container = document.getElementById('cardsContainer');
+    if (!container) return;
+    var html = '';
+    for (var i = 0; i < 5; i++) {
+      html += `
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="width: 25%;"></div>
+          <div class="skeleton-line" style="width: 60%; height: 20px;"></div>
+          <div class="skeleton-line" style="width: 100%; height: 42px;"></div>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  function renderEmptyState(message) {
+    var container = document.getElementById('cardsContainer');
+    if (!container) return;
+    container.innerHTML = `
+      <div class="empty-state">
+        <div style="font-size: 40px; margin-bottom: 12px;">🎉</div>
+        <h3>Tidak Ada Data Tersisa</h3>
+        <p>${escapeHtml(message)}</p>
+        <button class="btn btn-secondary" onclick="loadBatchData(true)">
+          🔄 Muat Ulang dari Awal
+        </button>
+      </div>
+    `;
+  }
+
+  function showToast(text, type) {
+    var container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type || '');
+    toast.innerHTML = (type === 'error' ? '⚠️ ' : '✅ ') + escapeHtml(text);
+    container.appendChild(toast);
+
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3200);
+  }
+
+  function hasGasBackend() {
+    return typeof google !== 'undefined' && google.script && google.script.run;
+  }
+
+  function extractCode(str) {
+    if (!str) return '';
+    var s = String(str).trim();
+    var m = s.match(/\b\d{5}\b/);
+    if (m) return m[0];
+    var m4 = s.match(/\b\d{4}\b/);
+    if (m4) return '0' + m4[0];
+    return s;
+  }
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  /**
+   * MOCK DATA PROVIDER
+   * Digunakan saat file dibuka langsung secara lokal di browser
+   */
+  function getMockBatchResponse() {
+    return {
+      success: true,
+      count: 5,
+      totalRemaining: 14246,
+      nextStartIndex: 7,
+      hasMore: true,
+      items: [
+        {
+          rowIndex: 2,
+          no: 1,
+          assignment_id: 'fd68e454-ba45-4b85-8205-f3bf777ded24',
+          nama_usaha: 'TOKO KELONTONG BAROKAH',
+          uraian_kegiatan: 'Perdagangan eceran berbagai macam barang kebutuhan sehari-hari seperti beras, gula, minyak goreng, mie instan, telur, sabun, dan aneka minuman dingin dalam kemasan.',
+          kecamatan: 'Demak',
+          desa: 'Bintoro',
+          kode_sls: '001B',
+          kbli_saat_ini: '47111',
+          judul_kbli_saat_ini: 'Perdagangan Eceran Berbagai Macam Barang Yang Utamanya Makanan, Minuman Atau Tembakau Di Toko',
+          rekomendasi_1: '47111 - Perdagangan Eceran Berbagai Macam Barang Yang Utamanya Makanan, Minuman Atau Tembakau Di Toko',
+          rekomendasi_1_code: '47111',
+          confidence_1: '98%',
+          rekomendasi_2: '47190 - Perdagangan Eceran Berbagai Macam Barang Yang Utamanya Bukan Makanan',
+          rekomendasi_2_code: '47190',
+          confidence_2: '15%',
+          link_fasih_sm: 'https://fasih-sm.bps.go.id/app/assignment/fd68e454-ba45-4b85-8205-f3bf777ded24/edit'
+        },
+        {
+          rowIndex: 3,
+          no: 2,
+          assignment_id: 'e28d8212-3201-4411-9a71-112233445566',
+          nama_usaha: 'BENGKEL MOTOR MAJU JAYA',
+          uraian_kegiatan: 'Jasa servis berkala sepeda motor roda dua, ganti oli mesin, perbaikan karburator dan injeksi, serta penjualan sparepart dan ban motor.',
+          kecamatan: 'Sayung',
+          desa: 'Purwosari',
+          kode_sls: '004A',
+          kbli_saat_ini: '45407',
+          judul_kbli_saat_ini: 'Perdagangan Eceran Suku Cadang Sepeda Motor Dan Aksesori',
+          rekomendasi_1: '45407 - Reparasi Dan Perawatan Sepeda Motor',
+          rekomendasi_1_code: '45407',
+          confidence_1: '94%',
+          rekomendasi_2: '45403 - Perdagangan Eceran Suku Cadang Dan Aksesorinya',
+          rekomendasi_2_code: '45403',
+          confidence_2: '80%',
+          link_fasih_sm: 'https://fasih-sm.bps.go.id/app/assignment/e28d8212-3201-4411-9a71-112233445566/edit'
+        },
+        {
+          rowIndex: 4,
+          no: 3,
+          assignment_id: 'a12bc34d-56ef-78gh-90ij-klmnopqrstuv',
+          nama_usaha: 'WARUNG MAKAN SEDEP MANTEP',
+          uraian_kegiatan: 'Menyediakan masakan siap santap seperti nasi rames, sayur asem, ayam goreng, lele penyet, dan aneka es teh manis untuk dinikmati di tempat.',
+          kecamatan: 'Mranggen',
+          desa: 'Batursari',
+          kode_sls: '012C',
+          kbli_saat_ini: '56101',
+          judul_kbli_saat_ini: 'Restoran Dan Rumah Makan',
+          rekomendasi_1: '56101 - Restoran Dan Rumah Makan',
+          rekomendasi_1_code: '56101',
+          confidence_1: '96%',
+          rekomendasi_2: '56102 - Warung Makan',
+          rekomendasi_2_code: '56102',
+          confidence_2: '92%',
+          link_fasih_sm: 'https://fasih-sm.bps.go.id/app/assignment/a12bc34d-56ef-78gh-90ij-klmnopqrstuv/edit'
+        },
+        {
+          rowIndex: 5,
+          no: 4,
+          assignment_id: 'b23cd45e-67fa-89ab-01cd-efghijklmnop',
+          nama_usaha: 'LAUNDRY BERSIH KILAT',
+          uraian_kegiatan: 'Jasa pencucian dan penyetrikaan pakaian kiloan maupun satuan bagi warga sekitar, menggunakan mesin cuci otomatis dan setrika uap.',
+          kecamatan: 'Wonosalam',
+          desa: 'Pilangsari',
+          kode_sls: '003A',
+          kbli_saat_ini: '96200',
+          judul_kbli_saat_ini: 'Aktivitas Binatu (Laundry) Dan Pembersihan Kering',
+          rekomendasi_1: '96200 - Aktivitas Binatu (Laundry) Dan Pembersihan Kering',
+          rekomendasi_1_code: '96200',
+          confidence_1: '99%',
+          link_fasih_sm: 'https://fasih-sm.bps.go.id/app/assignment/b23cd45e-67fa-89ab-01cd-efghijklmnop/edit'
+        },
+        {
+          rowIndex: 6,
+          no: 5,
+          assignment_id: 'c34de56f-78ab-90cd-12ef-345678901234',
+          nama_usaha: 'PENJAHIT RAPI BUSANA',
+          uraian_kegiatan: 'Menerima pesanan pembuatan pakaian pria dan wanita seperti baju kemeja, celana panjang, gamis, kebaya, dan permak jeans.',
+          kecamatan: 'Karangtengah',
+          desa: 'Sampang',
+          kode_sls: '007B',
+          kbli_saat_ini: '14120',
+          judul_kbli_saat_ini: 'Industri Pakaian Jadi Bukan Jahitan (Konveksi)',
+          rekomendasi_1: '14111 - Industri Pakaian Jadi (Konveksi) Dari Tekstil',
+          rekomendasi_1_code: '14111',
+          confidence_1: '88%',
+          rekomendasi_2: '95290 - Reparasi Barang-barang Rumah Tangga Dan Pribadi Lainnya',
+          rekomendasi_2_code: '95290',
+          confidence_2: '40%',
+          link_fasih_sm: 'https://fasih-sm.bps.go.id/app/assignment/c34de56f-78ab-90cd-12ef-345678901234/edit'
+        }
+      ]
+    };
+  }
+
+  function getMockMonitoringData() {
+    return {
+      total: 14246,
+      done: 1820,
+      remaining: 12426,
+      myDone: 65,
+      lastUpdated: '2026-10-22 09:30:00',
+      byPetugas: {
+        'Budi Santoso': 412,
+        'Siti Rahayu': 385,
+        'Ahmad Hidayat': 290,
+        'Dewi Lestari': 210,
+        'Eko Prasetyo': 185,
+        'Rina Wulandari': 145,
+        'Petugas': 128,
+        'Anda': 65
+      },
+      byKecamatan: {
+        'Bonang': { total: 1100, done: 150, remaining: 950 },
+        'Demak': { total: 1850, done: 420, remaining: 1430 },
+        'Dempet': { total: 950, done: 110, remaining: 840 },
+        'Gajah': { total: 820, done: 95, remaining: 725 },
+        'Guntur': { total: 1200, done: 160, remaining: 1040 },
+        'Karanganyar': { total: 980, done: 120, remaining: 860 },
+        'Karangawen': { total: 1350, done: 180, remaining: 1170 },
+        'Karangtengah': { total: 1050, done: 140, remaining: 910 },
+        'Kebonagung': { total: 680, done: 75, remaining: 605 },
+        'Mijen': { total: 890, done: 90, remaining: 800 },
+        'Mranggen': { total: 2100, done: 320, remaining: 1780 },
+        'Sayung': { total: 1650, done: 220, remaining: 1430 },
+        'Wedung': { total: 1120, done: 130, remaining: 990 },
+        'Wonosalam': { total: 1006, done: 100, remaining: 906 }
+      }
+    };
+  }
+</script>
+
+</body>
+</html>
