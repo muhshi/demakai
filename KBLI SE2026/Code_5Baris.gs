@@ -3,10 +3,12 @@
  * PINTAR KBLI - SE2026 DEMAK: 5-ASSIGNMENT BATCH VERIFIER CONTROLLER
  * Google Apps Script backend logic for 5-row batch verification
  * Features:
- *  1. Multi-user concurrency protection (row locking & timeout)
- *  2. Seamless dynamic replacement upon card completion (submitAndGetNext)
- *  3. Dedicated personal history & inline correction (getMyCompletedAssignments, updateCompletedAssignment)
- *  4. Linked with Google Spreadsheet & Fasih-SM BPS
+ *  1. Multi-user concurrency protection (row locking & 20-min timeout)
+ *  2. Default KBLI yang Benar diisi dari KBLI Fasih (kbli_saat_ini)
+ *  3. Tombol Skip / Lewati untuk melepas kunci dan mengambil penugasan lain
+ *  4. Seamless dynamic replacement upon completion / skip
+ *  5. Dedicated personal history & inline correction (getMyCompletedAssignments)
+ *  6. Linked with Google Spreadsheet & Fasih-SM BPS
  * =========================================================================
  */
 
@@ -124,6 +126,7 @@ function formatAssignmentItem(r, rIdx) {
   var rec3 = cleanString(r[20]);
   var assignId = cleanString(r[6]);
   var linkFasih = formatFasihUrl(r[25], assignId);
+  var fasihKbli = cleanString(r[14]);
 
   return {
     rowIndex: rIdx,
@@ -141,7 +144,8 @@ function formatAssignmentItem(r, rIdx) {
     petugas_lapangan: cleanString(r[11]),
     nama_usaha: cleanString(r[12]),
     uraian_kegiatan: cleanString(r[13]),
-    kbli_saat_ini: cleanString(r[14]),
+    kbli_saat_ini: fasihKbli,
+    kbli_saat_ini_code: extractKbliCode(fasihKbli),
     judul_kbli_saat_ini: cleanString(r[15]),
     rekomendasi_1: rec1,
     rekomendasi_1_code: extractKbliCode(rec1),
@@ -222,8 +226,6 @@ function get5Assignments(sheetName, userName, kecFilter, startIndex) {
   var cleanUser = cleanString(userName) || 'Petugas';
   var numRows = lastRow - 1;
 
-  // Baca Kolom 2 (B: status_pengerjaan), Kolom 5 (E: petugas_verifikasi), Kolom 6 (F: waktu_selesai/lock), Kolom 9 (I: kecamatan)
-  // Range: baris 2, kolom 2 sampai kolom 9 = 8 kolom (B, C, D, E, F, G, H, I)
   var metaValues = ws.getRange(2, 2, numRows, 8).getValues();
 
   var matchingRowIndices = [];
@@ -249,7 +251,6 @@ function get5Assignments(sheetName, userName, kecFilter, startIndex) {
 
     totalRemaining++;
 
-    // Lewati jika sedang dikerjakan orang lain dan lock belum expired
     if (isRecordLockedByOther(st, pet, waktu, cleanUser)) {
       continue;
     }
@@ -259,7 +260,6 @@ function get5Assignments(sheetName, userName, kecFilter, startIndex) {
     }
   }
 
-  // Jika startIndex berada di bagian akhir sheet tapi masih ada sisa di awal (wrap-around)
   if (matchingRowIndices.length < 5 && totalRemaining > 0 && startIndex > 2) {
     for (var j = 0; j < numRows; j++) {
       var wrapRowIndex = j + 2;
@@ -296,7 +296,6 @@ function get5Assignments(sheetName, userName, kecFilter, startIndex) {
     var rIdx = matchingRowIndices[k];
     var r = ws.getRange(rIdx, 1, 1, 26).getValues()[0];
 
-    // Otomatis tandai 'Sedang Dikerjakan' & kunci atas nama cleanUser jika belum selesai
     var currentSt = cleanString(r[1]);
     if (currentSt !== 'Sedang Dikerjakan') {
       ws.getRange(rIdx, 2).setValue('Sedang Dikerjakan');
@@ -326,9 +325,11 @@ function get5Assignments(sheetName, userName, kecFilter, startIndex) {
 
 /**
  * Menyimpan verifikasi 1 baris dan LANGSUNG MENGAMBIL 1 BARIS BERIKUTNYA (Seamless Replacement).
- * Data yang selesai langsung berstatus 'Selesai', dan baris pengganti dikunci atas nama userName.
+ * Default status:
+ * - Jika tidak diubah dari Fasih: 'KBLI Sudah Sesuai (Fasih)'
+ * - Jika diubah: 'KBLI Diubah ke: [KODE]'
  */
-function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1, kecFilter, currentVisibleRowIndices) {
+function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalFasihKbli, kecFilter, currentVisibleRowIndices, skippedRowIndices) {
   rowIndex = parseInt(rowIndex, 10);
   if (isNaN(rowIndex) || rowIndex < 2) {
     return { success: false, error: 'Indeks baris tidak valid.' };
@@ -336,34 +337,37 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
 
   var cleanUser = cleanString(userName) || 'Petugas';
   var cleanFinal = cleanString(finalKbli);
-  var cleanOrig = cleanString(originalRec1);
+  var cleanOrigFasih = cleanString(originalFasihKbli);
 
-  if (!cleanFinal && cleanOrig) {
-    cleanFinal = extractKbliCode(cleanOrig);
+  if (!cleanFinal && cleanOrigFasih) {
+    cleanFinal = extractKbliCode(cleanOrigFasih);
   }
 
   var codeFinal = extractKbliCode(cleanFinal);
-  var codeOrig = extractKbliCode(cleanOrig);
+  var codeFasih = extractKbliCode(cleanOrigFasih);
 
   var isEqual = false;
-  if (codeFinal && codeOrig) {
-    isEqual = (codeFinal === codeOrig);
+  if (codeFinal && codeFasih) {
+    isEqual = (codeFinal === codeFasih);
   } else {
-    isEqual = (cleanFinal.toLowerCase() === cleanOrig.toLowerCase());
+    isEqual = (cleanFinal.toLowerCase() === cleanOrigFasih.toLowerCase());
   }
 
-  var statusKbli = isEqual ? 'KBLI Sudah Benar Sesuai Rekomendasi 1' : ('KBLI Diubah ke: ' + cleanFinal);
+  var statusKbli = isEqual ? 'KBLI Sudah Sesuai (Fasih)' : ('KBLI Diubah ke: ' + cleanFinal);
   var waktuSelesai = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
 
-  // Parse daftar baris yang saat ini terlihat di layar pengguna agar tidak terpilih ganda
   var excludedMap = {};
   excludedMap[rowIndex] = true;
   if (currentVisibleRowIndices && Array.isArray(currentVisibleRowIndices)) {
     for (var x = 0; x < currentVisibleRowIndices.length; x++) {
       var exIdx = parseInt(currentVisibleRowIndices[x], 10);
-      if (!isNaN(exIdx)) {
-        excludedMap[exIdx] = true;
-      }
+      if (!isNaN(exIdx)) excludedMap[exIdx] = true;
+    }
+  }
+  if (skippedRowIndices && Array.isArray(skippedRowIndices)) {
+    for (var s = 0; s < skippedRowIndices.length; s++) {
+      var skIdx = parseInt(skippedRowIndices[s], 10);
+      if (!isNaN(skIdx)) excludedMap[skIdx] = true;
     }
   }
 
@@ -385,16 +389,12 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
   try {
     var ss = getSpreadsheet();
     var ws = getSheet(ss, sheetName);
-    if (!ws) {
-      throw new Error('Sheet "' + sheetName + '" tidak ditemukan.');
-    }
+    if (!ws) throw new Error('Sheet "' + sheetName + '" tidak ditemukan.');
 
     var lastRow = ws.getLastRow();
-    if (rowIndex > lastRow) {
-      throw new Error('Indeks baris melebihi jumlah data sheet.');
-    }
+    if (rowIndex > lastRow) throw new Error('Indeks baris melebihi jumlah data sheet.');
 
-    // 1. Simpan baris yang diselesaikan (Col B: status_pengerjaan s/d Col F: waktu_selesai)
+    // 1. Simpan baris yang diselesaikan
     ws.getRange(rowIndex, 2, 1, 5).setValues([[
       'Selesai',
       statusKbli,
@@ -403,7 +403,7 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
       waktuSelesai
     ]]);
 
-    // 2. Cari 1 baris berikutnya yang belum selesai dan tidak terkunci oleh pengguna lain
+    // 2. Cari 1 baris berikutnya
     var numRows = lastRow - 1;
     var metaValues = ws.getRange(2, 2, numRows, 8).getValues();
 
@@ -412,12 +412,11 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
 
     for (var i = 0; i < numRows; i++) {
       var actIdx = i + 2;
-      var st = cleanString(metaValues[i][0]); // Col B
-      var pet = cleanString(metaValues[i][3]); // Col E
-      var waktu = cleanString(metaValues[i][4]); // Col F
-      var kec = cleanString(metaValues[i][7]); // Col I
+      var st = cleanString(metaValues[i][0]);
+      var pet = cleanString(metaValues[i][3]);
+      var waktu = cleanString(metaValues[i][4]);
+      var kec = cleanString(metaValues[i][7]);
 
-      // Update jika row ini baru saja kita selesaikan
       if (actIdx === rowIndex) {
         st = 'Selesai';
       }
@@ -434,7 +433,6 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
 
       totalRemaining++;
 
-      // Jika baris ini bukan yang sedang tampil di layar dan tidak terkunci orang lain
       if (nextRowIndex === -1 && !excludedMap[actIdx]) {
         if (!isRecordLockedByOther(st, pet, waktu, cleanUser)) {
           nextRowIndex = actIdx;
@@ -444,7 +442,6 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
 
     var nextItem = null;
     if (nextRowIndex !== -1) {
-      // Kunci data baru atas nama user ini
       ws.getRange(nextRowIndex, 2).setValue('Sedang Dikerjakan');
       ws.getRange(nextRowIndex, 5).setValue(cleanUser);
       ws.getRange(nextRowIndex, 6).setValue(waktuSelesai);
@@ -481,16 +478,141 @@ function submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1
 }
 
 /**
+ * Melewati (Skip) 1 baris assignment yang sedang dikerjakan agar bisa dikerjakan orang lain:
+ * 1. Mengembalikan status baris ke 'Belum Dikerjakan' dan menghapus lock petugas.
+ * 2. Mengambil 1 baris baru dari antrean (yang tidak sedang ditampilkan & tidak termasuk daftar skipped).
+ */
+function skipAndGetNext(sheetName, rowIndex, userName, kecFilter, currentVisibleRowIndices, skippedRowIndices) {
+  rowIndex = parseInt(rowIndex, 10);
+  if (isNaN(rowIndex) || rowIndex < 2) {
+    return { success: false, error: 'Indeks baris tidak valid.' };
+  }
+
+  var cleanUser = cleanString(userName) || 'Petugas';
+  var waktuNow = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+
+  var excludedMap = {};
+  excludedMap[rowIndex] = true;
+  if (currentVisibleRowIndices && Array.isArray(currentVisibleRowIndices)) {
+    for (var x = 0; x < currentVisibleRowIndices.length; x++) {
+      var exIdx = parseInt(currentVisibleRowIndices[x], 10);
+      if (!isNaN(exIdx)) excludedMap[exIdx] = true;
+    }
+  }
+  if (skippedRowIndices && Array.isArray(skippedRowIndices)) {
+    for (var s = 0; s < skippedRowIndices.length; s++) {
+      var skIdx = parseInt(skippedRowIndices[s], 10);
+      if (!isNaN(skIdx)) excludedMap[skIdx] = true;
+    }
+  }
+
+  var lock = LockService.getScriptLock();
+  var hasLock = false;
+  try {
+    hasLock = lock.tryLock(10000);
+  } catch (e) {
+    hasLock = false;
+  }
+
+  if (!hasLock) {
+    return {
+      success: false,
+      error: 'Sistem sedang sibuk memproses lock. Silakan klik lewati kembali.'
+    };
+  }
+
+  try {
+    var ss = getSpreadsheet();
+    var ws = getSheet(ss, sheetName);
+    if (!ws) throw new Error('Sheet "' + sheetName + '" tidak ditemukan.');
+
+    var lastRow = ws.getLastRow();
+    if (rowIndex > lastRow) throw new Error('Indeks baris melebihi jumlah data sheet.');
+
+    // 1. Lepas kunci record yang di-skip: kembalikan ke 'Belum Dikerjakan', bersihkan Col E & Col F
+    ws.getRange(rowIndex, 2).setValue('Belum Dikerjakan');
+    ws.getRange(rowIndex, 5).setValue('');
+    ws.getRange(rowIndex, 6).setValue('');
+
+    // 2. Cari 1 baris pengganti
+    var numRows = lastRow - 1;
+    var metaValues = ws.getRange(2, 2, numRows, 8).getValues();
+
+    var nextRowIndex = -1;
+    var totalRemaining = 0;
+
+    for (var i = 0; i < numRows; i++) {
+      var actIdx = i + 2;
+      var st = cleanString(metaValues[i][0]);
+      var pet = cleanString(metaValues[i][3]);
+      var waktu = cleanString(metaValues[i][4]);
+      var kec = cleanString(metaValues[i][7]);
+
+      if (actIdx === rowIndex) {
+        st = 'Belum Dikerjakan';
+      }
+
+      if (st === 'Selesai') continue;
+
+      if (kecFilter && kecFilter !== 'ALL') {
+        var kVal = kec.toLowerCase();
+        var fVal = String(kecFilter).trim().toLowerCase();
+        if (kVal !== fVal && kVal.indexOf(fVal) === -1 && fVal.indexOf(kVal) === -1) {
+          continue;
+        }
+      }
+
+      totalRemaining++;
+
+      if (nextRowIndex === -1 && !excludedMap[actIdx]) {
+        if (!isRecordLockedByOther(st, pet, waktu, cleanUser)) {
+          nextRowIndex = actIdx;
+        }
+      }
+    }
+
+    var nextItem = null;
+    if (nextRowIndex !== -1) {
+      ws.getRange(nextRowIndex, 2).setValue('Sedang Dikerjakan');
+      ws.getRange(nextRowIndex, 5).setValue(cleanUser);
+      ws.getRange(nextRowIndex, 6).setValue(waktuNow);
+
+      var nextRowData = ws.getRange(nextRowIndex, 1, 1, 26).getValues()[0];
+      nextRowData[1] = 'Sedang Dikerjakan';
+      nextRowData[4] = cleanUser;
+      nextRowData[5] = waktuNow;
+      nextItem = formatAssignmentItem(nextRowData, nextRowIndex);
+    }
+
+    SpreadsheetApp.flush();
+
+    return {
+      success: true,
+      skippedRowIndex: rowIndex,
+      nextItem: nextItem,
+      totalRemaining: totalRemaining
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: err.message || String(err)
+    };
+  } finally {
+    try {
+      lock.releaseLock();
+    } catch (e) {}
+  }
+}
+
+/**
  * Menyimpan hasil verifikasi untuk 1 baris assignment (kompatibilitas backward)
  */
-function submitAssignment(sheetName, rowIndex, userName, finalKbli, originalRec1) {
-  var res = submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalRec1, 'ALL', []);
-  return res;
+function submitAssignment(sheetName, rowIndex, userName, finalKbli, originalFasihKbli) {
+  return submitAndGetNext(sheetName, rowIndex, userName, finalKbli, originalFasihKbli, 'ALL', [], []);
 }
 
 /**
  * Mengambil riwayat data yang sudah dikerjakan (Selesai) oleh userName saat ini.
- * Memungkinkan pengguna melihat daftar pekerjaan mereka dan melakukan koreksi jika ada salah input.
  */
 function getMyCompletedAssignments(sheetName, userName, limit) {
   var ss = getSpreadsheet();
@@ -514,14 +636,12 @@ function getMyCompletedAssignments(sheetName, userName, limit) {
 
   var cleanUserLower = cleanString(userName).toLowerCase();
   var numRows = lastRow - 1;
-  // Membaca Kolom B (status_pengerjaan) & Kolom E (petugas_verifikasi)
   var statusCol = ws.getRange(2, 2, numRows, 4).getValues();
 
   var matchingIndices = [];
   var totalFound = 0;
   var maxLimit = limit ? parseInt(limit, 10) : 100;
 
-  // Scan dari bawah ke atas agar yang paling terakhir diselesaikan tampil paling awal
   for (var i = numRows - 1; i >= 0; i--) {
     var st = cleanString(statusCol[i][0]);
     var pet = cleanString(statusCol[i][3]).toLowerCase();
@@ -551,7 +671,7 @@ function getMyCompletedAssignments(sheetName, userName, limit) {
 /**
  * Mengoreksi kembali data assignment yang sudah pernah diselesaikan oleh pengguna
  */
-function updateCompletedAssignment(sheetName, rowIndex, userName, newKbli, originalRec1) {
+function updateCompletedAssignment(sheetName, rowIndex, userName, newKbli, originalFasihKbli) {
   rowIndex = parseInt(rowIndex, 10);
   if (isNaN(rowIndex) || rowIndex < 2) {
     return { success: false, error: 'Indeks baris tidak valid.' };
@@ -559,23 +679,23 @@ function updateCompletedAssignment(sheetName, rowIndex, userName, newKbli, origi
 
   var cleanUser = cleanString(userName) || 'Petugas';
   var cleanFinal = cleanString(newKbli);
-  var cleanOrig = cleanString(originalRec1);
+  var cleanOrigFasih = cleanString(originalFasihKbli);
 
-  if (!cleanFinal && cleanOrig) {
-    cleanFinal = extractKbliCode(cleanOrig);
+  if (!cleanFinal && cleanOrigFasih) {
+    cleanFinal = extractKbliCode(cleanOrigFasih);
   }
 
   var codeFinal = extractKbliCode(cleanFinal);
-  var codeOrig = extractKbliCode(cleanOrig);
+  var codeFasih = extractKbliCode(cleanOrigFasih);
 
   var isEqual = false;
-  if (codeFinal && codeOrig) {
-    isEqual = (codeFinal === codeOrig);
+  if (codeFinal && codeFasih) {
+    isEqual = (codeFinal === codeFasih);
   } else {
-    isEqual = (cleanFinal.toLowerCase() === cleanOrig.toLowerCase());
+    isEqual = (cleanFinal.toLowerCase() === cleanOrigFasih.toLowerCase());
   }
 
-  var statusKbli = isEqual ? 'KBLI Sudah Benar Sesuai Rekomendasi 1' : ('KBLI Diubah ke: ' + cleanFinal);
+  var statusKbli = isEqual ? 'KBLI Sudah Sesuai (Fasih)' : ('KBLI Diubah ke: ' + cleanFinal);
   var waktuUpdate = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
 
   var lock = LockService.getScriptLock();
@@ -588,7 +708,6 @@ function updateCompletedAssignment(sheetName, rowIndex, userName, newKbli, origi
     var ws = getSheet(ss, sheetName);
     if (!ws) throw new Error('Sheet tidak ditemukan.');
 
-    // Update Kolom B s/d F
     ws.getRange(rowIndex, 2, 1, 5).setValues([[
       'Selesai',
       statusKbli,

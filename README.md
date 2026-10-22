@@ -61,9 +61,11 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-22
-- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow & Koreksi Riwayat)**:
+- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow, Default Fasih, Skip Action & Koreksi Riwayat)**:
   - **Dataset Merging & Google Drive Upload**: Menggabungkan seluruh hasil resolusi anomali SE2026 (`storage/app/se2026_resolved/*.xlsx`, total 14.246 baris data) menjadi satu dataset gabungan (`merged_se2026_cleaning_dataset.csv`) dan mengunggahnya ke Google Drive sebagai Google Spreadsheet (`PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`) di folder KBLI melalui `python/utils/upload_google_spreadsheet.py`.
   - **Container-Bound Apps Script Deployment**: Implementasi automation script `python/utils/deploy_apps_script.py` untuk mengunggah dan mendeploy script project bound langsung ke Google Spreadsheet target via Google Apps Script API.
+  - **Default KBLI yang Benar dari Fasih**: Mengubah nilai default input "KBLI yang Benar" menjadi kode KBLI saat ini dari Fasih (`kbli_saat_ini`). Jika tidak diubah oleh verifikator, status otomatis tercatat sebagai `KBLI Sudah Sesuai (Fasih)`, dan jika diubah menjadi kode lain akan tercatat `KBLI Diubah ke: [KODE]`.
+  - **Tombol Skip / Lewati Penugasan (`skipAndGetNext`)**: Menambahkan tombol `⏭️ Lewati` di setiap kartu penugasan. Jika petugas ragu/bingung, mengklik tombol ini akan langsung melepas kunci (*release lock*) baris kembali ke status `Belum Dikerjakan` (sehingga petugas lain yang lebih paham dapat mengerjakannya), dan secara seamless memuat 1 penugasan baru dari antrean.
   - **Seamless Dynamic Replacement (`submitAndGetNext`)**:
     - Ketika tombol "✅ Selesai" diklik pada kartu assignment, kartu tersebut langsung beranimasi keluar (fade/slide out) dan seketika digantikan di posisi yang sama oleh 1 assignment baru dari antrean yang belum selesai dan tidak terkunci oleh pengguna lain.
     - Menjaga antrean tetap stabil 5 penugasan aktif tanpa perlu bolak-balik menekan tombol "Muat 5 Data Berikutnya".

@@ -315,6 +315,19 @@
       background: var(--accent-green-hover);
     }
 
+    .btn-warning {
+      background: #FFF7ED;
+      color: #C2410C;
+      border: 1px solid #FDBA74;
+      font-weight: 700;
+    }
+
+    .btn-warning:hover {
+      background: #FFEDD5;
+      border-color: #FB923C;
+      color: #9A3412;
+    }
+
     .btn-fasih {
       background: #EFF6FF;
       color: #1D4ED8;
@@ -406,7 +419,7 @@
     }
 
     .assignment-card.saving::after {
-      content: "⏳ Menyimpan & Memuat Assignment Baru...";
+      content: "⏳ Memproses data & memuat antrean baru...";
       position: absolute;
       top: 50%;
       left: 50%;
@@ -714,6 +727,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     /* Tab Content Controls */
@@ -987,6 +1001,10 @@
 
     .toast.error {
       background: #DC2626;
+    }
+
+    .toast.info {
+      background: #0284C7;
     }
 
     @keyframes toastIn {
@@ -1272,11 +1290,13 @@
    * =========================================================================
    * PINTAR KBLI - FRONTEND BATCH VERIFIER CONTROLLER
    * Features:
-   *  1. Seamless Dynamic Replacement: Upon clicking 'Selesai', the card animates
-   *     out and is immediately replaced in-place by the next available unlocked card.
-   *  2. Personal History & Correction: A dedicated tab 'Yang Sudah Saya Kerjakan'
-   *     allowing operators to review and edit previous assignments.
-   *  3. Real-time Multi-user Locking & Stats tracking.
+   *  1. Default KBLI yang Benar: Otomatis diisi dari KBLI Fasih (kbli_saat_ini).
+   *  2. Tombol Skip / Lewati: Melepas kunci baris agar bisa dikerjakan petugas lain
+   *     dan langsung memuat penugasan baru di tempatnya.
+   *  3. Seamless Dynamic Replacement: Kartu selesai beranimasi keluar dan langsung
+   *     digantikan di tempat yang sama oleh penugasan baru yang unlocked.
+   *  4. Riwayat & Koreksi Mandiri: Tab 'Yang Sudah Saya Kerjakan' untuk melihat dan
+   *     memperbaiki kode KBLI jika ada kesalahan.
    * =========================================================================
    */
 
@@ -1289,6 +1309,7 @@
     totalRemaining: 0,
     currentItems: [], // Daftar item aktif di tab Verifikasi (maks 5)
     historyItems: [], // Daftar riwayat item yang sudah diselesaikan user ini
+    skippedRowIndices: [], // Daftar baris yang di-skip user sesi ini agar tidak langsung muncul lagi
     isLoadingBatch: false,
     activeTab: 'verifier'
   };
@@ -1307,9 +1328,6 @@
     refreshHistoryCount();
   });
 
-  /**
-   * Helper pengecekan GAS Environment
-   */
   function hasGasBackend() {
     return (typeof google !== 'undefined' && google.script && google.script.run);
   }
@@ -1507,7 +1525,6 @@
         })
         .get5Assignments(state.currentSheet, state.userName, state.currentKec, state.startIndex);
     } else {
-      // Mock mode untuk testing lokal
       setTimeout(function() {
         state.isLoadingBatch = false;
         handleBatchResponse(getMockBatchResponse());
@@ -1550,9 +1567,6 @@
     if (statBatch) statBatch.textContent = state.currentItems.length + ' Assignment';
   }
 
-  /**
-   * Mengambil daftar rowIndex yang saat ini aktif tampil di layar
-   */
   function getCurrentVisibleRowIndices() {
     return state.currentItems.map(function(item) {
       return item.rowIndex;
@@ -1560,7 +1574,7 @@
   }
 
   /**
-   * 5. SEAMLESS CARD RENDERING & REPLACEMENT
+   * 5. CARD RENDERING (DEFAULT DARI KBLI FASIH & TOMBOL SKIP)
    */
   function renderAssignmentCards(items) {
     var container = document.getElementById('cardsContainer');
@@ -1578,7 +1592,10 @@
     card.className = 'assignment-card';
     card.id = 'card-' + item.rowIndex;
 
-    var defaultKbli = item.rekomendasi_1_code || extractCode(item.rekomendasi_1) || '';
+    // Sesuai Permintaan: Default KBLI yang Benar DIISI DARI KBLI FASIH (item.kbli_saat_ini)
+    var fasihCode = item.kbli_saat_ini_code || extractCode(item.kbli_saat_ini) || item.kbli_saat_ini || '';
+    var defaultKbli = fasihCode;
+
     var recsHtml = '';
 
     if (item.rekomendasi_1) {
@@ -1686,16 +1703,20 @@
               value="${escapeHtml(defaultKbli)}" 
               placeholder="5 Digit" 
               maxlength="5"
+              data-original-fasih="${escapeHtml(fasihCode)}"
               data-original-rec1="${escapeHtml(item.rekomendasi_1_code || '')}"
             >
           </div>
-          <span class="input-hint">💡 Default Rek 1 (${escapeHtml(item.rekomendasi_1_code || '-')}). Edit jika berbeda.</span>
+          <span class="input-hint">💡 Default KBLI dari Fasih (<strong>${escapeHtml(fasihCode || '-')}</strong>). Pilih Rekomendasi di atas jika perlu diubah.</span>
         </div>
 
         <div class="action-buttons-group">
           <a href="${escapeHtml(item.link_fasih_sm || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih" title="Buka form edit di Fasih-SM BPS">
             🔗 Buka Fasih
           </a>
+          <button class="btn btn-warning" id="btnSkip-${item.rowIndex}" onclick="skipCardSeamless(${item.rowIndex})" title="Lewati jika bingung / ragu agar dapat dikerjakan oleh petugas lain">
+            ⏭️ Lewati
+          </button>
           <button class="btn btn-success" id="btnSubmit-${item.rowIndex}" onclick="submitCardSeamless(${item.rowIndex})">
             ✅ Selesai
           </button>
@@ -1714,23 +1735,22 @@
       input.focus();
       input.style.backgroundColor = '#FEF08A';
       setTimeout(function() { input.style.backgroundColor = '#FFFFFF'; }, 300);
-      showToast('KBLI diterapkan: ' + code, 'success');
+      showToast('KBLI diganti ke Rekomendasi: ' + code, 'success');
     }
   }
 
   /**
    * 6. SEAMLESS SUBMIT & DYNAMIC REPLACEMENT FLOW
-   * Kartu yang selesai langsung menghilang (fade/slide out) dan digantikan
-   * secara langsung di tempat yang sama oleh assignment berikutnya yang unlocked.
    */
   function submitCardSeamless(rowIndex) {
     var card = document.getElementById('card-' + rowIndex);
     var input = document.getElementById('inputKbli-' + rowIndex);
     var btnSubmit = document.getElementById('btnSubmit-' + rowIndex);
+    var btnSkip = document.getElementById('btnSkip-' + rowIndex);
 
     if (!input) return;
     var finalKbli = input.value.trim();
-    var origRec1 = input.getAttribute('data-original-rec1') || '';
+    var origFasih = input.getAttribute('data-original-fasih') || '';
 
     if (!finalKbli) {
       showToast('Kode KBLI tidak boleh kosong. Harap isi 5 digit.', 'error');
@@ -1743,11 +1763,12 @@
       return;
     }
 
-    // Tampilkan efek loading pada kartu
     if (card) card.classList.add('saving');
     if (btnSubmit) btnSubmit.disabled = true;
+    if (btnSkip) btnSkip.disabled = true;
 
     var currentVisibleIndices = getCurrentVisibleRowIndices();
+    var skippedIndices = state.skippedRowIndices || [];
 
     if (hasGasBackend()) {
       google.script.run
@@ -1757,20 +1778,21 @@
           } else {
             if (card) card.classList.remove('saving');
             if (btnSubmit) btnSubmit.disabled = false;
+            if (btnSkip) btnSkip.disabled = false;
             showToast('Gagal menyimpan: ' + (res.error || 'Terjadi kesalahan.'), 'error');
           }
         })
         .withFailureHandler(function(err) {
           if (card) card.classList.remove('saving');
           if (btnSubmit) btnSubmit.disabled = false;
+          if (btnSkip) btnSkip.disabled = false;
           showToast('Error server: ' + (err.message || err), 'error');
         })
-        .submitAndGetNext(state.currentSheet, rowIndex, state.userName, finalKbli, origRec1, state.currentKec, currentVisibleIndices);
+        .submitAndGetNext(state.currentSheet, rowIndex, state.userName, finalKbli, origFasih, state.currentKec, currentVisibleIndices, skippedIndices);
     } else {
-      // Mock flow
       setTimeout(function() {
-        var isMatch = (extractCode(finalKbli) === extractCode(origRec1));
-        var status = isMatch ? 'KBLI Sudah Benar Sesuai Rekomendasi 1' : ('KBLI Diubah ke: ' + finalKbli);
+        var isMatch = (extractCode(finalKbli) === extractCode(origFasih));
+        var status = isMatch ? 'KBLI Sudah Sesuai (Fasih)' : ('KBLI Diubah ke: ' + finalKbli);
         var mockNext = getMockSingleNextItem();
         handleSeamlessSuccess(rowIndex, {
           success: true,
@@ -1801,30 +1823,25 @@
 
     if (!oldCard || !container) return;
 
-    // 1. Mainkan animasi keluar pada kartu lama
     oldCard.classList.remove('saving');
     oldCard.classList.add('card-slide-out');
 
     setTimeout(function() {
-      // Hapus kartu lama dari daftar state.currentItems
       state.currentItems = state.currentItems.filter(function(item) {
         return item.rowIndex !== oldRowIndex;
       });
 
-      // 2. Jika ada item pengganti berikutnya dari antrean
       if (res.nextItem) {
         state.currentItems.push(res.nextItem);
         var newCard = createCardElement(res.nextItem, state.currentItems.length - 1);
         newCard.classList.add('card-slide-in');
 
-        // Ganti elemen kartu lama dengan kartu baru tepat di posisi yang sama
         if (oldCard.parentNode === container) {
           container.replaceChild(newCard, oldCard);
         } else {
           container.appendChild(newCard);
         }
       } else {
-        // Tidak ada lagi data berikutnya di antrean
         if (oldCard.parentNode === container) {
           container.removeChild(oldCard);
         }
@@ -1837,7 +1854,101 @@
   }
 
   /**
-   * 7. RIWAYAT PENGERJAAN & KOREKSI SAYA (TAB 2)
+   * 7. SEAMLESS SKIP / LEWATI FLOW
+   * Melepas kunci penugasan kembali ke antrean umum agar orang lain bisa mengerjakan,
+   * dan langsung mengambil penugasan berikutnya untuk user ini.
+   */
+  function skipCardSeamless(rowIndex) {
+    var card = document.getElementById('card-' + rowIndex);
+    var btnSkip = document.getElementById('btnSkip-' + rowIndex);
+    var btnSubmit = document.getElementById('btnSubmit-' + rowIndex);
+
+    if (!card) return;
+
+    if (card) card.classList.add('saving');
+    if (btnSkip) btnSkip.disabled = true;
+    if (btnSubmit) btnSubmit.disabled = true;
+
+    // Masukkan ke skipped list agar tidak muncul lagi ke user yang sama dalam sesi ini
+    if (!state.skippedRowIndices) state.skippedRowIndices = [];
+    if (state.skippedRowIndices.indexOf(rowIndex) === -1) {
+      state.skippedRowIndices.push(rowIndex);
+    }
+
+    var currentVisibleIndices = getCurrentVisibleRowIndices();
+
+    if (hasGasBackend()) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            handleSeamlessSkipSuccess(rowIndex, res);
+          } else {
+            if (card) card.classList.remove('saving');
+            if (btnSkip) btnSkip.disabled = false;
+            if (btnSubmit) btnSubmit.disabled = false;
+            showToast('Gagal melewati: ' + (res.error || 'Terjadi kesalahan.'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (card) card.classList.remove('saving');
+          if (btnSkip) btnSkip.disabled = false;
+          if (btnSubmit) btnSubmit.disabled = false;
+          showToast('Error server: ' + (err.message || err), 'error');
+        })
+        .skipAndGetNext(state.currentSheet, rowIndex, state.userName, state.currentKec, currentVisibleIndices, state.skippedRowIndices);
+    } else {
+      setTimeout(function() {
+        var mockNext = getMockSingleNextItem();
+        handleSeamlessSkipSuccess(rowIndex, {
+          success: true,
+          skippedRowIndex: rowIndex,
+          nextItem: mockNext,
+          totalRemaining: state.totalRemaining
+        });
+      }, 300);
+    }
+  }
+
+  function handleSeamlessSkipSuccess(oldRowIndex, res) {
+    var oldCard = document.getElementById('card-' + oldRowIndex);
+    var container = document.getElementById('cardsContainer');
+
+    showToast('Penugasan dilewati & dikembalikan ke antrean umum.', 'info');
+
+    if (!oldCard || !container) return;
+
+    oldCard.classList.remove('saving');
+    oldCard.classList.add('card-slide-out');
+
+    setTimeout(function() {
+      state.currentItems = state.currentItems.filter(function(item) {
+        return item.rowIndex !== oldRowIndex;
+      });
+
+      if (res.nextItem) {
+        state.currentItems.push(res.nextItem);
+        var newCard = createCardElement(res.nextItem, state.currentItems.length - 1);
+        newCard.classList.add('card-slide-in');
+
+        if (oldCard.parentNode === container) {
+          container.replaceChild(newCard, oldCard);
+        } else {
+          container.appendChild(newCard);
+        }
+      } else {
+        if (oldCard.parentNode === container) {
+          container.removeChild(oldCard);
+        }
+        if (state.currentItems.length === 0) {
+          renderEmptyState('Semua assignment untuk filter ini telah selesai diverifikasi! 🎉');
+        }
+      }
+      updateHeaderStats();
+    }, 300);
+  }
+
+  /**
+   * 8. RIWAYAT PENGERJAAN & KOREKSI SAYA (TAB 2)
    */
   function refreshHistoryCount() {
     if (!state.userName) return;
@@ -1903,7 +2014,6 @@
         })
         .getMyCompletedAssignments(state.currentSheet, state.userName, 100);
     } else {
-      // Mock history
       setTimeout(function() {
         state.historyItems = getMockHistoryItems();
         updateBadgeCount(state.historyItems.length);
@@ -1967,6 +2077,8 @@
       `;
     }
 
+    var fasihCode = item.kbli_saat_ini_code || extractCode(item.kbli_saat_ini) || item.kbli_saat_ini || '';
+
     card.innerHTML = `
       <div class="card-meta-bar">
         <div class="card-tags">
@@ -2015,7 +2127,6 @@
         </div>
       </div>
 
-      <!-- Action & Inline Correction Form -->
       <div class="card-action-bar">
         <div class="input-verification-group">
           <label for="inputHistoryKbli-${item.rowIndex}">Koreksi KBLI Final:</label>
@@ -2027,7 +2138,7 @@
               value="${escapeHtml(item.kbli_final_benar || '')}" 
               placeholder="5 Digit" 
               maxlength="5"
-              data-original-rec1="${escapeHtml(item.rekomendasi_1_code || '')}"
+              data-original-fasih="${escapeHtml(fasihCode)}"
             >
           </div>
           <span class="input-hint">Koreksi jika sebelumnya terdapat kesalahan input kode.</span>
@@ -2062,11 +2173,10 @@
   function saveHistoryCorrection(rowIndex) {
     var input = document.getElementById('inputHistoryKbli-' + rowIndex);
     var btn = document.getElementById('btnSaveHistory-' + rowIndex);
-    var banner = document.getElementById('historyBanner-' + rowIndex);
 
     if (!input) return;
     var newKbli = input.value.trim();
-    var origRec1 = input.getAttribute('data-original-rec1') || '';
+    var origFasih = input.getAttribute('data-original-fasih') || '';
 
     if (!newKbli) {
       showToast('Kode KBLI tidak boleh kosong.', 'error');
@@ -2099,15 +2209,15 @@
           }
           showToast('Error server: ' + (err.message || err), 'error');
         })
-        .updateCompletedAssignment(state.currentSheet, rowIndex, state.userName, newKbli, origRec1);
+        .updateCompletedAssignment(state.currentSheet, rowIndex, state.userName, newKbli, origFasih);
     } else {
       setTimeout(function() {
         if (btn) {
           btn.disabled = false;
           btn.textContent = '💾 Simpan Koreksi';
         }
-        var isMatch = (extractCode(newKbli) === extractCode(origRec1));
-        var status = isMatch ? 'KBLI Sudah Benar Sesuai Rekomendasi 1' : ('KBLI Diubah ke: ' + newKbli);
+        var isMatch = (extractCode(newKbli) === extractCode(origFasih));
+        var status = isMatch ? 'KBLI Sudah Sesuai (Fasih)' : ('KBLI Diubah ke: ' + newKbli);
         handleHistoryCorrectionSuccess(rowIndex, {
           success: true,
           rowIndex: rowIndex,
@@ -2136,7 +2246,6 @@
       `;
     }
 
-    // Perbarui item di memory
     for (var i = 0; i < state.historyItems.length; i++) {
       if (state.historyItems[i].rowIndex === rowIndex) {
         state.historyItems[i].status_kbli = res.status_kbli;
@@ -2175,7 +2284,7 @@
   }
 
   /**
-   * 8. MONITORING & LEADERBOARD TAB
+   * 9. MONITORING & LEADERBOARD TAB
    */
   function loadMonitoringData() {
     var tablePetugas = document.getElementById('petugasLeaderboardBody');
@@ -2229,7 +2338,6 @@
 
     updateBadgeCount(myDone);
 
-    // Leaderboard Petugas
     var tablePetugas = document.getElementById('petugasLeaderboardBody');
     var elCountPet = document.getElementById('leaderboardTotalPetugas');
     if (tablePetugas) {
@@ -2265,7 +2373,6 @@
       }
     }
 
-    // Progres Kecamatan
     var tableKec = document.getElementById('kecamatanProgressBody');
     if (tableKec) {
       tableKec.innerHTML = '';
@@ -2294,7 +2401,7 @@
   }
 
   /**
-   * 9. HELPERS & UTILITIES
+   * 10. HELPERS & UTILITIES
    */
   function extractCode(val) {
     if (!val) return '';
@@ -2362,7 +2469,7 @@
   }
 
   /**
-   * MOCK DATA GENERATORS UNTUK PENGUJIAN LOKAL
+   * MOCK DATA UNTUK PENGUJIAN LOKAL
    */
   function getMockBatchResponse() {
     return {
@@ -2381,6 +2488,7 @@
           nama_usaha: "Toko Kelontong Berkah Ibu Siti",
           uraian_kegiatan: "Menjual berbagai macam kebutuhan pokok sembako beras minyak gula dan sabun secara eceran di warung kelontong",
           kbli_saat_ini: "47111",
+          kbli_saat_ini_code: "47111",
           judul_kbli_saat_ini: "Perdagangan Eceran Berbagai Macam Barang Yang Utamanya Makanan...",
           rekomendasi_1: "47112 - Perdagangan Eceran Berbagai Macam Barang Bukan Makanan",
           rekomendasi_1_code: "47112",
@@ -2402,6 +2510,7 @@
           nama_usaha: "Pentol Kuah Keliling Mas Danu",
           uraian_kegiatan: "Membuat pentol daging sapi dan ayam kemudian menjualnya berkeliling ke sekolah dan kampung menggunakan sepeda motor gerobak modifikasi",
           kbli_saat_ini: "45407",
+          kbli_saat_ini_code: "45407",
           judul_kbli_saat_ini: "Perdagangan Eceran Sepeda Motor Bekas",
           rekomendasi_1: "56103 - Rumah Makan dan Restoran Keliling",
           rekomendasi_1_code: "56103",
@@ -2421,6 +2530,7 @@
           nama_usaha: "Bengkel Las Listrik Makmur",
           uraian_kegiatan: "Jasa pengelasan besi teralis pagar kanopi dan pintu besi pesanan konsumen",
           kbli_saat_ini: "25920",
+          kbli_saat_ini_code: "25920",
           judul_kbli_saat_ini: "Jasa Pemotongan Logam dan Pengelasan",
           rekomendasi_1: "25920 - Jasa Pemotongan Logam dan Pengelasan",
           rekomendasi_1_code: "25920",
@@ -2442,6 +2552,7 @@
       nama_usaha: "Usaha Kerupuk Tenggiri Sari Rasa",
       uraian_kegiatan: "Mengolah adonan tepung tapioka dan ikan tenggiri dijemur lalu digoreng menjadi kerupuk kemasan untuk dititipkan di warung makan",
       kbli_saat_ini: "10794",
+      kbli_saat_ini_code: "10794",
       judul_kbli_saat_ini: "Industri Kerupuk, Keripik, Peyek dan Sejenisnya",
       rekomendasi_1: "10794 - Industri Kerupuk, Keripik, Peyek dan Sejenisnya",
       rekomendasi_1_code: "10794",
@@ -2465,9 +2576,10 @@
         nama_usaha: "Toko Kelontong Berkah Ibu Siti",
         uraian_kegiatan: "Menjual berbagai macam kebutuhan pokok sembako beras minyak gula dan sabun secara eceran di warung kelontong",
         kbli_saat_ini: "47111",
+        kbli_saat_ini_code: "47111",
         judul_kbli_saat_ini: "Perdagangan Eceran Beras dan Sembako",
-        kbli_final_benar: "47112",
-        status_kbli: "KBLI Sudah Benar Sesuai Rekomendasi 1",
+        kbli_final_benar: "47111",
+        status_kbli: "KBLI Sudah Sesuai (Fasih)",
         waktu_selesai: "2026-10-22 09:30:15",
         rekomendasi_1: "47112 - Perdagangan Eceran Berbagai Macam Barang Bukan Makanan",
         rekomendasi_1_code: "47112",
