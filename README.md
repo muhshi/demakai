@@ -61,7 +61,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-22
-- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow, Default Fasih, Skip Action & Koreksi Riwayat)**:
+- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow, Default Fasih, Skip Action, Koreksi Riwayat & Sheet Template Bot)**:
+  - **Sheet "template bot" untuk Bot RPA Fasih**:
+    - Menambahkan sheet pendamping bernama `template bot` di spreadsheet verifikasi dengan format 3 kolom wajib bot RPA: `assignment_id`, `kbli_baru`, dan `remark`.
+    - **Logika RPA Bot**:
+      - Jika KBLI lama (Fasih) sama dengan KBLI baru (hasil verifikasi/rekomendasi): kolom `kbli_baru` dikosongkan (`""`) dan `remark` diisi `"#0"`.
+      - Jika KBLI lama berbeda dengan KBLI baru: kolom `kbli_baru` memuat kode KBLI 5 digit baru dan `remark` diisi `"#1"`.
+    - **Sinkronisasi Real-Time (`syncRowToTemplateBot`)**: Setiap kali verifikator menyelesaikan atau mengoreksi penugasan di antarmuka Verifikator 5 Baris, baris terkait pada sheet `template bot` langsung diperbarui secara instan.
+    - **Inisialisasi Otomatis & Tombol Generator**: Sheet otomatis diinisialisasi saat spreadsheet dibuka (`onOpen`), serta tersedia menu Spreadsheet (`⚡ PINTAR KBLI > 🤖 Buat / Perbarui Sheet "template bot"`) dan tombol `🤖 Template Bot` pada UI modal verifikator.
   - **Dataset Merging & Google Drive Upload**: Menggabungkan seluruh hasil resolusi anomali SE2026 (`storage/app/se2026_resolved/*.xlsx`, total 14.246 baris data) menjadi satu dataset gabungan (`merged_se2026_cleaning_dataset.csv`) dan mengunggahnya ke Google Drive sebagai Google Spreadsheet (`PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`) di folder KBLI melalui `python/utils/upload_google_spreadsheet.py`.
   - **Container-Bound Apps Script Deployment**: Implementasi automation script `python/utils/deploy_apps_script.py` untuk mengunggah dan mendeploy script project bound langsung ke Google Spreadsheet target via Google Apps Script API.
   - **Repository Clean-Up (.gitignore)**: Mengabaikan seluruh isi folder lokal `KBLI SE2026/` dari pelacakan git remote repository (GitHub) untuk menjaga kerahasiaan berkas survei internal, dengan tetap mendukung deployment otomatis ke Google Apps Script via script `deploy_apps_script.py`.

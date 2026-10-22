@@ -95,7 +95,7 @@ def deploy_apps_script() -> dict:
         "exceptionLogging": "STACKDRIVER",
         "runtimeVersion": "V8",
         "webapp": {
-            "executeAs": "USER_ACCESSING",
+            "executeAs": "USER_DEPLOYING",
             "access": "ANYONE"
         }
     }
