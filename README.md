@@ -61,14 +61,19 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-22
-- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (5 Penugasan per Batch)**:
+- **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow & Koreksi Riwayat)**:
   - **Dataset Merging & Google Drive Upload**: Menggabungkan seluruh hasil resolusi anomali SE2026 (`storage/app/se2026_resolved/*.xlsx`, total 14.246 baris data) menjadi satu dataset gabungan (`merged_se2026_cleaning_dataset.csv`) dan mengunggahnya ke Google Drive sebagai Google Spreadsheet (`PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`) di folder KBLI melalui `python/utils/upload_google_spreadsheet.py`.
   - **Container-Bound Apps Script Deployment**: Implementasi automation script `python/utils/deploy_apps_script.py` untuk mengunggah dan mendeploy script project bound langsung ke Google Spreadsheet target via Google Apps Script API.
-  - **5-Assignment Batch Verifier UI & Engine**:
-    - Web App / modal dialog Apps Script (`KBLI SE2026/Code_5Baris.gs` dan `KBLI SE2026/Index_5Baris.html`) untuk menyajikan 5 penugasan verifikasi sekaligus per batch lengkap dengan timer countdown 10 menit untuk mencegah tabrakan edit antar petugas (*concurrency lock*).
-    - Menampilkan detail kegiatan, judul KBLI saat ini, serta Top-3 rekomendasi AI PINTAR KBLI lengkap dengan alasan rekomendasi (*rationale*).
-    - Fitur *Auto-Default Radio Button*: Otomatis memilih Rekomendasi 1 dan mengisikan kode KBLI baru secara default demi percepatan proses verifikasi, serta mendukung opsi input kode manual dengan validasi format 5 digit.
-    - Status Tracking & Lock Lifecycle: Mekanisme penandaan status baris data secara real-time (`SEDANG DIVERIFIKASI [Petugas]`, `TERVERIFIKASI`) dan auto-release saat timeout/batal.
+  - **Seamless Dynamic Replacement (`submitAndGetNext`)**:
+    - Ketika tombol "✅ Selesai" diklik pada kartu assignment, kartu tersebut langsung beranimasi keluar (fade/slide out) dan seketika digantikan di posisi yang sama oleh 1 assignment baru dari antrean yang belum selesai dan tidak terkunci oleh pengguna lain.
+    - Menjaga antrean tetap stabil 5 penugasan aktif tanpa perlu bolak-balik menekan tombol "Muat 5 Data Berikutnya".
+  - **Tab "Yang Sudah Saya Kerjakan" & Fitur Koreksi Mandiri**:
+    - Tab navigasi khusus (`getMyCompletedAssignments`) yang menampilkan seluruh daftar penugasan yang telah diselesaikan oleh user aktif beserta badge total pengerjaan.
+    - Pencarian cepat riwayat berdasarkan nama usaha, uraian kegiatan, atau kode KBLI.
+    - Fitur koreksi kode KBLI final secara inline (`updateCompletedAssignment`) dengan proteksi `ScriptLock`: petugas dapat memperbaiki kode KBLI jika ada kesalahan input tanpa merusak status pengerjaan atau data petugas lain.
+  - **Multi-user Concurrency & Locking**:
+    - Proteksi otomatis baris yang sedang dikerjakan (`Sedang Dikerjakan`) dengan penguncian berbasis `userName` dan batas timeout 20 menit agar tidak terjadi bentrok pengerjaan antar petugas di lapangan.
+    - Menu Spreadsheet `⚡ PINTAR KBLI > 🔓 Buka Kunci (Unlock) Semua Data Tergantung` untuk merilis record yang menggantung.
 
 ### [Added] - 2026-10-21
 - **Pencarian Kalimat Naratif Panjang & Context Preservation (SE2026 Ready)**:
