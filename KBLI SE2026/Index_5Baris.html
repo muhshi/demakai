@@ -1711,7 +1711,7 @@
         </div>
 
         <div class="action-buttons-group">
-          <a href="${escapeHtml(item.link_fasih_sm || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih" title="Buka form edit di Fasih-SM BPS">
+          <a href="${escapeHtml(getFasihUrl(item))}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih" title="Buka form edit di Fasih-SM BPS">
             🔗 Buka Fasih
           </a>
           <button class="btn btn-warning" id="btnSkip-${item.rowIndex}" onclick="skipCardSeamless(${item.rowIndex})" title="Lewati jika bingung / ragu agar dapat dikerjakan oleh petugas lain">
@@ -2145,7 +2145,7 @@
         </div>
 
         <div class="action-buttons-group">
-          <a href="${escapeHtml(item.link_fasih_sm || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih">
+          <a href="${escapeHtml(getFasihUrl(item))}" target="_blank" rel="noopener noreferrer" class="btn btn-fasih">
             🔗 Buka Fasih
           </a>
           <button class="btn btn-primary" id="btnSaveHistory-${item.rowIndex}" onclick="saveHistoryCorrection(${item.rowIndex})">
@@ -2403,6 +2403,21 @@
   /**
    * 10. HELPERS & UTILITIES
    */
+  var FASIH_SURVEY_ID = 'fd68e454-ba45-4b85-8205-f3bf777ded24';
+
+  function getFasihUrl(item) {
+    if (!item) return '#';
+    var assignId = item.assignment_id || '';
+    if (!assignId && item.link_fasih_sm) {
+      var m = String(item.link_fasih_sm).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+      if (m) assignId = m[0];
+    }
+    if (assignId) {
+      return 'https://fasih-sm.bps.go.id/app/assignment/' + FASIH_SURVEY_ID + '/' + assignId + '/edit';
+    }
+    return item.link_fasih_sm || '#';
+  }
+
   function extractCode(val) {
     if (!val) return '';
     var s = String(val).trim();

@@ -79,21 +79,33 @@ function extractKbliCode(val) {
   return s;
 }
 
+var FASIH_SURVEY_ID = 'fd68e454-ba45-4b85-8205-f3bf777ded24';
+
 /**
- * Memastikan URL Fasih-SM selalu berformat '/edit' yang valid
+ * Memastikan URL Fasih-SM selalu berformat resmi:
+ * https://fasih-sm.bps.go.id/app/assignment/fd68e454-ba45-4b85-8205-f3bf777ded24/{assignment_id}/edit
  */
 function formatFasihUrl(url, assignmentId) {
-  var cleanUrl = cleanString(url);
-  if (!cleanUrl && assignmentId) {
-    cleanUrl = 'https://fasih-sm.bps.go.id/app/assignment/fd68e454-ba45-4b85-8205-f3bf777ded24/' + assignmentId + '/edit';
+  var assignId = cleanString(assignmentId);
+  if (!assignId && url) {
+    var m = String(url).match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    if (m) assignId = m[0];
   }
-  if (cleanUrl.indexOf('http') === 0 && cleanUrl.indexOf('fasih-sm.bps.go.id') !== -1) {
+
+  if (assignId) {
+    return 'https://fasih-sm.bps.go.id/app/assignment/' + FASIH_SURVEY_ID + '/' + assignId + '/edit';
+  }
+
+  var cleanUrl = cleanString(url);
+  if (cleanUrl) {
+    cleanUrl = cleanUrl.replace('assignment-detail', 'assignment/' + FASIH_SURVEY_ID);
     cleanUrl = cleanUrl.replace(/\/+$/, '');
     if (!cleanUrl.endsWith('/edit')) {
       cleanUrl += '/edit';
     }
+    return cleanUrl;
   }
-  return cleanUrl;
+  return '#';
 }
 
 /**
@@ -921,6 +933,43 @@ function open5BarisModal() {
 }
 
 /**
+ * Memperbarui seluruh isi Kolom Z (link_fasih_sm) agar menggunakan format resmi Fasih:
+ * https://fasih-sm.bps.go.id/app/assignment/fd68e454-ba45-4b85-8205-f3bf777ded24/{assignment_id}/edit
+ */
+function updateAllFasihUrlsInSheet() {
+  var ss = getSpreadsheet();
+  var sheets = ss.getSheets();
+  var totalUpdated = 0;
+
+  for (var s = 0; s < sheets.length; s++) {
+    var ws = sheets[s];
+    var lastRow = ws.getLastRow();
+    if (lastRow < 2) continue;
+
+    var numRows = lastRow - 1;
+    // Baca assignment_id (Kolom G = 7)
+    var assignIds = ws.getRange(2, 7, numRows, 1).getValues();
+    var newLinks = [];
+
+    for (var i = 0; i < numRows; i++) {
+      var aId = cleanString(assignIds[i][0]);
+      var validUrl = formatFasihUrl('', aId);
+      newLinks.push([validUrl]);
+    }
+
+    ws.getRange(2, 26, numRows, 1).setValues(newLinks);
+    totalUpdated += numRows;
+  }
+
+  SpreadsheetApp.flush();
+  try {
+    SpreadsheetApp.getActiveSpreadsheet().toast('Berhasil memperbarui ' + totalUpdated + ' link Fasih di Kolom Z.', 'PINTAR KBLI');
+  } catch (e) {}
+
+  return { success: true, count: totalUpdated };
+}
+
+/**
  * Menambahkan Menu Kustom di UI Spreadsheet
  */
 function onOpen() {
@@ -931,6 +980,7 @@ function onOpen() {
     .addItem('📜 Riwayat & Koreksi Saya', 'open5BarisModal')
     .addItem('📊 Monitoring & Leaderboard', 'open5BarisModal')
     .addSeparator()
+    .addItem('🔗 Perbarui Seluruh Link Fasih (Kolom Z)', 'updateAllFasihUrlsInSheet')
     .addItem('🔓 Buka Kunci (Unlock) Semua Data Tergantung', 'unlockAllAbandonedRecords')
     .addToUi();
 }
