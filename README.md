@@ -61,7 +61,12 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-23
-- **Fitur Pencarian Usaha Sejenis di Verifikator 5 Baris KBLI SE2026 (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+- **Fitur Pencarian Usaha Sejenis & Optimasi Performa Loading Instan Verifikator 5 Baris (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Optimasi Kecepatan Eksekusi (Fix Loading Stuck)**:
+    - Mengeliminasi antrean RPC simultan pada startup (`DOMContentLoaded`) dengan memindahkan dropdown kecamatan dan sheet ke inisialisasi lokal instan (tanpa query lambat ke server).
+    - Memangkas pembacaan cell spreadsheet pada `get5Assignments`, `submitAndGetNext`, dan `skipAndGetNext`: saat mode reguler (tanpa kata kunci), server hanya membaca 8 kolom ringkas (`Col B s.d. I`) alih-alih 15 kolom teks narasi panjang, memangkas volume data yang diproses hingga ~65%.
+    - Meringkas penulisan status dan timestamp penguncian penugasan menjadi satu batch RPC (`ws.getRange(rIdx, 5, 1, 2).setValues(...)`) dengan `SpreadsheetApp.flush()`.
+    - Pemuatan jumlah riwayat verifikasi (`refreshHistoryCount`) dilakukan secara santai (*lazy-load*) setelah 5 kartu penugasan selesai dirender di layar.
   - **Filter Pencarian Kata Kunci Real-Time**: Verifikator dapat mencari kata kunci spesifik (contoh: *laundry*, *warung*, *sembako*, *bengkel*, *salon*, *takoyaki*, dll) untuk memverifikasi kelompok jenis usaha yang sama secara serentak.
   - **Dynamic 5-Card Replacement Berbasis Kata Kunci**:
     - Kartu pengganti yang dimuat secara otomatis saat tombol *"✅ Selesai"* atau *"⏭️ Lewati"* diklik (`submitAndGetNext` dan `skipAndGetNext`) disaring khusus agar selalu mengambil penugasan berikutnya yang cocok dengan kata kunci pencarian aktif.
