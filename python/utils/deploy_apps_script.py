@@ -96,7 +96,7 @@ def deploy_apps_script() -> dict:
         "runtimeVersion": "V8",
         "webapp": {
             "executeAs": "USER_DEPLOYING",
-            "access": "ANYONE"
+            "access": "ANYONE_ANONYMOUS"
         }
     }
 
@@ -156,12 +156,43 @@ def deploy_apps_script() -> dict:
     script_service.projects().updateContent(scriptId=script_id, body=content_payload).execute()
     logging.info("Project content updated successfully!")
 
+    # Create new version
+    version_res = script_service.projects().versions().create(scriptId=script_id, body={"description": "Auto-deploy via Python"}).execute()
+    version_num = version_res.get("versionNumber")
+    logging.info(f"Created script version: {version_num}")
+
+    # Update deployment
+    deployments = script_service.projects().deployments().list(scriptId=script_id).execute().get("deployments", [])
+    web_app_url = ""
+    for d in deployments:
+        d_id = d.get("deploymentId")
+        if d_id and not d_id.startswith("AKfycbwl0r1BM"):  # Skip HEAD deployment
+            try:
+                update_body = {
+                    "deploymentConfig": {
+                        "scriptId": script_id,
+                        "versionNumber": version_num,
+                        "description": f"Version {version_num}",
+                        "manifestFileName": "appsscript"
+                    }
+                }
+                upd = script_service.projects().deployments().update(scriptId=script_id, deploymentId=d_id, body=update_body).execute()
+                for ep in upd.get("entryPoints", []):
+                    if ep.get("entryPointType") == "WEB_APP":
+                        web_app_url = ep.get("webApp", {}).get("url", "")
+                logging.info(f"Updated deployment {d_id} to version {version_num}")
+                break
+            except Exception as e:
+                logging.warning(f"Could not update deployment {d_id}: {e}")
+
     editor_url = f"https://script.google.com/d/{script_id}/edit"
     result = {
         "scriptId": script_id,
         "spreadsheetId": spreadsheet_id,
         "spreadsheetUrl": spreadsheet_url,
         "scriptEditorUrl": editor_url,
+        "webAppUrl": web_app_url,
+        "versionNumber": version_num,
         "title": PROJECT_TITLE
     }
 
