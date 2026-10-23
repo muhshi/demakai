@@ -61,6 +61,15 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-23
+- **Verifikasi Real-Time Monitoring & Normalisasi Nama Petugas Leaderboard (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Penghitungan Monitoring Real-Time Langsung dari Google Spreadsheet**:
+    - Setiap kali tab `📊 Rekap Monitoring` dibuka atau tombol `🔄 Segarkan Rekap` diklik, sistem mengeksekusi `getMonitoringData()` yang membaca baris spreadsheet secara langsung (*live query*), mencakup: Total Target (14.246), Total Selesai, Sisa Belum Selesai, Rekap per Status KBLI, Rekap per Kecamatan (14 kecamatan), dan Pengerjaan per Petugas.
+    - Terbukti *live*: data pengerjaan bertambah secara dinamis seiring verifikator lapangan menyelesaikan kartu verifikasi di waktu yang sama.
+  - **Normalisasi Case-Insensitive Leaderboard Nama Petugas**:
+    - Mengelompokkan variasi penulisan nama yang tidak sensitif huruf besar/kecil (contoh: *Rini* & *rini*, *Imam* & *imam*, *Aris Sutikno* & *Aris sutikno*) ke dalam satu entitas yang sama dengan representasi Title Case paling rapi.
+    - Menjamin peringkat leaderboard dan jumlah porsi kontribusi (100% akurat) tanpa duplikasi baris nama petugas.
+  - **Interaktivitas Dropdown Kecamatan pada Monitoring**:
+    - Mengintegrasikan perubahan filter kecamatan pada dropdown navigasi atas agar langsung memperbarui tabel progres kecamatan dan leaderboard secara instan jika tab monitoring sedang aktif.
 - **Perbaikan Total Seluruh Interaktivitas Tombol, Modal Identitas Petugas & Runtime HTMLService (`Index_5Baris.html` & `Code_5Baris.gs`)**:
   - **Penyelesaian Masalah "Semua Tombol Tidak Aktif, Nama Petugas Tidak Bisa Diklik & Keyword Pencarian Tidak Bisa"**:
     - **Penyebab Utama (Root Cause)**:
