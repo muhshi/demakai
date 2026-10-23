@@ -61,6 +61,11 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-23
+- **Perbaikan Masalah Lifecycle Startup, Modal Popup Identitas Petugas & Pemuatan Antrean (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Penyelesaian Masalah "Nama Petugas Tidak Muncul & Data Tidak Ter-load"**:
+    - **DOM Ready Lifecycle Fix**: Pada sandboxed iframe Google Sheets (`showModalDialog`), event `DOMContentLoaded` seringkali telah selesai (*already fired*) sebelum tag `<script>` dievaluasi, sehingga `addEventListener('DOMContentLoaded', ...)` tidak pernah terpanggil. Diperbaiki dengan pemeriksaan `document.readyState === 'interactive' || 'complete'` yang langsung memanggil `initApp()` seketika.
+    - **Modal Overlay Display & Z-Index Fix**: Mengganti animasi `opacity: 0` / `pointer-events: none` pada `.modal-overlay` menjadi `display: none` dan `.modal-overlay.open { display: flex !important; z-index: 999999; }`, menjamin popup permintaan nama petugas selalu muncul di lapisan paling depan (termasuk saat mode Incognito).
+    - **Penyelarasan Nama Sheet Resmi**: Menyelaraskan nama sheet dari `PINTAR_KBLI_SE2026_VERIFIKASI_D` ke nama lengkap sebenarnya di spreadsheet: `PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`, serta menambahkan *smart fallback* pencarian sheet dengan kolom $\ge 20$ agar tidak keliru membaca sheet `template bot`.
 - **Perbaikan Masalah Loading Hang & Dropdown Sheet/Kecamatan di Modal Spreadsheet (`Index_5Baris.html` & `Code_5Baris.gs`)**:
   - **Penyelesaian Masalah "Sheet Gak Kebaca & Semua Kecamatan Gak Muncul"**:
     - **SafeStorage Fallback**: Menambahkan lapisan `SafeStorage` pada `localStorage` untuk mencegah unhandled `DOMException` / `SecurityError` saat modal verifikator dijalankan di dalam sandboxed iframe Google Sheets (`*.googleusercontent.com`).
