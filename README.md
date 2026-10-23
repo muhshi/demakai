@@ -61,6 +61,24 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-23
+- **Perbaikan Total Seluruh Interaktivitas Tombol, Modal Identitas Petugas & Runtime HTMLService (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Penyelesaian Masalah "Semua Tombol Tidak Aktif, Nama Petugas Tidak Bisa Diklik & Keyword Pencarian Tidak Bisa"**:
+    - **Penyebab Utama (Root Cause)**:
+      - Sanitizer Caja / Google Apps Script HTMLService memperlakukan karakter garis miring ganda (`//`) di dalam string URL mock function sebagai komentar JavaScript baris tunggal, sehingga memotong baris menjadi string yang tidak tertutup (`"https:`) dan memicu `SyntaxError: Invalid or unexpected token`.
+      - Karena sintaks error tersebut, browser menghentikan eksekusi script sebelum fungsi-fungsi penanganan tombol dideklarasikan.
+      - Selain itu, sandboxed wrapper Google Apps Script mengisolasi function deklarasi di dalam closure internal sehingga inline HTML attribute (`onclick="foo()"`) tidak menemukan fungsi di objek `window`.
+      - Terdapat referensi fungsi riwayat yang belum terdefinisi (`openEditHistoryModal`, `closeEditHistoryModal`, `saveEditHistory`) pada export `window.*` yang memicu `ReferenceError`.
+    - **Solusi & Pengujian Menyeluruh (Root Cause Fix)**:
+      - Menghapus seluruh mock data function yang mengandung raw URL mentah dan menggantinya dengan stub aman.
+      - Membuka akses publik ke seluruh fungsi event handler pada objek `window` (`window.openNameModal`, `window.savePetugasName`, `window.applyQuickSuggestion`, `window.applySearch`, dll).
+      - Menambahkan delegasi *event listener* statis (`attachStaticEventListeners`) dan klik dokumen global untuk tombol identitas `#btnUserBadge` dan chip pencarian `.suggestion-chip`.
+      - Mengoreksi penamaan atribut ID input modal nama menjadi `inputPetugasName` dan binding tombol `#btnSavePetugasName`.
+      - Memverifikasi secara *live* melalui protokol CDP (*Chrome DevTools Protocol*) pada iframe `userCodeAppPanel`:
+        - `Runtime.exceptionThrown` = 0 (bebas dari syntax error & reference error).
+        - Modal identitas petugas otomatis terbuka pada mode Incognito atau pengunjung baru.
+        - Klik tombol *Simpan Nama* dan *Ganti Petugas* berjalan mulus dan memperbarui state serta badge pengguna.
+        - Klik tombol pencarian cepat (*Quick Suggestion Chips*: Laundry, Warung, Sembako, Bengkel, dll) responsif dan memicu pencarian antrean.
+        - 5 kartu penugasan antrean ter-load dengan sempurna dari Google Spreadsheet.
 - **Perbaikan Masalah Lifecycle Startup, Modal Popup Identitas Petugas & Pemuatan Antrean (`Index_5Baris.html` & `Code_5Baris.gs`)**:
   - **Penyelesaian Masalah "Nama Petugas Tidak Muncul & Data Tidak Ter-load"**:
     - **DOM Ready Lifecycle Fix**: Pada sandboxed iframe Google Sheets (`showModalDialog`), event `DOMContentLoaded` seringkali telah selesai (*already fired*) sebelum tag `<script>` dievaluasi, sehingga `addEventListener('DOMContentLoaded', ...)` tidak pernah terpanggil. Diperbaiki dengan pemeriksaan `document.readyState === 'interactive' || 'complete'` yang langsung memanggil `initApp()` seketika.
