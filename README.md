@@ -60,6 +60,16 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-10-23
+- **Fitur Pencarian Usaha Sejenis di Verifikator 5 Baris KBLI SE2026 (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Filter Pencarian Kata Kunci Real-Time**: Verifikator dapat mencari kata kunci spesifik (contoh: *laundry*, *warung*, *sembako*, *bengkel*, *salon*, *takoyaki*, dll) untuk memverifikasi kelompok jenis usaha yang sama secara serentak.
+  - **Dynamic 5-Card Replacement Berbasis Kata Kunci**:
+    - Kartu pengganti yang dimuat secara otomatis saat tombol *"✅ Selesai"* atau *"⏭️ Lewati"* diklik (`submitAndGetNext` dan `skipAndGetNext`) disaring khusus agar selalu mengambil penugasan berikutnya yang cocok dengan kata kunci pencarian aktif.
+  - **Notifikasi & Transisi Habis Kata Kunci**:
+    - Jika seluruh penugasan untuk kata kunci tersebut telah habis dikerjakan dari antrean, sistem secara elegan menampilkan pesan: *"Data dengan kata kunci ini sudah habis! Silakan ganti kata kunci pencarian."* disertai tombol cepat untuk mereset atau mengganti kata kunci.
+  - **Visual Highlighting Kata Kunci**: Menyorot teks kata kunci yang dicari (*yellow text highlight*) secara otomatis pada Nama Usaha, Uraian Kegiatan, dan Judul KBLI di setiap kartu penugasan.
+  - **Chips Saran Cepat**: Menyediakan tombol pintas (*quick chips*) untuk kata kunci yang sering muncul di lapangan (*Laundry, Warung, Sembako, Bengkel, Salon, Jahit, Pulsa, Takoyaki, Mebel*).
+
 ### [Added] - 2026-10-22
 - **Google Spreadsheet & Apps Script Verifier KBLI SE2026 (Seamless 5-Assignment Flow, Default Fasih, Skip Action, Koreksi Riwayat & Sheet Template Bot)**:
   - **Sheet "template bot" untuk Bot RPA Fasih (Mode Murni Append-Only & Proteksi Modifikasi Manual)**:
