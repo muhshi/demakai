@@ -60,6 +60,16 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-10-29
+- **Penambahan Kolom `nama_usaha` pada Sheet `template bot` & Dukungan Multi-Usaha per Assignment (`Code_5Baris.gs`)**:
+  - **Penyisipan Kolom `nama_usaha` di Sheet `template bot`**:
+    - Menyisipkan kolom baru `nama_usaha` tepat setelah `assignment_id` (Kolom B), menggeser kolom `kbli_baru`, `remark`, dan kolom kustom bot pengguna ke kanan secara aman tanpa menghapus atau menimpa data manual pengguna.
+    - Mengisi secara otomatis (*backfill*) nilai `nama_usaha` untuk 11.698 baris yang sudah ada berdasarkan pencocokan data dari sheet utama `PINTAR_KBLI_SE2026_VERIFIKASI_DEMAK`.
+  - **Pembaruan Logika Penanganan Multi-Usaha per Assignment**:
+    - Dalam satu `assignment_id`, sebuah keluarga/rumah tangga dapat memiliki lebih dari 1 jenis usaha (misal: Usaha 1 jualan pulsa, Usaha 2 warung makan).
+    - Memperbarui fungsi `createTemplateBotSheet` dan `syncRowToTemplateBot` agar menggunakan kunci komposit unik (`assignment_id` + `nama_usaha`), sehingga seluruh usaha dalam satu penugasan dapat tercatat di sheet `template bot` tanpa terlewat atau tertimpa.
+    - Menambahkan menu kustom `📌 Sisipkan Kolom Nama Usaha di "template bot"` di spreadsheet untuk kemudahan sinkronisasi masa depan.
+
 ### [Added] - 2026-10-23
 - **Verifikasi Real-Time Monitoring & Normalisasi Nama Petugas Leaderboard (`Index_5Baris.html` & `Code_5Baris.gs`)**:
   - **Penghitungan Monitoring Real-Time Langsung dari Google Spreadsheet**:
