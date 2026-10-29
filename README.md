@@ -61,6 +61,18 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 All notable changes to this project will be documented in this section.
 
 ### [Added] - 2026-10-29
+- **Peningkatan & Perbaikan Menyeluruh Fitur Pencarian Tab "Yang Sudah Saya Kerjakan" (`Index_5Baris.html` & `Code_5Baris.gs`)**:
+  - **Optimasi Batch Query Server (50x Lebih Cepat & Kapasitas hingga 500+ Data)**:
+    - Memperbaiki `getMyCompletedAssignments` di `Code_5Baris.gs` dari pola looping baris-per-baris (`ws.getRange().getValues()`) menjadi satu kali pembacaan batch array di memori, memangkas waktu muat riwayat ratusan baris dari belasan detik menjadi di bawah 1 detik.
+    - Menaikkan limit pengambilan riwayat dari 100 menjadi 500 data pengerjaan per petugas, sehingga seluruh riwayat penugasan verifikator aktif (seperti 350+ data) dapat dicari secara tuntas.
+  - **Dukungan Pencarian Multi-Field & Multi-Kata**:
+    - Filter pencarian kini memeriksa secara komprehensif seluruh atribut data: `nama_usaha`, `uraian_kegiatan`, `kbli_final_benar`, `kbli_saat_ini`, `judul_kbli_saat_ini`, `assignment_id`, `no_usaha`, `kecamatan`, `desa`, `kode_sls`, dan `status_kbli`.
+    - Mendukung pencarian multi-kata (semua kata kunci harus cocok) dan *case-insensitive*.
+  - **Penyempurnaan UI/UX Pencarian Riwayat**:
+    - **Visual Text Highlighting**: Kata kunci yang dicari otomatis disorot dengan warna kuning (`<mark class="search-highlight">`) pada nama usaha, uraian kegiatan, dan kode/judul KBLI.
+    - **Pill Indikator Hasil**: Menampilkan pill status jumlah hasil pencarian (misal: *"Hasil Cari: 26 data"*) disertai tombol silang (`✕`) untuk mereset.
+    - **Tombol Hapus Instan (`✕`)**: Tombol silang di dalam kotak pencarian otomatis muncul saat ada teks untuk memudahkan pembersihan kata kunci sekali klik.
+    - **Pesan Kosong yang Jelas (*Empty State*)**: Jika kata kunci tidak ditemukan, sistem menampilkan pesan informatif *"Tidak ada data yang cocok dengan kata kunci: X"* disertai tombol cepat *"✕ Bersihkan Pencarian"*, menggantikan pesan salah kaprah *"Belum ada data yang diselesaikan"*.
 - **Penambahan Kolom `nama_usaha` pada Sheet `template bot` & Dukungan Multi-Usaha per Assignment (`Code_5Baris.gs`)**:
   - **Penyisipan Kolom `nama_usaha` di Sheet `template bot`**:
     - Menyisipkan kolom baru `nama_usaha` tepat setelah `assignment_id` (Kolom B), menggeser kolom `kbli_baru`, `remark`, dan kolom kustom bot pengguna ke kanan secara aman tanpa menghapus atau menimpa data manual pengguna.
