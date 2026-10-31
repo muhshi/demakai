@@ -60,6 +60,11 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-10-31
+- **Federated Single Logout (SLO) & Anti Double-Click SSO Button**:
+  - Implementasi `SsoLogoutResponse` pada Filament agar logout pengguna otomatis memutus sesi terpusat di SIPETRA (`/oauth/logout`) dan mencegah login otomatis tanpa kredensial.
+  - Menambahkan animasi loading spinner dan disable state pada tombol "Masuk dengan SIPETRA SSO" untuk mencegah submit ganda.
+
 ### [Added] - 2026-10-29
 - **Peningkatan & Perbaikan Menyeluruh Fitur Pencarian Tab "Yang Sudah Saya Kerjakan" (`Index_5Baris.html` & `Code_5Baris.gs`)**:
   - **Optimasi Batch Query Server (50x Lebih Cepat & Kapasitas hingga 500+ Data)**:

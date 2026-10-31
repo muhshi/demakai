@@ -11,26 +11,34 @@
 
     {{-- SSO Button --}}
     <a href="{{ route('sipetra.login') }}"
+       id="sipetra-sso-btn"
+       onclick="if(this.getAttribute('data-submitting')) return false; this.setAttribute('data-submitting', '1'); this.style.pointerEvents='none'; this.style.opacity='0.75'; document.getElementById('sipetra-sso-text').innerText='Menghubungkan ke SIPETRA...'; document.getElementById('sipetra-sso-spinner').style.display='inline-block'; document.getElementById('sipetra-sso-arrow').style.display='none';"
        style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.625rem 1.25rem; 
               font-size: 0.875rem; font-weight: 500; color: #374151; text-decoration: none;
               background-color: #ffffff; border: 1px solid #d1d5db; border-radius: 0.5rem; 
               box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); 
               transition: all 0.2s ease; cursor: pointer;"
-       onmouseover="this.style.backgroundColor='#f9fafb'; this.style.borderColor='#60a5fa'; this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,0.1)';"
-       onmouseout="this.style.backgroundColor='#ffffff'; this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0,0,0,0.05)';">
+       onmouseover="if(!this.getAttribute('data-submitting')){this.style.backgroundColor='#f9fafb'; this.style.borderColor='#60a5fa'; this.style.boxShadow='0 4px 6px -1px rgba(0,0,0,0.1)';}"
+       onmouseout="if(!this.getAttribute('data-submitting')){this.style.backgroundColor='#ffffff'; this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0,0,0,0.05)';}">
 
-        {{-- Logo BPS (menggunakan SVG jika logo png belum tersedia, tapi disesuaikan dgn panduan) --}}
-        <div style="margin-right: 0.75rem; display: flex; align-items: center;">
-            <svg style="width: 20px; height: 20px; color: #1d4ed8;" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-            </svg>
-        </div>
+        {{-- Logo BPS --}}
+        <img src="{{ file_exists(public_path('assets/logo_bps.png')) ? asset('assets/logo_bps.png') : (file_exists(public_path('images/logo_bps.png')) ? asset('images/logo_bps.png') : asset('assets/logo.svg')) }}" 
+             alt="Logo BPS" 
+             style="width: 20px; height: 20px; object-fit: contain; margin-right: 0.75rem; flex-shrink: 0;"
+             loading="lazy">
 
         {{-- Label --}}
-        <span>Masuk dengan SIPETRA SSO</span>
+        <span id="sipetra-sso-text" style="font-weight: 600; color: #1f2937;">Masuk dengan SIPETRA SSO</span>
+
+        {{-- Spinner (hidden by default) --}}
+        <svg id="sipetra-sso-spinner" style="display: none; width: 16px; height: 16px; margin-left: 0.5rem; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none">
+            <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+            <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="4" opacity="0.3"></circle>
+            <path fill="#2563eb" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
 
         {{-- Arrow --}}
-        <svg style="width: 16px; height: 16px; margin-left: 0.5rem; color: #9ca3af; flex-shrink: 0;" 
+        <svg id="sipetra-sso-arrow" style="width: 16px; height: 16px; margin-left: 0.5rem; color: #9ca3af; flex-shrink: 0;" 
              fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
         </svg>
