@@ -59,6 +59,11 @@ class SsoController extends Controller
         }
 
         Auth::login($user);
+        \Filament\Notifications\Notification::make()
+            ->title('Profil Berhasil Disinkronkan dari SIPETRA')
+            ->success()
+            ->send();
+
         return redirect()->intended('/admin');
     }
 }

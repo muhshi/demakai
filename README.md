@@ -320,6 +320,9 @@ git pull
 ./deploy.sh
 
 ## Changelog
+- **2026-10-31**:
+  - Menambahkan menu navigasi "Profil & Password (SIPETRA)" dan "Sinkronkan Profil dari SIPETRA" pada dropdown user panel Filament admin.
+  - Implementasi Federated Single Logout (SLO) via `SsoLogoutResponse` dan tombol SSO anti-double click dengan spinner.
 - **2026-06-24**: 
   - Penambahan route `/eval-results` pada Laravel web.php untuk akses public hasil A/B testing.
   - Update `hybrid.py` dengan mekanisme In-Memory CACHE dan Exponential Backoff untuk menghindari blokir Limit API Gemini (HTTP 429).
