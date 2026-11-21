@@ -60,6 +60,11 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Fixed] - 2026-11-21
+- **Perbaikan CSS & Layout Halaman Login Tunggal SIPETRA SSO**:
+  - Menyematkan styling CSS mandiri (self-contained scoped CSS) untuk tombol SSO heroik, logo badge BPS, animasi spinner, alert notifikasi, dan collapsible form darurat agar tampilan rapi, presisi, dan tidak berantakan di lingkungan Filament v5.
+  - Memperbaiki transisi dan interaktivitas collapsible accordion "Opsi Darurat / Pengembang" menggunakan Alpine.js `x-transition` dan indikator rotasi chevron.
+
 ### [Added] - 2026-11-21
 - **Login Tunggal SIPETRA SSO (Single Sign-On BPS Kab. Demak)**:
   - Mengubah antarmuka login Filament menjadi Single Button utama heroik berwarna biru BPS (`#005596`) dengan logo BPS ber-badge putih dan proteksi anti-double click / loading spinner.
