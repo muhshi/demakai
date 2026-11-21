@@ -60,6 +60,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 All notable changes to this project will be documented in this section.
 
+### [Added] - 2026-11-21
+- **Login Tunggal SIPETRA SSO (Single Sign-On BPS Kab. Demak)**:
+  - Mengubah antarmuka login Filament menjadi Single Button utama heroik berwarna biru BPS (`#005596`) dengan logo BPS ber-badge putih dan proteksi anti-double click / loading spinner.
+  - Mengimplementasikan custom page `App\Filament\Pages\Auth\Login` dengan heading dan subheading "PINTAR KBLI - Sistem Klasifikasi KBLI 2025 BPS Kab. Demak".
+  - Menyediakan accordion tersembunyi "Opsi Darurat / Pengembang" menggunakan Alpine.js (`?fallback=1` atau klik accordion) untuk akses login email/password lokal jika SIPETRA down atau pengujian lokal.
+  - Menonaktifkan registrasi mandiri publik dan membersihkan render hook legacy `AUTH_LOGIN_FORM_AFTER`.
+  - Memperbarui penanganan callback di `SsoController`: redirect balik ke login page dengan flash message error yang ramah dan auto-assign role default pada pengguna baru.
+
 ### [Added] - 2026-10-31
 - **Federated Single Logout (SLO) & Anti Double-Click SSO Button**:
   - Implementasi `SsoLogoutResponse` pada Filament agar logout pengguna otomatis memutus sesi terpusat di SIPETRA (`/oauth/logout`) dan mencegah login otomatis tanpa kredensial.

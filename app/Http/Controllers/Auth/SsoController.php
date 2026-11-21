@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 
 class SsoController extends Controller
@@ -18,23 +20,34 @@ class SsoController extends Controller
     public function callback(Request $request)
     {
         if ($request->has('error')) {
-            // Redirect to filament login with error
-            return redirect('/admin/login')->withErrors(['email' => 'Login SSO Dibatalkan.']);
+            $errorDescription = $request->get('error_description') ?? 'Login SSO dibatalkan oleh pengguna.';
+
+            return redirect()->route('filament.admin.auth.login')->with('error', $errorDescription);
         }
 
         try {
-            $ssoUser = Socialite::driver('sipetra')->stateless()->user();
-        } catch (\Exception $e) {
-            return redirect('/admin/login')->withErrors(['email' => 'Gagal mengambil data dari SIPETRA SSO: ' . $e->getMessage()]);
+            $ssoUser = Socialite::driver('sipetra')->user();
+        } catch (\Throwable $e) {
+            Log::error('SIPETRA SSO Callback error: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return redirect()->route('filament.admin.auth.login')->with(
+                'error',
+                'Gagal terhubung dengan server SIPETRA atau otentikasi tidak valid. Silakan coba kembali.'
+            );
         }
 
-        if (!$ssoUser->getId() || !$ssoUser->getEmail()) {
-            return redirect('/admin/login')->withErrors(['email' => 'Data User SIPETRA tidak lengkap. Pastikan Scope diizinkan.']);
+        if (! $ssoUser->getId() || ! $ssoUser->getEmail()) {
+            return redirect()->route('filament.admin.auth.login')->with(
+                'error',
+                'Data User SIPETRA tidak lengkap. Pastikan izin akses profil disetujui.'
+            );
         }
 
         $rawData = $ssoUser->getRaw();
 
-        // Find user by sipetra_id first, then fallback to email to prevent duplicates
+        // Cari user berdasarkan sipetra_id atau email
         $user = User::where('sipetra_id', $ssoUser->getId())->first()
              ?? User::where('email', $ssoUser->getEmail())->first();
 
@@ -51,15 +64,25 @@ class SsoController extends Controller
         if ($user) {
             $user->update($data);
         } else {
-            // For new users, set password to null. They can use SSO only unless they set a password later.
             $data['password'] = null;
             $user = User::create($data);
-            
-            // Note: Not using assignRole() here because DEMAKAI doesn't use Spatie Permission yet.
+
+            // Assign role default jika sistem mendukung roles
+            if (method_exists($user, 'assignRole')) {
+                try {
+                    if (class_exists(\Spatie\Permission\Models\Role::class)) {
+                        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'pegawai', 'guard_name' => 'web']);
+                    }
+                    $user->assignRole('pegawai');
+                } catch (\Throwable $e) {
+                    Log::warning('Gagal assign default role pegawai: ' . $e->getMessage());
+                }
+            }
         }
 
         Auth::login($user);
-        \Filament\Notifications\Notification::make()
+
+        Notification::make()
             ->title('Profil Berhasil Disinkronkan dari SIPETRA')
             ->success()
             ->send();
